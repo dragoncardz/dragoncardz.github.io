@@ -9,6 +9,7 @@
 var SUPA_URL='https://tugraajxznhtyqwzkosb.supabase.co';
 var SUPA_KEY='sb_publishable_iEhjmAoVo3xE-qJUM81mKw_4EANtdiE';
 
+var ONLINE_V=4;
 var Online=(function(){
   var SESS_KEY='dczo_session',SYNC_KEY='dczo_sync',OWNER_KEY='dczo_owner';
   var sess=null,me=null,rank=null,tab='account',lbTab='all',pushTimer=null,dirty=false,lastSync=null,busyNet=false,opps=null,friendsData=null,friendsLoading=false,searchRes=null,msg='';
@@ -31,7 +32,10 @@ var Online=(function(){
     try{r=await fetch(SUPA_URL+path,{method:opt.method||'GET',headers:h,body:opt.body!=null?JSON.stringify(opt.body):undefined,keepalive:!!opt.keepalive});}
     catch(e){throw new Error(frErr(String(e&&e.message||e)));}
     var txt=await r.text(),data=null;try{data=txt?JSON.parse(txt):null;}catch(e){data=txt;}
-    if(!r.ok){var m=(data&&(data.msg||data.message||data.error_description||data.error))||('Erreur '+r.status);throw new Error(frErr(m,data&&data.error_code));}
+    if(!r.ok){
+      var m=(data&&(data.msg||data.message||data.error_description||data.error))||('Erreur '+r.status);
+      throw new Error(frErr(m,data&&data.error_code)+' ['+r.status+(data&&data.error_code?' · '+data.error_code:'')+']');
+    }
     return data;
   }
   function frErr(m,code){
@@ -287,7 +291,7 @@ var Online=(function(){
   function render(){
     var box=$('online_box');if(!box)return;
     if(!configured()){box.innerHTML='<div class="panel"><p style="font-weight:800">Le mode Online n’est pas encore configuré.</p><p class="hint">Il faut renseigner l’adresse et la clé publique du projet Supabase dans online.js (voir supabase/LISEZMOI.txt).</p></div>';return;}
-    var h=tabsHTML()+(msg?'<div class="panel" style="border-color:#f87171;color:#fecaca;font-weight:800">'+esc(msg)+'</div>':'')+'<p class="hint" id="o_status">'+(busyNet?'Connexion au serveur…':'')+'</p>';
+    var h='<p class="hint" style="text-align:right;margin:-8px 0 6px">Online v'+ONLINE_V+'</p>'+tabsHTML()+(msg?'<div class="panel" style="border-color:#f87171;color:#fecaca;font-weight:800">'+esc(msg)+'</div>':'')+'<p class="hint" id="o_status">'+(busyNet?'Connexion au serveur…':'')+'</p>';
     if(tab==='account')h+=accountHTML();
     else if(!me)h+=needLogin();
     else if(tab==='arena')h+=arenaHTML();
