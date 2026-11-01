@@ -13,7 +13,7 @@ INSTALLER LE MODE ONLINE (Supabase) — environ 10 minutes
 
 3. Régler les emails de connexion
    - Menu « Authentication » > « URL Configuration » :
-       Site URL : l'adresse où le jeu est publié (ex. https://<ton-pseudo-github>.github.io/dragon-card-z/dragon-card-z.html)
+       Site URL : l'adresse où le jeu est publié : https://dragoncardz.github.io/dragon-card-z.html
        Redirect URLs : ajoute la même adresse, et http://localhost:* si tu testes en local.
    - Par défaut, chaque joueur doit confirmer son email avant de jouer en ligne : c'est plus sûr, garde-le.
 
