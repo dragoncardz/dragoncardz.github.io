@@ -1,0 +1,18 @@
+ILLUSTRATIONS DES CARTES
+========================
+
+Dépose ici un dessin par carte. Le jeu l'utilise à la place du dessin automatique.
+Si une carte n'a pas d'image dans ce dossier, le jeu garde son dessin d'origine.
+
+Nom du fichier : l'ID de la carte + .webp, .png ou .jpg
+  Exemples : goku_db.webp   vegeta_ssj.png   kamehameha.jpg
+  La liste des ID est dans la colonne « ID » du fichier cartes-dragon-card-z.xlsx
+  (et la colonne « Fichier image » donne le chemin complet).
+
+Conseils pour les dessinateurs :
+  - Format conseillé : 1000 x 900 px (rapport 10:9), en .webp (plus léger) ou .png.
+  - Le personnage centré, avec le visage dans le tiers haut de l'image :
+    les avatars ronds (combats, boss) recadrent sur le haut du dessin.
+  - Une image plus haute (portrait) fonctionne aussi : elle est recadrée automatiquement.
+  - Les techniques, les objets et les boules de cristal peuvent aussi avoir leur image.
+  - Le nom du fichier doit être EXACTEMENT l'ID : en minuscules, sans espace ni accent.

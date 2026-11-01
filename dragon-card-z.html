@@ -221,6 +221,7 @@ main{position:relative;z-index:1;padding:16px;max-width:1000px;margin:0 auto}
   background:linear-gradient(180deg,var(--rb) 0%,#1b0d05 100%);box-shadow:inset 0 0 0 1px rgba(0,0,0,.6)}
 .card-art{height:58%;position:relative;flex:none;border-bottom:.22em solid rgba(0,0,0,.55);background:#000}
 .card-art svg{display:block;width:100%;height:100%}
+.art-img{display:block;width:100%;height:100%;object-fit:cover;object-position:50% 22%;-webkit-user-drag:none;user-select:none}
 .card-name{font-family:var(--font-ui);font-size:1.12em;line-height:1.08;color:#fff;padding:.38em .45em 0;text-shadow:0 .1em 0 #000,0 0 .4em rgba(0,0,0,.6);
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .card-type{font-size:.68em;font-weight:900;text-transform:uppercase;letter-spacing:.04em;color:rgba(255,240,220,.82);padding:.2em .6em 0;
@@ -545,6 +546,7 @@ main{position:relative;z-index:1;padding:16px;max-width:1000px;margin:0 auto}
   90%{transform:rotate(-10deg) scale(1.15)}100%{transform:rotate(0) scale(1.2);filter:drop-shadow(0 0 40px #ffd23f) brightness(1.7)}}
 .po-pack.burst{animation:packBurst .4s ease-out forwards}
 @keyframes packBurst{from{transform:scale(1.2);filter:brightness(2);opacity:1}to{transform:scale(2.3);filter:brightness(4);opacity:0}}
+.po-video{position:fixed;inset:0;width:100%;height:100%;object-fit:cover;z-index:5;background:#000;cursor:pointer}
 .po-cards{position:relative;display:flex;flex-wrap:wrap;justify-content:center;gap:18px 14px;max-width:720px;padding-top:26px}
 .po-actions{position:relative;text-align:center;min-height:50px}
 .po-hint{margin:0 0 10px;color:var(--muted);font-weight:800;animation:fadeUp .4s .6s backwards}
@@ -698,9 +700,9 @@ main{position:relative;z-index:1;padding:16px;max-width:1000px;margin:0 auto}
 .ci-aura,.ci-char{position:absolute;left:8%;top:-8%;height:116%;aspect-ratio:10/9}
 .ci-aura{filter:blur(16px) brightness(1.7) saturate(1.6);opacity:.75;animation:auraCam 1.8s ease-out both}
 .ci-char{filter:drop-shadow(10px 10px 0 rgba(0,0,0,.45));animation:charCam 1.8s cubic-bezier(.15,.8,.25,1) both}
-.ci-char svg,.ci-aura svg{width:100%;height:100%;display:block;-webkit-mask:radial-gradient(ellipse 60% 62% at 50% 46%,#000 62%,transparent 100%);mask:radial-gradient(ellipse 60% 62% at 50% 46%,#000 62%,transparent 100%)}
+.ci-char svg,.ci-aura svg,.ci-char img,.ci-aura img{width:100%;height:100%;display:block;-webkit-mask:radial-gradient(ellipse 60% 62% at 50% 46%,#000 62%,transparent 100%);mask:radial-gradient(ellipse 60% 62% at 50% 46%,#000 62%,transparent 100%)}
 .cutin.foe .ci-aura,.cutin.foe .ci-char{left:auto;right:8%}
-.cutin.foe .ci-char svg,.cutin.foe .ci-aura svg{transform:scaleX(-1)}
+.cutin.foe .ci-char svg,.cutin.foe .ci-aura svg,.cutin.foe .ci-char img,.cutin.foe .ci-aura img{transform:scaleX(-1)}
 @keyframes charCam{0%{transform:translateX(-70%) rotateY(38deg) scale(1.35);opacity:0}16%{opacity:1}34%{transform:translateX(0) rotateY(-6deg) scale(1.06)}100%{transform:translateX(5%) rotateY(-14deg) scale(1)}}
 @keyframes auraCam{0%{transform:translateX(-35%) scale(1.6);opacity:0}30%{opacity:.8}100%{transform:translateX(-2%) scale(1.25)}}
 .cutin.foe .ci-char{animation-name:charCamF}.cutin.foe .ci-aura{animation-name:auraCamF}
@@ -709,7 +711,7 @@ main{position:relative;z-index:1;padding:16px;max-width:1000px;margin:0 auto}
 .ci-team{position:absolute;inset:0;display:flex;transform:skewY(7deg)}
 .ci-pan{position:relative;flex:1;overflow:hidden;border-left:5px solid #000;animation:panIn .4s cubic-bezier(.2,1.2,.4,1) backwards;animation-delay:calc(var(--k)*.13s)}
 .ci-pan:first-child{border-left:none}
-.ci-pan svg{position:absolute;left:50%;top:50%;height:120%;width:auto;transform:translate(-50%,-50%);animation:panZoom 2s ease-out both}
+.ci-pan svg,.ci-pan img{position:absolute;left:50%;top:50%;height:120%;width:auto;transform:translate(-50%,-50%);animation:panZoom 2s ease-out both}
 @keyframes panIn{from{transform:translateY(-100%);opacity:0}}
 @keyframes panZoom{from{transform:translate(-50%,-50%) scale(1.4)}to{transform:translate(-50%,-50%) scale(1.05)}}
 .ci-title{position:absolute;right:5%;top:50%;transform:translateY(-50%);text-align:right;max-width:58%;z-index:3;animation:ciTitle .5s .12s cubic-bezier(.2,1.3,.4,1) both}
@@ -1767,7 +1769,20 @@ function techSVG(id,c){
   }
   return '<svg viewBox="0 0 100 90" preserveAspectRatio="xMidYMid slice"><defs>'+d+'</defs>'+b+'</svg>';
 }
-function artSVG(id){var c=CARDS[id];if(!c)return '';if(c.art||c.t==='q'||c.t==='o'||c.t==='b')return techSVG(id,c);return portraitSVG(VIS[id]||DEFAULT_VIS,c.r);}
+function svgArt(id){var c=CARDS[id];if(!c)return '';if(c.art||c.t==='q'||c.t==='o'||c.t==='b')return techSVG(id,c);return portraitSVG(VIS[id]||DEFAULT_VIS,c.r);}
+/* Illustrations : une image assets/cartes/<id>.webp|png|jpg remplace le dessin SVG de la carte (sinon on garde le SVG) */
+var ART_DIR='assets/cartes/',ART_EXT=['webp','png','jpg'],ART_OK={},ART_KO={};
+function artSVG(id){
+  if(!CARDS[id])return '';
+  if(ART_KO[id])return svgArt(id);
+  var e=ART_OK[id]||0;
+  return '<img class="art-img" alt="" draggable="false" src="'+ART_DIR+id+'.'+ART_EXT[e]+'" data-id="'+id+'" data-e="'+e+'" onload="ART_OK[this.dataset.id]=+this.dataset.e" onerror="artFail(this)">';
+}
+function artFail(im){
+  var id=im.dataset.id,e=+im.dataset.e+1;
+  if(e<ART_EXT.length){im.dataset.e=e;im.src=ART_DIR+id+'.'+ART_EXT[e];return;}
+  ART_KO[id]=1;var t=document.createElement('div');t.innerHTML=svgArt(id);if(t.firstChild)im.replaceWith(t.firstChild);
+}
 
 /* =====================================================================
    RENDU DES CARTES
@@ -2264,7 +2279,7 @@ function renderMenu(){
 }
 
 /* ---------- Mode Histoire ---------- */
-function bossPortrait(L){var c=CARDS[L.boss];return portraitSVG(VIS[L.boss]||DEFAULT_VIS,c?c.r:'autre');}
+function bossPortrait(L){var c=CARDS[L.boss];return c?artSVG(L.boss):portraitSVG(VIS[L.boss]||DEFAULT_VIS,'autre');}
 function renderStory(){
   var h='',cur=unlockedIdx(),last='';
   LEVELS.forEach(function(L,i){
@@ -2341,7 +2356,7 @@ function pullCard(era,minIdx){
 function packInner(era){
   var E_=ERAS[era];
   return '<div class="pack-inner"><div class="pack-body"><div class="pk-top"></div><div class="pk-brand">DRAGON CARD Z</div>'+
-    '<div class="pk-art">'+portraitSVG(VIS[E_.rep],'sayen')+'</div><div class="pk-name">'+E_.short+'</div>'+
+    '<div class="pk-art">'+artSVG(E_.rep)+'</div><div class="pk-name">'+E_.short+'</div>'+
     '<div class="pk-sub">Booster · 5 cartes</div><div class="pk-bot"></div><div class="pk-shine"></div><div class="glare"></div></div></div>';
 }
 function packStyle(era){var p=ERAS[era];return '--pa:'+p.a+';--pb:'+p.b+';--pc:'+p.c;}
@@ -2363,6 +2378,24 @@ function renderShop(){
   var all=Object.keys(CARDS).filter(function(k){return !CARDS[k].en;}).length,own=Object.keys(col).filter(function(k){return CARDS[k]&&!CARDS[k].en;}).length;
   $('shop_stats').textContent='Ta collection : '+totalCards()+' cartes · '+own+' / '+all+' cartes différentes découvertes';
 }
+/* Animations d'invocation : assets/animations/invocation_<rareté>.webm|mp4, choisie selon la meilleure carte du booster.
+   Sans fichier pour cette rareté, l'animation de base du jeu est jouée. Un clic passe la vidéo. */
+var ANIM_DIR='assets/animations/',ANIM_EXT=['webm','mp4'],ANIM_KO={};
+var ANIM_FILE={c:'commun',u:'peu-commun',r:'rare',e:'epique',l:'legendaire',m:'mythique',x:'unique'};
+function playSummonVideo(ov,rar){
+  return new Promise(function(res){
+    if(ANIM_KO[rar])return res(false);
+    var v=document.createElement('video'),exts=ANIM_EXT.slice(),started=false,done=false;
+    function end(ok){if(done)return;done=true;v.remove();res(ok);}
+    function next(){if(started)return end(true);if(!exts.length){ANIM_KO[rar]=1;return end(false);}v.src=ANIM_DIR+'invocation_'+ANIM_FILE[rar]+'.'+exts.shift();}
+    v.className='po-video';v.playsInline=true;v.preload='auto';
+    v.onerror=next;
+    v.oncanplay=function(){if(started)return;started=true;var p=v.play();if(p&&p.catch)p.catch(function(){v.muted=true;v.play().catch(function(){end(true);});});};
+    v.onended=function(){end(true);};
+    v.onclick=function(){end(true);};
+    ov.appendChild(v);next();
+  });
+}
 var packBusy=false;
 async function openPack(era,useTk){
   if(packBusy)return;
@@ -2380,14 +2413,17 @@ async function openPack(era,useTk){
   ov.innerHTML='<div class="po-rays"></div><div class="po-stage" id="po_stage"><div class="po-pack" style="'+packStyle(era)+'">'+packInner(era)+'</div></div><div class="po-cards" id="po_cards"></div><div class="po-actions" id="po_actions"></div>';
   ov.classList.remove('hidden');
   var pk=ov.querySelector('.po-pack');
+  var best=pulled.reduce(function(b,id){var r=CARDS[id].rar;return RIDX[r]>RIDX[b]?r:b;},'c');
   await wait(450);
-  sfxRumble();pk.classList.add('charging');
-  var r0=pk.getBoundingClientRect();converge(ov,r0.left+r0.width/2,r0.top+r0.height/2,'#ffd23f',26,220,1000);
-  await wait(1100);
-  var r=pk.getBoundingClientRect(),cx=r.left+r.width/2,cy=r.top+r.height/2;
-  flashScreen('#fff');sfxTear();pk.classList.remove('charging');pk.classList.add('burst');
-  burst(ov,cx,cy,'#ffd23f',40,260);ring(ov,cx,cy,'#fff3c4',6);
-  await wait(380);
+  if(!(await playSummonVideo(ov,best))){
+    sfxRumble();pk.classList.add('charging');
+    var r0=pk.getBoundingClientRect();converge(ov,r0.left+r0.width/2,r0.top+r0.height/2,'#ffd23f',26,220,1000);
+    await wait(1100);
+    var r=pk.getBoundingClientRect(),cx=r.left+r.width/2,cy=r.top+r.height/2;
+    flashScreen('#fff');sfxTear();pk.classList.remove('charging');pk.classList.add('burst');
+    burst(ov,cx,cy,'#ffd23f',40,260);ring(ov,cx,cy,'#fff3c4',6);
+    await wait(380);
+  }
   $('po_stage').remove();
   var html='';
   pulled.forEach(function(id,i){var c=CARDS[id];html+='<div class="flip r-'+c.rar+'" style="--i:'+i+'" data-rar="'+c.rar+'" onclick="flipCard(this)"><div class="flip-inner"><div class="flip-back">'+cardBackHTML()+'</div><div class="flip-front">'+cardHTML(id,{isNew:isNew[i]})+'</div></div></div>';});
@@ -3534,8 +3570,8 @@ function init(){
     '<div class="sc l" style="--x:-112px;--y:28px;--r:-13deg;--d:.25s"><div class="floaty">'+cardHTML('vegeta_ue',{noi:true})+'</div></div>'+
     '<div class="sc r" style="--x:112px;--y:28px;--r:13deg;--d:.4s"><div class="floaty">'+cardHTML('gohan_beast',{noi:true})+'</div></div>'+
     '<div class="sc mid" style="--x:0px;--y:0px;--r:0deg;--d:.55s"><div class="floaty">'+cardHTML('u_mui',{noi:true})+'</div></div>';
-  $('multi_a').innerHTML=portraitSVG(VIS.goku_blue,'sayen');
-  $('multi_b').innerHTML=portraitSVG(VIS.vegeta,'terrien');
+  $('multi_a').innerHTML=artSVG('goku_blue');
+  $('multi_b').innerHTML=artSVG('vegeta');
   updateMusicBtn();
   rollDaily();renderTop();
   setInterval(updateDots,60000);

@@ -1,0 +1,23 @@
+ANIMATIONS D'INVOCATION (ouverture des boosters)
+================================================
+
+Quand un booster est ouvert, le jeu regarde la meilleure carte obtenue
+et joue la vidéo de cette rareté, avant de révéler les 5 cartes.
+S'il n'y a pas de vidéo pour cette rareté, l'animation d'origine du jeu est jouée.
+Le joueur peut cliquer sur la vidéo pour la passer.
+
+Noms des fichiers (en .webm ou .mp4) :
+  invocation_commun.webm
+  invocation_peu-commun.webm
+  invocation_rare.webm
+  invocation_epique.webm
+  invocation_legendaire.webm
+  invocation_mythique.webm
+
+Conseils pour les animateurs :
+  - Vidéo de 2 à 6 secondes, 1920 x 1080 (elle remplit l'écran et est recadrée sur les bords
+    sur téléphone : garder l'action importante au centre).
+  - .webm (VP9) ou .mp4 (H.264). Un .webm peut avoir un fond transparent.
+  - Le son est permis (il est coupé automatiquement si le navigateur le refuse).
+  - Une vidéo légère (moins de 5 Mo) se charge plus vite, surtout sur GitHub Pages.
+  - Si l'animation est un GIF ou une suite d'images, il faut d'abord l'exporter en vidéo.
