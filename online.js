@@ -9,7 +9,7 @@
 var SUPA_URL='https://tugraajxznhtyqwzkosb.supabase.co';
 var SUPA_KEY='sb_publishable_iEhjmAoVo3xE-qJUM81mKw_4EANtdiE';
 
-var ONLINE_V=6;
+var ONLINE_V=7;
 var Online=(function(){
   var SESS_KEY='dczo_session',SYNC_KEY='dczo_sync',OWNER_KEY='dczo_owner';
   var sess=null,me=null,rank=null,tab='account',lbTab='all',pushTimer=null,dirty=false,lastSync=null,busyNet=false,opps=null,friendsData=null,friendsLoading=false,searchRes=null,msg='';
@@ -81,6 +81,7 @@ var Online=(function(){
   async function signOut(){
     if(dirty)await pushSave().catch(function(){});
     try{await req('/auth/v1/logout',{method:'POST'});}catch(e){}
+    if(window.Live)Live.stop();
     saveSess(null);me=null;rank=null;opps=null;friendsData=null;lsSet(OWNER_KEY,null);lsSet(SYNC_KEY,null);
   }
   async function resetPassword(email){await req('/auth/v1/recover?redirect_to='+encodeURIComponent(location.href.split('#')[0]),{method:'POST',auth:false,body:{email:email}});}
@@ -130,6 +131,7 @@ var Online=(function(){
     if(!/^[A-Za-z0-9_-]{3,16}$/.test(ps))throw new Error('Pseudo : 3 à 16 caractères (lettres, chiffres, _ ou -).');
     var r=await req('/rest/v1/profiles',{method:'POST',prefer:'return=representation',body:{id:uid(),pseudo:ps,level:meta.lvl||1}});
     me=r&&r[0];await loadRank();await pushProfile();
+    if(window.Live)Live.start();
   }
   async function loadRank(){var r=await req('/rest/v1/ranks?select=pts,wins,losses,season,season_pts&user_id=eq.'+uid());rank=r&&r[0]||{pts:1000,wins:0,losses:0,season:season(),season_pts:0};}
   function defenseData(){
@@ -190,6 +192,7 @@ var Online=(function(){
 
   async function afterLogin(interactive){
     await loadMe();
+    if(me&&window.Live)Live.start();
     if(me)await syncOnLogin(interactive);
     refreshUI();
   }
@@ -303,7 +306,7 @@ var Online=(function(){
   function refreshUI(){var sc=$('screen-online');if(sc&&!sc.classList.contains('hidden'))render();updateBadge();}
   function updateBadge(){var b=$('mb_online_sub');if(b)b.textContent=me?('Connecté : '+me.pseudo):'Compte, Arène, amis';}
   function tabsHTML(){
-    var T=[['account','👤 Compte'],['arena','⚔ Arène'],['board','🏆 Classement'],['friends','🤝 Amis']];
+    var T=[['account','👤 Compte'],['live','⚡ Direct'],['arena','⚔ Arène'],['board','🏆 Classement'],['friends','🤝 Amis']];
     return '<div class="tabs">'+T.map(function(t){return '<button class="fchip'+(tab===t[0]?' on':'')+'" onclick="Online.open(\''+t[0]+'\')">'+t[1]+'</button>';}).join('')+'</div>';
   }
   function needLogin(){return '<div class="panel center"><p style="font-weight:800">Connecte-toi pour accéder à cette partie.</p><button class="btn" onclick="Online.open(\'account\')">Se connecter</button></div>';}
@@ -316,6 +319,7 @@ var Online=(function(){
     else if(tab==='arena')h+=arenaHTML();
     else if(tab==='board')h+='<div id="lb_box"><p class="hint">Chargement…</p></div>';
     else if(tab==='friends')h+=friendsHTML();
+    else if(tab==='live')h+='<div id="live_box">'+(window.Live?Live.html():'')+'</div>';
     box.innerHTML=h;
     if(tab==='board')renderBoard();
   }
@@ -408,6 +412,9 @@ var Online=(function(){
     init:init,open:open,render:render,markDirty:markDirty,isPvp:function(L){return !!(L&&L.pvp);},endPvp:endPvp,showProfile:act(showProfile),fightFriend:act(fightFriend),
     keepCloud:keepCloud,keepLocal:act(keepLocal),setBoard:function(t){lbTab=t;render();},
     doOAuth:function(p){oauth(p);},
+    who:function(){return me&&uid()?{uid:uid(),pseudo:me.pseudo,lvl:meta.lvl||1}:null;},
+    friendIds:function(){var o={};if(friendsData)friendsData.rows.forEach(function(r){if(r.status==='accepted')o[r.user_id===uid()?r.friend_id:r.user_id]=1;});return o;},
+    loadFriendsQuiet:function(){if(me&&!friendsData)loadFriends().catch(function(){});},
     doSignIn:act(async function(){await signIn(val('o_email'),$('o_pass').value);}),
     doSignUp:act(async function(){var p=$('o_spass').value;if(p.length<8)throw new Error('Le mot de passe doit faire au moins 8 caractères.');var r=await signUp(val('o_semail'),p,val('o_pseudo'));if(r==='confirm')openModal('<h3 class="mtitle">Vérifie tes emails</h3><p style="font-weight:800">Un lien de confirmation vient d’être envoyé à '+esc(val('o_semail'))+'. Clique dessus pour activer ton compte : tu reviendras ici connecté.</p>');}),
     doReset:act(async function(){var e=val('o_email');if(!e)throw new Error('Écris ton email dans le champ ci-dessus.');await resetPassword(e);openModal('<h3 class="mtitle">Email envoyé</h3><p style="font-weight:800">Si un compte existe pour '+esc(e)+', tu vas recevoir un lien pour choisir un nouveau mot de passe.</p>');}),

@@ -37,6 +37,14 @@ INSTALLER LE MODE ONLINE (Supabase) — environ 10 minutes
      apparaît dès que le fournisseur est activé dans Supabase.
    - Le code secret client reste dans Supabase : ne le mets jamais dans le jeu.
 
+6. Combats en direct (onglet « ⚡ Direct »)
+   - Rien à configurer : ils utilisent « Realtime » de Supabase (activé par défaut), via les canaux
+     « dcz-lobby » (joueurs en ligne, défis) et « dcz-room-… » (un par combat).
+   - Si un jour les combats en direct ne se lancent plus, vérifie dans « Realtime » > « Settings »
+     que l'accès public aux canaux (« Allow public access ») est bien autorisé.
+   - Les deux joueurs calculent le même combat chacun de leur côté : un tricheur pourrait modifier le sien.
+     Les combats en direct sont donc amicaux (pas de points de rang).
+
 Ce qui est protégé
    - Chaque joueur ne peut lire et modifier que SA sauvegarde.
    - Les profils (pseudo, équipe, collection) sont publics, mais seul leur propriétaire peut les modifier.

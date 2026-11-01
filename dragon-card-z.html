@@ -724,6 +724,8 @@ body.inbattle{overflow:hidden}
 .actbar{display:flex;flex-wrap:wrap;gap:8px;align-items:stretch;justify-content:center;min-height:62px;margin:4px 0 8px}
 .ab-hint,.ab-prompt{align-self:center;font-weight:800;color:var(--muted);text-align:center;padding:0 8px}
 .ab-prompt{color:#ffd23f;font-size:15px}
+.ltimer{align-self:center;font-family:var(--font-ui);font-size:15px;color:#7cc7ff;min-width:44px;text-align:center}
+.ltimer.low{color:#f87171;animation:dotpulse 1s infinite}
 .abtn{display:flex;flex-direction:column;align-items:flex-start;gap:2px;min-width:140px;max-width:250px;padding:8px 12px;border:none;border-radius:12px;color:#fff;cursor:pointer;
   text-align:left;box-shadow:0 4px 0 rgba(0,0,0,.4);font-family:var(--font-body);transition:transform .12s,filter .12s;animation:popIn .3s cubic-bezier(.2,1.4,.4,1) backwards}
 .abtn:hover{transform:translateY(-2px);filter:brightness(1.1)}
@@ -1008,7 +1010,11 @@ body.calm .arena .sun,body.calm .grid,body.calm .emptyslot,body.calm .stunb,body
 <script>
 function $(id){return document.getElementById(id);}
 function wait(ms){return new Promise(function(r){setTimeout(r,ms);});}
-function shuffle(a){for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1)),t=a[i];a[i]=a[j];a[j]=t;}return a;}
+/* Hasard du combat : graine partagée en PvP direct pour que les deux écrans tirent les mêmes nombres */
+var RNG=null;
+function rnd(){return RNG?RNG():Math.random();}
+function seedRng(a){a=a>>>0;return function(){a=(a+0x6D2B79F5)>>>0;var t=a;t=Math.imul(t^(t>>>15),t|1);t^=t+Math.imul(t^(t>>>7),t|61);return ((t^(t>>>14))>>>0)/4294967296;};}
+function shuffle(a){for(var i=a.length-1;i>0;i--){var j=Math.floor(rnd()*(i+1)),t=a[i];a[i]=a[j];a[j]=t;}return a;}
 function loadLS(k,def){try{var v=localStorage.getItem(k);return v?JSON.parse(v):def;}catch(e){return def;}}
 function saveLS(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}
 
@@ -2636,6 +2642,10 @@ var GUIDE_LOCK=['screen-shop','screen-tower','screen-quests','screen-deck','scre
 function lockedMsg(){sfxError();toast('🔒 Termine d’abord l’entraînement','Kaïo te guide : mode Histoire, premier niveau. (« Passer les tutos » débloque tout.)');}
 function show(id){
   if(guided()&&GUIDE_LOCK.indexOf(id)>=0){lockedMsg();return;}
+  if(id!=='screen-battle'&&curL&&curL.live&&!gameOver&&!$('screen-battle').classList.contains('hidden')){
+    if(!confirm('Quitter le combat en direct ? Ce sera compté comme un abandon.'))return;
+    Live.forfeit();
+  }
   document.querySelectorAll('.screen').forEach(function(s){s.classList.add('hidden');});
   $(id).classList.remove('hidden');
   var theme=id==='screen-battle'?'battle':(id==='screen-shop'?'shop':(id==='screen-deck'?'deck':'menu'));
@@ -3234,7 +3244,7 @@ function autoDeck(silent){
 /* =====================================================================
    MOTEUR DE COMBAT EN ÉQUIPE (5 contre 5)
    ===================================================================== */
-var P,E,gameOver,busy=false,curLevel=0,curL=null,SEL=null,TGT=null,slotCache={},UID=0,LOG=[];
+var P,E,FIRST=null,gameOver,busy=false,curLevel=0,curL=null,SEL=null,TGT=null,slotCache={},UID=0,LOG=[];
 var cineMode=loadLS('dcz4_cine','all');
 function opp(s){return s===P?E:P;}
 function sk(s){return s===P?'me':'foe';}
@@ -3344,25 +3354,31 @@ function pctOf(u,k,v){return Math.round((k==='a'?u.nA:(k==='d'?u.nD:u.maxHp))*v/
 function basicDmg(u,tg,n){return Math.max(Math.round(u.atk*.2),u.atk-(hasAb(u,'pierce')?0:tg.def))+((n||1)-1)*K;}
 /* Coût d'une transformation : +2 Ki par niveau sauté */
 function tfCost(u,c){if(!u||c.fus)return c.c;return c.c+2*Math.max(0,c.lv-(u.lv||0)-1);}
-function tensionBonus(){var t=P?P.turn:0;return t>=TENSION_T?t-TENSION_T+1:0;}
+function tensionBonus(){var f=FIRST||P,t=f?f.turn:0;return t>=TENSION_T?t-TENSION_T+1:0;}
 function teamMembers(s,T){
   var out=[];
   for(var k=0;k<T.m.length;k++){var j=-1;s.units.forEach(function(u,i){if(u&&j<0&&u.fam===T.m[k]&&out.indexOf(i)<0)j=i;});if(j<0)return null;out.push(j);}
   return out;
 }
 function mostHurt(s){var b=null;s.units.forEach(function(u){if(u&&u.hp<u.maxHp&&(!b||u.hp/u.maxHp<b.hp/b.maxHp))b=u;});return b;}
-function randAlive(s){var a=alive(s);return a.length?a[Math.floor(Math.random()*a.length)]:-1;}
+function randAlive(s){var a=alive(s);return a.length?a[Math.floor(rnd()*a.length)]:-1;}
 function sideDead(s){return !s.units.some(Boolean)&&!s.reserve.length;}
 
 /* --- Début de combat --- */
 function startBattle(li,Lobj){
   closeModal();$('battle_end').classList.add('hidden');
   curLevel=li;var L=Lobj||LEVELS[li];curL=L;
-  var pteam=(L.tuto?TUTO_TEAM:myTeam).map(function(id){return {id:id};});
-  var pdeck=L.tuto?TUTO_DECK.slice():shuffle(myDeck.slice()),ed=parseDeck(L.deck);
-  if(!L.tuto)shuffle(ed);
+  var pteam=(L.tuto?TUTO_TEAM:(L.live?L.me.team:myTeam)).map(function(id){return {id:id};}),pdeck,ed;
+  if(L.live){
+    // PvP direct : même graine des deux côtés, l'hôte mélange toujours son deck en premier
+    RNG=seedRng(L.seed);pdeck=L.me.deck.slice();ed=L.op.deck.slice();
+    if(L.host){shuffle(pdeck);shuffle(ed);}else{shuffle(ed);shuffle(pdeck);}
+  } else {
+    RNG=null;pdeck=L.tuto?TUTO_DECK.slice():shuffle(myDeck.slice());ed=parseDeck(L.deck);
+    if(!L.tuto)shuffle(ed);
+  }
   P=newSide('me','Ton équipe',pteam,pdeck,[],1);
-  if(!L.tuto)applyAwaken(P);
+  if(L.live)applyAwaken(P,L.me.aw);else if(!L.tuto)applyAwaken(P);
   E=newSide('foe',L.name,parseTeam(L.team),ed,parseTeam(L.reserve),L.bx||1);
   if(L.scale)applyScale(E,L.scale);
   if(L.aw)applyAwaken(E,L.aw);
@@ -3383,20 +3399,22 @@ function startBattle(li,Lobj){
   if(P.ld)logMsg('Ton leader 👑 '+CARDS[P.ld.id].n+' — '+P.ld.n+' : ATK, DEF et PV +'+P.ld.pct+'% pour '+ldCondTxt(P.ld.cd)+'.');
   if(E.ld)logMsg('Leader adverse 👑 '+CARDS[E.ld.id].n+' — '+E.ld.n+' : +'+E.ld.pct+'% pour '+ldCondTxt(E.ld.cd)+'.');
   [P,E].forEach(function(s){s.syn.forEach(function(a){logMsg((s===P?'Ta synergie':'Synergie adverse')+' : '+a.S.i+' '+a.S.n+' — '+a.tiers.map(function(t){return t[3];}).join(', '));});});
-  [P,E].forEach(function(s){
+  FIRST=L.live&&!L.host?E:P;
+  (FIRST===P?[P,E]:[E,P]).forEach(function(s){
     s.units.forEach(function(u){
       if(!u)return;
       if(hasAb(u,'scout')&&s.deck.length){s.hand.push(s.deck.shift());if(s===P)P._fresh++;logMsg(nm(u)+' : Éclaireur, pioche 1 carte.');}
       if(hasAb(u,'freeze')){var o=opp(s),j=randAlive(o);if(j>=0&&!o.units[j].stunImm){o.units[j].stun=true;logMsg(nm(u)+' paralyse '+nm(o.units[j])+' !');}}
     });
   });
-  beginPlayerTurn(true);
+  if(L.live)Live.begin();else beginPlayerTurn(true);
 }
 async function beginPlayerTurn(first){
   await startTurn(P);
   renderBattle();
   await banner(first?'COMBAT !':'TON TOUR','');
   busy=false;renderBattle();
+  if(curL&&curL.live)Live.myTurn();
   if(first){tip('b_start');tip('b_hand');tip('b_select');if(P.syn.length)tip('b_syn');}
   checkTips();
 }
@@ -3433,7 +3451,7 @@ async function startTurn(s){
   });
   if(!first)s.units.forEach(function(u){if(u&&hasAb(u,'healer')){var t=mostHurt(s);if(t){var g=healU(t,pctOf(t,'h',abVal(u,'healer')||10));if(g)logMsg(nm(u)+' soigne '+nm(t)+' (+'+fmt(g)+' PV).');}}});
   var kb=0;s.units.forEach(function(u){if(u)kb+=abVal(u,'kiup');});if(kb){s.ki+=kb;if(s===P)logMsg('Énergie infinie : +'+kb+' Ki.');}
-  if(!(s===P&&first))await drawCards(s,1+(first?0:s.synDraw));
+  if(!(s===(FIRST||P)&&first))await drawCards(s,1+(first?0:s.synDraw));
   renderBattle();
   if(pops.length){
     pops.forEach(function(p){var q=posOf(s,p[0]);p[1].forEach(function(x,k){setTimeout(function(){floatText(q.x,q.y-10-k*20,x[0],x[1]+' small');},k*180);});});
@@ -3542,7 +3560,8 @@ function renderActbar(){
     return;
   }
   var left=alive(P).filter(function(j){return !P.units[j].acted;}).length;
-  bar.innerHTML='<div class="ab-hint">'+(busy?'…':(left?'Clique sur un de tes combattants pour agir ('+left+' prêt'+(left>1?'s':'')+'), ou joue une carte de soutien.':'Tous tes combattants ont agi : clique sur « Fin du tour ».'))+'</div>';
+  if(curL&&curL.live&&busy&&!Live.mine()){bar.innerHTML='<div class="ab-hint">⏳ '+E.name+' joue son tour…</div>';return;}
+  bar.innerHTML=(curL&&curL.live?'<b class="ltimer" id="ltimer"></b>':'')+'<div class="ab-hint">'+(busy?'…':(left?'Clique sur un de tes combattants pour agir ('+left+' prêt'+(left>1?'s':'')+'), ou joue une carte de soutien.':'Tous tes combattants ont agi : clique sur « Fin du tour ».'))+'</div>';
 }
 function clearSel(){SEL=null;TGT=null;renderBattle();}
 function clickSlot(side,i){
@@ -3566,19 +3585,19 @@ function doAction(key){
   var a=unitActions(i).filter(function(x){return x.key===key;})[0];if(!a||!a.ok){sfxError();return;}
   if(key==='atk'){
     var bt=basicTargets(P);
-    askTarget('enemy','Choisis la cible de l’attaque de '+nm(u)+(bt.length<alive(E).length?' (Provocation !)':''),function(j){return bt.indexOf(j)>=0;},function(j){runPlayer(function(){return actBasic(P,i,j);});});
+    askTarget('enemy','Choisis la cible de l’attaque de '+nm(u)+(bt.length<alive(E).length?' (Provocation !)':''),function(j){return bt.indexOf(j)>=0;},function(j){pMove({k:'atk',i:i,t:j});});
     if(bt.length<alive(E).length)tip('b_taunt');
     return;
   }
   if(key==='sp'||key==='ul'){
-    var d=key==='sp'?spOf(u):ulOf(u),need=NEEDT[d[1]],go=function(t){runPlayer(function(){return actSkill(P,i,key,t);});};
+    var d=key==='sp'?spOf(u):ulOf(u),need=NEEDT[d[1]],go=function(t){pMove({k:key,i:i,t:t});};
     if(need==='enemy')askTarget('enemy','Choisis la cible de « '+d[0]+' »',function(j){return !!E.units[j];},go);
     else if(need==='ally')askTarget('ally','Choisis l’allié à soigner',function(j){return !!P.units[j];},go);
     else go(-1);
     return;
   }
   var T=TEAMATK.filter(function(x){return 'tm:'+x.id===key;})[0];if(!T)return;
-  var go2=function(t){runPlayer(function(){return actTeam(P,T,t);});};
+  var go2=function(t){pMove({k:'tm',id:T.id,t:t});};
   if(NEEDT[T.k]==='enemy')askTarget('enemy','Choisis la cible de « '+T.n+' »',function(j){return !!E.units[j];},go2);else go2(-1);
 }
 function transformError(s,u,c){
@@ -3616,9 +3635,17 @@ function playCard(hi){
   var err=cardError(P,id);
   if(err){logMsg(err);sfxError();nope(el);return;}
   var tw=cardTarget(c);SEL=null;
-  if(tw)askTarget(tw,'Choisis la cible de « '+c.n+' »',function(j){return validCardTarget(P,c,tw,j);},function(j){track('card');runPlayer(function(){return playSupport(P,hi,j);});},hi);
-  else{track('card');runPlayer(function(){return playSupport(P,hi,-1);});}
+  if(tw)askTarget(tw,'Choisis la cible de « '+c.n+' »',function(j){return validCardTarget(P,c,tw,j);},function(j){track('card');pMove({k:'card',hi:hi,t:j});},hi);
+  else{track('card');pMove({k:'card',hi:hi,t:-1});}
 }
+/* Une action = un « coup » : en PvP direct, il est aussi envoyé à l'adversaire qui le rejoue à l'identique */
+function execMove(s,m){
+  if(m.k==='atk')return actBasic(s,m.i,m.t);
+  if(m.k==='sp'||m.k==='ul')return actSkill(s,m.i,m.k,m.t);
+  if(m.k==='tm'){var T=TEAMATK.filter(function(x){return x.id===m.id;})[0];return T?actTeam(s,T,m.t):null;}
+  if(m.k==='card')return playSupport(s,m.hi,m.t);
+}
+function pMove(m){if(curL&&curL.live)Live.send('mv',{m:m});runPlayer(function(){return execMove(P,m);});}
 
 /* --- Cut-ins 2.5D --- */
 function cutin(o){
@@ -3735,14 +3762,14 @@ async function actBasic(s,i,t){
   for(var h=0;h<hits&&s.units[i]===u&&o.units[t]===tg&&!gameOver;h++){
     var dmg=basicDmg(u,tg,n),crit=abVal(u,'crit');
     var ev=Math.min(75,abVal(tg,'evade')+(tg.evB||0));
-    if(ev&&Math.random()*100<ev){await lunge(s,i,o,t,true);var q=posOf(o,t);floatText(q.x,q.y-30,'ESQUIVE !','buff small');logMsg(nm(tg)+' esquive l’attaque de '+nm(u)+' !');tip('b_ability');continue;}
-    if(crit&&Math.random()*100<crit){dmg=Math.round(u.atk*1.5)+(n-1)*K;var qc=posOf(o,t);floatText(qc.x,qc.y-44,'CRITIQUE !','down small');}
+    if(ev&&rnd()*100<ev){await lunge(s,i,o,t,true);var q=posOf(o,t);floatText(q.x,q.y-30,'ESQUIVE !','buff small');logMsg(nm(tg)+' esquive l’attaque de '+nm(u)+' !');tip('b_ability');continue;}
+    if(crit&&rnd()*100<crit){dmg=Math.round(u.atk*1.5)+(n-1)*K;var qc=posOf(o,t);floatText(qc.x,qc.y-44,'CRITIQUE !','down small');}
     if(n>=2&&h===0){unitCut(s,u,'combo','COMBO ×'+n,'+'+fmt((n-1)*K)+' dégâts');if(s===P){tip('b_combo');if(n===3)track('combo3');}}
     await lunge(s,i,o,t,false);
     var d=await dealDmg(o,t,dmg,s,i);
     if(s.units[i]===u&&hasAb(u,'drain')){var g=healU(u,Math.floor(d/2));if(g){var p=posOf(s,i);floatText(p.x,p.y-30,'+'+fmt(g),'heal small');}}
     if(o.units[t]===tg&&!gameOver){
-      var sh=abVal(u,'stunhit');if(sh&&Math.random()*100<sh)stunUnit(o,t);
+      var sh=abVal(u,'stunhit');if(sh&&rnd()*100<sh)stunUnit(o,t);
       var ct=abVal(tg,'counter');
       if(ct&&s.units[i]===u){var qt=posOf(o,t);floatText(qt.x,qt.y-44,'CONTRE !','buff small');logMsg(nm(tg)+' contre-attaque !');await lunge(o,t,s,i,false);await dealDmg(s,i,Math.round(tg.atk*ct/100),o,t);}
     }
@@ -3839,7 +3866,7 @@ async function transformUnit(s,t,id){
     if(j>=0){var pu=s.units[j];u.maxHp+=pu.maxHp;u.hp+=pu.hp;s.units[j]=null;logMsg(nm(u)+' fusionne avec '+nm(pu)+' !');tip('b_fusion');}
     u.fam='fusion';
   }
-  var ga=c.a,gd=c.d,title=c.n,mui=c.mui&&Math.random()>=.5;
+  var ga=c.a,gd=c.d,title=c.n,mui=c.mui&&rnd()>=.5;
   if(mui){ga=K;gd=K;title='Pas encore maîtrisé…';logMsg('Ultra Instinct pas encore maîtrisé : effet minime.');}
   u.atk+=ga;u.def+=gd;u.nA+=ga;u.nD+=gd;u.id=id;u.lv=c.lv;if(!mui)addPassive(u,c.ab);
   if(c.pn&&!mui)logMsg('Passif : '+c.pn+' !');
@@ -3917,6 +3944,7 @@ async function koFX(slot){
 async function endTurn(){
   if(gameOver||busy||!P)return;
   SEL=null;TGT=null;busy=true;renderBattle();
+  if(curL&&curL.live)return Live.endMyTurn();
   await banner('TOUR DE '+E.name.toUpperCase(),'red');
   tip('b_enemy');
   await enemyTurn();
@@ -4002,7 +4030,12 @@ async function enemyTurn(){
   if(!gameOver){await wait(250);await beginPlayerTurn(false);}
   else{busy=false;renderBattle();}
 }
-function checkEnd(){if(gameOver||!P)return;if(sideDead(E))endGame(true);else if(sideDead(P))endGame(false);}
+function checkEnd(){
+  if(gameOver||!P)return;
+  // Ordre fixe (2e joueur d'abord) pour que les deux écrans tranchent pareil en cas de K.O. simultané
+  var a=FIRST===E?P:E,b=a===E?P:E;
+  if(sideDead(a))endGame(a===E);else if(sideDead(b))endGame(b===E);
+}
 function checkTips(){
   if(!P||gameOver||busy)return;
   if(P.turn>=2)tip('b_draw');
@@ -4018,7 +4051,9 @@ function checkTips(){
 function endGame(won){
   gameOver=true;busy=false;SEL=null;TGT=null;Music.duck(3);
   var L=curL;
+  RNG=null;
   if(L.tower)return endTower(won,L);
+  if(L.live)return Live.end(won,L);
   if(L.pvp)return Online.endPvp(won,L);
   var first=won&&!prog.cleared[L.id],gain=won?(first?L.zeni:Math.round(L.zeni*.3)):Math.round(L.zeni*.1),rew=[];
   if(first){rew=L.rew||[];rew.forEach(addCard);prog.cleared[L.id]=true;saveProg();}
@@ -4079,6 +4114,7 @@ function init(){
 init();
 </script>
 <!-- Augmenter le numéro à chaque modification de online.js, pour que les navigateurs ne gardent pas l'ancienne version en cache -->
-<script src="online.js?v=6"></script>
+<script src="online.js?v=7"></script>
+<script src="live.js?v=1"></script>
 </body>
 </html>
