@@ -69,12 +69,13 @@ var Live=(function(){
     var seen={},team=[],deck=[],aw={};
     ((d&&d.team)||[]).forEach(function(id){if(typeof id==='string'&&CARDS[id]&&CARDS[id].t==='p'&&!CARDS[id].en&&!seen[id]&&team.length<TEAM_SIZE){seen[id]=1;team.push(id);}});
     ((d&&d.deck)||[]).forEach(function(id){if(typeof id==='string'&&CARDS[id]&&CARDS[id].t!=='p'&&deck.length<DECK_MAX)deck.push(id);});
-    team.forEach(function(id){var n=parseInt(d.aw&&d.aw[id],10);aw[id]=n>=0?Math.min(5,n):0;});
-    return {team:team,deck:deck,aw:aw,pseudo:String((d&&d.pseudo)||'?').slice(0,16),lvl:Math.max(1,parseInt(d&&d.lvl,10)||1)};
+    var tr={};
+    team.forEach(function(id){var n=parseInt(d.aw&&d.aw[id],10);aw[id]=n>=0?Math.min(5,n):0;n=parseInt(d.tr&&d.tr[id],10);tr[id]=n>=0?Math.min(TR_MAX,n):0;});
+    return {team:team,deck:deck,aw:aw,tr:tr,pseudo:String((d&&d.pseudo)||'?').slice(0,16),lvl:Math.max(1,parseInt(d&&d.lvl,10)||1)};
   }
   function myData(){
     var aw={};myTeam.forEach(function(id){aw[id]=awakeOf(id);});
-    return clean({team:myTeam,deck:myDeck,aw:aw,pseudo:me.pseudo,lvl:me.lvl});
+    return clean({team:myTeam,deck:myDeck,aw:aw,tr:trMap(myTeam),pseudo:me.pseudo,lvl:me.lvl});
   }
   function readyErr(){
     if(!me)return 'Connecte-toi d’abord.';
@@ -221,7 +222,7 @@ var Live=(function(){
   function begin0(){
     if(match.started)return;match.started=true;clearInterval(helloTimer);hello();closeModal();
     var od=match.opD,m=match;
-    var L={live:true,pvp:true,host:m.host,seed:m.seed,id:'live',name:od.pseudo,boss:od.team[0],team:od.team.join(','),deck:'',aw:od.aw,
+    var L={live:true,pvp:true,host:m.host,seed:m.seed,id:'live',name:od.pseudo,boss:od.team[0],team:od.team.join(','),deck:'',aw:od.aw,tr:od.tr,
       me:m.myD,op:od,quote:'Combat en direct !'};
     pingTimer=setInterval(function(){if(room&&match)room.send('ping',{last:match.seqOut});},8000);
     watchTimer=setInterval(function(){
@@ -288,6 +289,7 @@ var Live=(function(){
     // Pas de récompense pour un combat expédié au 1er tour (évite les abandons arrangés)
     var op=match&&match.op,real=P&&FIRST&&FIRST.turn>=2;
     var gain=real?(won?60:15):0,xp=real?(won?30:10):0;
+    var orb=real&&won?3:0;giveMat('orbe',orb,true);
     if(gain)setZeni(zeni+gain);var ups=xp?addXP(xp):[];
     if(won){if(real)track('win');sfxVictory();}else sfxDefeat();
     var hero=alive(P)[0],box=$('battle_end');
@@ -295,7 +297,7 @@ var Live=(function(){
       '<div class="endtitle">'+(won?'VICTOIRE !':'DÉFAITE…')+'</div>'+
       '<div class="hero">'+(won&&hero!==undefined?artSVG(P.units[hero].id):bossPortrait(L))+'</div>'+
       '<p>'+(L.ffWin?esc(L.name)+' a quitté le combat.':(won?'Tu as battu '+esc(L.name)+' en direct !':esc(L.name)+' t’a battu en direct.'))+'</p>'+
-      (gain?'<div class="zgain"><i class="coin"></i>+'+gain+' Zénis</div><div class="xpgain">+'+xp+' XP</div>':'<div class="hint">Combat trop court : pas de récompense.</div>')+
+      (gain?'<div class="zgain"><i class="coin"></i>+'+gain+' Zénis</div><div class="xpgain">+'+xp+' XP</div>'+orbHTML(orb,0):'<div class="hint">Combat trop court : pas de récompense.</div>')+
       ups.map(function(u){return '<div class="lvup">NIVEAU '+u.l+' !</div>';}).join('')+
       '<div class="endbtns">'+(op?'<button class="btn big" onclick="$(\'battle_end\').classList.add(\'hidden\');Online.open(\'live\');Live.challenge(\''+esc(op.uid)+'\')">Revanche</button>':'')+
       '<button class="btn blue big" onclick="$(\'battle_end\').classList.add(\'hidden\');Online.open(\'live\')">Combats en direct</button>'+

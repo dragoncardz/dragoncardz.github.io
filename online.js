@@ -9,7 +9,7 @@
 var SUPA_URL='https://tugraajxznhtyqwzkosb.supabase.co';
 var SUPA_KEY='sb_publishable_iEhjmAoVo3xE-qJUM81mKw_4EANtdiE';
 
-var ONLINE_V=7;
+var ONLINE_V=8;
 var Online=(function(){
   var SESS_KEY='dczo_session',SYNC_KEY='dczo_sync',OWNER_KEY='dczo_owner';
   var sess=null,me=null,rank=null,tab='account',lbTab='all',pushTimer=null,dirty=false,lastSync=null,busyNet=false,opps=null,friendsData=null,friendsLoading=false,searchRes=null,msg='';
@@ -136,7 +136,7 @@ var Online=(function(){
   async function loadRank(){var r=await req('/rest/v1/ranks?select=pts,wins,losses,season,season_pts&user_id=eq.'+uid());rank=r&&r[0]||{pts:1000,wins:0,losses:0,season:season(),season_pts:0};}
   function defenseData(){
     var aw={};myTeam.forEach(function(id){aw[id]=awakeOf(id);});
-    return {team:myTeam.slice(0,TEAM_SIZE),aw:aw,deck:myDeck.slice(0,DECK_MAX)};
+    return {team:myTeam.slice(0,TEAM_SIZE),aw:aw,tr:trMap(myTeam.slice(0,TEAM_SIZE)),deck:myDeck.slice(0,DECK_MAX)};
   }
   function showcaseData(){
     var cards={};Object.keys(col).forEach(function(id){if(CARDS[id]&&col[id]>0)cards[id]=col[id];});
@@ -218,16 +218,18 @@ var Online=(function(){
     return out;
   }
   function validAw(def){var aw={};var src=(def&&def.aw)||{};Object.keys(src).forEach(function(id){var n=parseInt(src[id],10);if(CARDS[id]&&n>=0)aw[id]=Math.min(5,n);});return aw;}
+  function validTr(def){var tr={};var src=(def&&def.tr)||{};Object.keys(src).forEach(function(id){var n=parseInt(src[id],10);if(CARDS[id]&&n>=0)tr[id]=Math.min(TR_MAX,n);});return tr;}
   function fight(o,ranked){
     var team=validTeam(o.profiles.defense);if(!team.length){toast('Équipe invalide','Cet adversaire n’a pas d’équipe de défense');return;}
     if(!myTeam.length){toast('Pas d’équipe','Compose ton équipe dans l’écran Deck');return;}
-    var L={pvp:true,ranked:!!ranked,id:'pvp',oppId:o.user_id,name:o.profiles.pseudo,boss:team[0],team:team.join(','),deck:validDeck(o.profiles.defense).join(','),aw:validAw(o.profiles.defense),
+    var L={pvp:true,ranked:!!ranked,id:'pvp',oppId:o.user_id,name:o.profiles.pseudo,boss:team[0],team:team.join(','),deck:validDeck(o.profiles.defense).join(','),aw:validAw(o.profiles.defense),tr:validTr(o.profiles.defense),
       quote:ranked?'Combat classé ! Les points de rang sont en jeu.':'Combat amical : aucun point de rang en jeu.'};
     startBattle(-1,L);
   }
   async function endPvp(won,L){
     var gain=won?(L.ranked?80:30):(L.ranked?20:10),xp=won?30:10,res=null,err='';
     if(L.ranked){try{res=await req('/rest/v1/rpc/report_pvp',{method:'POST',body:{p_defender:L.oppId,p_won:!!won}});await loadRank();}catch(e){err=e.message;}}
+    var orb=won?2:0;giveMat('orbe',orb,true);
     setZeni(zeni+gain);var ups=addXP(xp);if(won){track('win');sfxVictory();}else sfxDefeat();
     var hero=alive(P)[0],box=$('battle_end');
     box.innerHTML='<div class="endbox '+(won?'win':'lose')+'"><div class="endrays"></div>'+
@@ -235,7 +237,7 @@ var Online=(function(){
       '<div class="hero">'+(won&&hero!==undefined?artSVG(P.units[hero].id):bossPortrait(L))+'</div>'+
       '<p>'+(won?'Tu as battu l’équipe de '+esc(L.name)+' !':'L’équipe de '+esc(L.name)+' t’a battu.')+'</p>'+
       (L.ranked?(res?'<div class="xpgain" style="color:'+(res.delta>=0?'#4ade80':'#f87171')+'">'+(res.delta>=0?'+':'')+res.delta+' points de rang · total '+res.pts+'</div>':'<div class="hint">Résultat non enregistré : '+esc(err)+'</div>'):'<div class="hint">Combat amical</div>')+
-      '<div class="zgain"><i class="coin"></i>+'+gain+' Zénis</div><div class="xpgain">+'+xp+' XP</div>'+
+      '<div class="zgain"><i class="coin"></i>+'+gain+' Zénis</div><div class="xpgain">+'+xp+' XP</div>'+orbHTML(orb,0)+
       ups.map(function(u){return '<div class="lvup">NIVEAU '+u.l+' !</div>';}).join('')+
       '<div class="endbtns"><button class="btn big" onclick="$(\'battle_end\').classList.add(\'hidden\');Online.open(\'arena\')">Arène</button>'+
       '<button class="btn ghost big" onclick="$(\'battle_end\').classList.add(\'hidden\');show(\'screen-menu\')">Menu</button></div></div>';
@@ -412,6 +414,18 @@ var Online=(function(){
     init:init,open:open,render:render,markDirty:markDirty,isPvp:function(L){return !!(L&&L.pvp);},endPvp:endPvp,showProfile:act(showProfile),fightFriend:act(fightFriend),
     keepCloud:keepCloud,keepLocal:act(keepLocal),setBoard:function(t){lbTab=t;render();},
     doOAuth:function(p){oauth(p);},
+    /* Code cadeau : vérifié côté serveur (fonction redeem_code), une seule fois par compte */
+    redeem:async function(code){
+      if(!me)throw new Error('Connecte-toi d’abord.');
+      try{return await req('/rest/v1/rpc/redeem_code',{method:'POST',body:{p_code:code}});}
+      catch(e){
+        var m=e.message||'',C={invalid_code:'Ce code n’existe pas.',already_used:'Tu as déjà utilisé ce code.',expired:'Ce code a expiré.',exhausted:'Ce code a déjà été utilisé le nombre maximum de fois.',
+          too_many:'Trop d’essais : réessaie dans une heure.',not_logged_in:'Connecte-toi d’abord.'};
+        for(var k in C)if(m.indexOf(k)>=0)throw new Error(C[k]);
+        if(/redeem_code|PGRST202|404/.test(m))throw new Error('Les codes cadeaux ne sont pas encore activés sur le serveur.');
+        throw e;
+      }
+    },
     who:function(){return me&&uid()?{uid:uid(),pseudo:me.pseudo,lvl:meta.lvl||1}:null;},
     friendIds:function(){var o={};if(friendsData)friendsData.rows.forEach(function(r){if(r.status==='accepted')o[r.user_id===uid()?r.friend_id:r.user_id]=1;});return o;},
     loadFriendsQuiet:function(){if(me&&!friendsData)loadFriends().catch(function(){});},

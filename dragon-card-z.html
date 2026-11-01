@@ -161,6 +161,23 @@ main{position:relative;z-index:1;padding:16px;max-width:1000px;margin:0 auto}
 .mbtn.quest{background:linear-gradient(145deg,#6ee7b7,#059669 55%,#064e3b)}
 .mbtn.gift{background:linear-gradient(145deg,#ff9ad5,#e11d74 55%,#6b0f3f)}
 .mbtn.online{background:linear-gradient(145deg,#7dd3fc,#0ea5e9 45%,#7c3aed);grid-column:1/-1}
+.mbtn.inv{background:linear-gradient(145deg,#fdba74,#ea580c 55%,#7c2d12)}
+.mbtn.gift{grid-column:1/-1}
+/* Inventaire */
+.matgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px}
+.mat{display:flex;gap:12px;align-items:center;background:rgba(255,255,255,.06);border-radius:14px;padding:10px 12px}
+.mat .mi{font-size:30px;width:44px;text-align:center;flex:none}
+.mat b{display:block;font-family:var(--font-ui);font-weight:400;font-size:16px}
+.mat .mn{font-family:var(--font-ui);font-size:22px;color:#ffd23f;margin-left:auto}
+.trrow{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.1)}
+.trrow .card{--w:70px}
+.trinfo{flex:1 1 200px;min-width:0}
+.trinfo b{font-family:var(--font-ui);font-weight:400;font-size:16px}
+.trbar{display:flex;gap:3px;margin:5px 0}
+.trbar i{width:14px;height:8px;border-radius:3px;background:rgba(255,255,255,.14)}
+.trbar i.on{background:linear-gradient(90deg,#fde047,#f97316)}
+.codebox{display:flex;gap:8px;flex-wrap:wrap;max-width:460px}
+.codebox input{flex:1 1 200px;font:inherit;font-weight:900;letter-spacing:2px;text-transform:uppercase;padding:11px 12px;border-radius:12px;border:1px solid var(--line);background:rgba(0,0,0,.35);color:#fff;min-width:0}
 /* Mode Online */
 .ofrm{display:flex;flex-direction:column;gap:10px;max-width:420px}
 .ofrm.row{flex-direction:row;flex-wrap:wrap}
@@ -888,6 +905,7 @@ body.calm .arena .sun,body.calm .grid,body.calm .emptyslot,body.calm .stunb,body
           <button class="mbtn shop" id="mb_shop" onclick="show('screen-shop')"><span class="mic"><svg viewBox="0 0 24 24" fill="#fff"><path d="M3 9h18v4H3zM5 13h14v8H5z"/><path d="M11 9h2v12h-2z" fill="rgba(0,0,0,.25)"/><path d="M12 9C9 9 6.5 7.5 7.5 5.5S11 5 12 9zm0 0c3 0 5.5-1.5 4.5-3.5S13 5 12 9z"/></svg></span><span>Boutique<small>Boosters par ère</small></span></button>
           <button class="mbtn deck" id="mb_deck" onclick="openDeckScreen()"><span class="mic"><svg viewBox="0 0 24 24" fill="#fff"><rect x="3" y="6" width="11" height="15" rx="2" transform="rotate(-12 8.5 13.5)" opacity=".55"/><rect x="9" y="3" width="11" height="15" rx="2"/></svg></span><span>Deck<small>Ta collection</small></span></button>
           <button class="mbtn quest" id="mb_quest" onclick="show('screen-quests')"><span class="mic"><svg viewBox="0 0 24 24" fill="#fff"><path d="M12 2l2.9 6.3 6.9.7-5.2 4.6 1.5 6.8L12 17l-6.1 3.4 1.5-6.8L2.2 9l6.9-.7z"/></svg></span><span>Missions<small id="mb_quest_sub">Quotidiennes &amp; succès</small></span></button>
+          <button class="mbtn inv" id="mb_inv" onclick="show('screen-inv')"><span class="mic"><svg viewBox="0 0 24 24" fill="#fff"><path d="M4 8h16v12a2 2 0 01-2 2H6a2 2 0 01-2-2z"/><path d="M8 8V6a4 4 0 018 0v2h-2V6a2 2 0 00-4 0v2z"/><path d="M10 12h4v2h-4z" fill="rgba(0,0,0,.35)"/></svg></span><span>Inventaire<small>Entraînement &amp; codes</small></span></button>
           <button class="mbtn online" id="mb_online" onclick="Online.open()"><span class="mic"><svg viewBox="0 0 24 24" fill="#fff"><path d="M12 2a10 10 0 100 20 10 10 0 000-20zm6.9 6h-3a15.6 15.6 0 00-1.3-3.9A8 8 0 0118.9 8zM12 4c.8 1.2 1.5 2.5 1.9 4h-3.8c.4-1.5 1.1-2.8 1.9-4zM4.3 14a8 8 0 010-4h3.4a16.5 16.5 0 000 4zm.8 2h3a15.6 15.6 0 001.3 3.9A8 8 0 015.1 16zm3-8h-3a8 8 0 014.3-3.9C8.9 5.3 8.4 6.6 8.1 8zM12 20c-.8-1.2-1.5-2.5-1.9-4h3.8c-.4 1.5-1.1 2.8-1.9 4zm2.3-6H9.7a14.7 14.7 0 010-4h4.6a14.7 14.7 0 010 4zm.3 5.9c.6-1.2 1-2.5 1.3-3.9h3a8 8 0 01-4.3 3.9zM16.3 14a16.5 16.5 0 000-4h3.4a8 8 0 010 4z"/></svg></span><span>Online<small id="mb_online_sub">Compte, Arène, amis</small></span></button>
           <button class="mbtn gift" id="mb_daily" onclick="openLoginModal()"><span class="mic"><svg viewBox="0 0 24 24" fill="#fff"><path d="M4 9h16v12H4z"/><path d="M3 6h18v4H3z"/><path d="M11 6h2v15h-2z" fill="rgba(0,0,0,.3)"/><path d="M12 6C9 6 7 4 8 2.5S11 3 12 6zm0 0c3 0 5-2 4-3.5S13 3 12 6z"/></svg></span><span>Cadeau du jour<small id="mb_daily_sub">Connecte-toi chaque jour</small></span></button>
         </div>
@@ -907,6 +925,12 @@ body.calm .arena .sun,body.calm .grid,body.calm .emptyslot,body.calm .stunb,body
       <h2 class="h2">Monde Online</h2>
       <p class="lead">Ton compte, ta sauvegarde partout, l’Arène, le classement et tes amis.</p>
       <div id="online_box"></div>
+    </section>
+
+    <section id="screen-inv" class="screen hidden">
+      <h2 class="h2">Inventaire</h2>
+      <div class="tabs" id="inv_tabs"></div>
+      <div id="inv_box"></div>
     </section>
 
     <section id="screen-tower" class="screen hidden">
@@ -2184,6 +2208,11 @@ function showDetails(id){
     h+='<div class="abl"><b>Cible</b><br>'+(tw==='enemy'?'Un ennemi au choix (ignore la Provocation).':(tw==='ally'?'Un allié au choix.':'Aucune : effet immédiat.'))+'</div>';
   }
   if(c.t==='p'&&!c.en){var aw=awakeOf(id);h+='<div class="abl"><b>✴ Éveil '+(aw?'★'+aw:'')+'</b><br>'+awakeTxt(aw)+(aw<5?'<br><span class="hint">Prochain : '+awakeTxt(aw+1)+' (encore 1 exemplaire)</span>':'')+'</div>';}
+  if(c.t==='p'&&!c.en&&col[id]){
+    var tl=trOf(id),tb=trBlock(id);
+    h+='<div class="abl" data-tr="'+id+'"><b>💪 Entraînement : niveau '+tl+' / '+TR_MAX+'</b><br>'+(tl?'+'+(tl*TR_PCT)+' % ATK, DEF et PV':'Pas encore entraîné')+
+      (tb?'<br><span class="hint">Niveau '+(tl+1)+' : '+costTxt(tb.c)+'</span><br><button class="btn small'+(tb.ok?'':' ghost')+'" style="margin-top:6px" onclick="trainCard(\''+id+'\')">Entraîner</button>':'<br><span class="status-ok">Niveau maximum !</span>')+'</div>';
+  }
   if(c.fl)h+='<div class="flavor">« '+c.fl+' »</div>';
   h+='<div class="kv"><span class="chip">Possédées : '+(col[id]||0)+'</span><span class="chip">Max '+(c.t==='p'?'1 par équipe':rr.max+' par deck')+'</span>'+(c.en?'<span class="chip">Réservée aux ennemis</span>':'')+'</div>';
   openModal('<div class="det"><div class="cardcol">'+cardHTML(id,{noi:true})+'</div><div class="det-info"><h3 class="mtitle">'+c.n+'</h3>'+chips+h+'</div></div>');
@@ -2638,7 +2667,7 @@ function resetTips(){tipsSeen={};saveLS('dcz4_tips',tipsSeen);if(!$('screen-menu
 /* =====================================================================
    NAVIGATION ET ÉCRANS
    ===================================================================== */
-var GUIDE_LOCK=['screen-shop','screen-tower','screen-quests','screen-deck','screen-online'];
+var GUIDE_LOCK=['screen-shop','screen-tower','screen-quests','screen-deck','screen-online','screen-inv'];
 function lockedMsg(){sfxError();toast('🔒 Termine d’abord l’entraînement','Kaïo te guide : mode Histoire, premier niveau. (« Passer les tutos » débloque tout.)');}
 function show(id){
   if(guided()&&GUIDE_LOCK.indexOf(id)>=0){lockedMsg();return;}
@@ -2657,6 +2686,7 @@ function show(id){
     if(!loginAsked&&loginState().can&&tipsSeen.welcome&&!guided()){loginAsked=true;setTimeout(function(){if(!tipOpen&&$('modal').classList.contains('hidden'))openLoginModal();},700);}}
   if(id==='screen-story'){renderStory();tip('story');}
   if(id==='screen-online'&&window.Online)Online.render();
+  if(id==='screen-inv')renderInv();
   if(id==='screen-shop'){renderShop();tip('shop');}
   if(id==='screen-tower'){renderTower();tip('tower');}
   if(id==='screen-quests'){renderQuests();tip('quests');}
@@ -2669,7 +2699,7 @@ function totalCards(){var n=0;Object.keys(col).forEach(function(k){n+=col[k];});
 function unlockedIdx(){var i=0;while(i<LEVELS.length-1&&prog.cleared[LEVELS[i].id])i++;return i;}
 function renderMenu(){
   var done=LEVELS.filter(function(L){return prog.cleared[L.id];}).length;
-  var g=guided();['mb_tower','mb_shop','mb_deck','mb_quest','mb_online','mb_daily'].forEach(function(b){$(b).classList.toggle('locked',g);});
+  var g=guided();['mb_tower','mb_shop','mb_deck','mb_quest','mb_inv','mb_online','mb_daily'].forEach(function(b){$(b).classList.toggle('locked',g);});
   $('menu_stats').textContent='Niveau '+meta.lvl+' · Histoire : '+done+'/'+LEVELS.length+' (⭐ '+totalStars()+') · Tour : étage '+meta.tower.best+' · Collection : '+distinctOwned()+'/'+ALLN;
   $('mb_story_sub').textContent=done?('Prochain : '+LEVELS[unlockedIdx()].name):'De DB à Super';
 }
@@ -2779,12 +2809,21 @@ function renderShop(){
    Sans fichier pour cette rareté, l'animation de base du jeu est jouée. Un clic passe la vidéo. */
 var ANIM_DIR='assets/animations/',ANIM_EXT=['webm','mp4'],ANIM_KO={};
 var ANIM_FILE={c:'commun',u:'peu-commun',r:'rare',e:'epique',l:'legendaire',m:'mythique',x:'unique'};
-function playSummonVideo(ov,rar){
+function playSummonVideo(ov,rar){return playVideo(ov,'invocation_'+ANIM_FILE[rar]);}
+/* Joue assets/animations/<nom>.webm|mp4 s'il existe (sinon ne fait rien) */
+function playAnim(name){
   return new Promise(function(res){
-    if(ANIM_KO[rar])return res(false);
+    if(ANIM_KO[name])return res(false);
+    var ov=document.createElement('div');ov.style.cssText='position:fixed;inset:0;z-index:95;background:#000';document.body.appendChild(ov);
+    playVideo(ov,name).then(function(ok){ov.remove();res(ok);});
+  });
+}
+function playVideo(ov,name){
+  return new Promise(function(res){
+    if(ANIM_KO[name])return res(false);
     var v=document.createElement('video'),exts=ANIM_EXT.slice(),started=false,done=false;
     function end(ok){if(done)return;done=true;v.remove();res(ok);}
-    function next(){if(started)return end(true);if(!exts.length){ANIM_KO[rar]=1;return end(false);}v.src=ANIM_DIR+'invocation_'+ANIM_FILE[rar]+'.'+exts.shift();}
+    function next(){if(started)return end(true);if(!exts.length){ANIM_KO[name]=1;return end(false);}v.src=ANIM_DIR+name+'.'+exts.shift();}
     v.className='po-video';v.playsInline=true;v.preload='auto';
     v.onerror=next;
     v.oncanplay=function(){if(started)return;started=true;var p=v.play();if(p&&p.catch)p.catch(function(){v.muted=true;v.play().catch(function(){end(true);});});};
@@ -2849,7 +2888,7 @@ function closePackResult(){var ov=$('pack_overlay');ov.classList.add('hidden');o
    PROGRESSION : niveau joueur, missions, connexion, succès, étoiles, éveil, Tour
    ===================================================================== */
 var meta=loadLS('dcz5_meta',null)||{};
-['stats','ach','stars','daily','login','tower','achSeen'].forEach(function(k){if(!meta[k])meta[k]={};});
+['stats','ach','stars','daily','login','tower','achSeen','inv','tr','codes'].forEach(function(k){if(!meta[k])meta[k]={};});
 if(meta.xp==null){meta.xp=0;meta.lvl=1;meta.tickets=1;meta.pity=0;meta.chests=0;meta.freeAt=0;}
 if(!meta.tower.floor){meta.tower.floor=1;meta.tower.best=0;meta.tower.seed=1+Math.floor(Math.random()*99999);}
 function saveMeta(){saveLS('dcz5_meta',meta);}
@@ -2922,7 +2961,7 @@ function claimMission(i){
   var m=meta.daily.list[i],M=MBYID[m.id];if(!m||m.c||m.p<M.n)return;
   m.c=true;saveMeta();setZeni(zeni+M.z);sfxCoin();addXP(M.xp);renderQuests();
 }
-function claimBonus(){if(meta.daily.bonus||!dailyAllDone())return;meta.daily.bonus=true;meta.tickets++;saveMeta();setZeni(zeni+150);sfxVictory();addXP(60);toast('🎁 Bonus du jour !','+1 ticket booster · +150 Zénis','gold');renderQuests();}
+function claimBonus(){if(meta.daily.bonus||!dailyAllDone())return;meta.daily.bonus=true;meta.tickets++;saveMeta();setZeni(zeni+150);giveMat('orbe',5,true);sfxVictory();addXP(60);toast('🎁 Bonus du jour !','+1 ticket booster · +150 Zénis · +5 🔮','gold');renderQuests();}
 
 /* --- Cadeau de connexion (série de 7 jours) --- */
 var LOGIN=[{z:100},{z:150},{tk:1},{z:250},{z:300},{tk:1,z:150},{tk:2,z:500}];
@@ -3028,14 +3067,129 @@ function awakeTxt(st){var w=AW[st];return st?'★'+st+' : +'+fmt(w[0])+' PV'+(w[
 function recalcTot(s){s.maxTot=0;s.units.forEach(function(u){if(u)s.maxTot+=u.maxHp;});s.reserve.forEach(function(r){s.maxTot+=resHp(s,r);});}
 function applyAwaken(s,map){s.units.forEach(function(u){if(!u)return;var w=AW[map?Math.max(0,Math.min(5,map[u.baseId]|0)):awakeOf(u.baseId)];u.hp+=w[0];u.maxHp+=w[0];u.nH+=w[0];u.atk+=w[1];u.nA+=w[1];u.def+=w[2];u.nD+=w[2];u.gauge=Math.max(u.gauge,w[3]);});recalcTot(s);}
 
+/* --- Entraînement : +4 % ATK/DEF/PV par niveau (max 10), payé en Zénis, Orbes de Ki et Parchemins --- */
+var TR_MAX=10,TR_PCT=4,TR_RM={c:1,u:1.5,r:2,e:3,l:4,m:5,x:6};
+var MATS={
+  orbe:{n:'Orbe de Ki',i:'🔮',d:'Sert à entraîner les personnages. Gagnée en combat (Histoire, Tour, Arène, Direct), avec le bonus du jour et en recyclant les doublons.'},
+  parch:{n:'Parchemin de Kaïo',i:'📜',d:'Indispensable à partir du niveau 6 d’entraînement. Tous les 10 étages de la Tour, ou à fabriquer avec des Orbes.'}
+};
+var PARCH_CRAFT={orbe:50,z:5000};
+function trOf(id){return Math.max(0,Math.min(TR_MAX,(meta.tr&&meta.tr[id])|0));}
+function trCost(id,lv){
+  var rm=TR_RM[CARDS[id].rar]||1;
+  return {z:Math.round(100*lv*lv*rm/50)*50,orbe:Math.ceil(2*lv*rm),parch:lv>=6?[1,1,2,2,3][lv-6]:0};
+}
+function matN(k){return (meta.inv&&meta.inv[k])|0;}
+function giveMat(k,n,silent){if(!n)return;meta.inv[k]=Math.max(0,matN(k)+n);saveMeta();if(!silent&&n>0)toast(MATS[k].i+' +'+n+' '+MATS[k].n+(n>1?'s':''),'');}
+function trBlock(id){
+  var lv=trOf(id);if(lv>=TR_MAX)return '';
+  var c=trCost(id,lv+1);
+  return {c:c,ok:zeni>=c.z&&matN('orbe')>=c.orbe&&matN('parch')>=c.parch};
+}
+function costTxt(c){return fmt(c.z)+' Z · '+c.orbe+' 🔮'+(c.parch?' · '+c.parch+' 📜':'');}
+async function trainCard(id){
+  var lv=trOf(id),b=trBlock(id);
+  if(!col[id]||!b){sfxError();return;}
+  if(!b.ok){sfxError();toast('Pas assez de ressources','Il faut '+costTxt(b.c)+'.');return;}
+  setZeni(zeni-b.c.z);meta.inv.orbe-=b.c.orbe;meta.inv.parch-=b.c.parch;meta.tr[id]=lv+1;saveMeta();
+  track('train');
+  await playAnim('entrainement');
+  sfxPower();toast('💪 '+CARDS[id].n+' : entraînement niveau '+(lv+1)+' !','+'+((lv+1)*TR_PCT)+' % ATK, DEF et PV au total','gold');
+  renderInv();if(!$('modal').classList.contains('hidden')&&$('modal').querySelector('[data-tr="'+id+'"]'))showDetails(id);
+}
+function craftParch(){
+  if(matN('orbe')<PARCH_CRAFT.orbe||zeni<PARCH_CRAFT.z){sfxError();toast('Pas assez de ressources','Il faut '+PARCH_CRAFT.orbe+' 🔮 et '+fmt(PARCH_CRAFT.z)+' Zénis.');return;}
+  meta.inv.orbe-=PARCH_CRAFT.orbe;saveMeta();setZeni(zeni-PARCH_CRAFT.z);giveMat('parch',1);sfxCoin();renderInv();
+}
+function applyTraining(s,map){
+  s.units.forEach(function(u){
+    if(!u)return;var lv=map?Math.max(0,Math.min(TR_MAX,map[u.baseId]|0)):trOf(u.baseId);if(!lv)return;
+    var p=lv*TR_PCT,a=Math.round(u.nA*p/100),d=Math.round(u.nD*p/100),h=Math.round(u.nH*p/100);
+    u.atk+=a;u.nA+=a;u.def+=d;u.nD+=d;u.hp+=h;u.maxHp+=h;u.nH+=h;
+  });
+  recalcTot(s);
+}
+function orbHTML(o,p){return (o||p)?'<div class="xpgain" style="color:#c4b5fd">'+(o?'+'+o+' 🔮 ':'')+(p?'+'+p+' 📜':'')+'</div>':'';}
+function trMap(team){var m={};team.forEach(function(id){m[id]=trOf(id);});return m;}
+
+/* --- Écran Inventaire : objets, entraînement, codes cadeaux --- */
+var invTab='train',invFilter='team';
+function setInvTab(t){invTab=t;renderInv();}
+function renderInv(){
+  if(!$('inv_box'))return;
+  var T=[['train','💪 Entraînement'],['items','🎒 Objets'],['codes','🎁 Codes cadeaux']];
+  $('inv_tabs').innerHTML=T.map(function(t){return '<button class="fchip'+(invTab===t[0]?' on':'')+'" onclick="setInvTab(\''+t[0]+'\')">'+t[1]+'</button>';}).join('');
+  var res='<div class="kv"><span class="chip"><i class="coin"></i> '+fmt(zeni)+' Zénis</span><span class="chip">🔮 '+matN('orbe')+' Orbes</span><span class="chip">📜 '+matN('parch')+' Parchemins</span></div>',h='';
+  if(invTab==='items'){
+    h='<div class="panel"><div class="section-title">Ressources</div><div class="matgrid">'+
+      '<div class="mat"><span class="mi">🪙</span><div><b>Zénis</b><span class="hint">La monnaie du jeu.</span></div><span class="mn">'+fmt(zeni)+'</span></div>'+
+      '<div class="mat"><span class="mi">🎫</span><div><b>Tickets booster</b><span class="hint">Ouvrent un booster gratuit dans la Boutique.</span></div><span class="mn">'+meta.tickets+'</span></div>'+
+      Object.keys(MATS).map(function(k){var M=MATS[k];return '<div class="mat"><span class="mi">'+M.i+'</span><div><b>'+M.n+'s</b><span class="hint">'+M.d+'</span></div><span class="mn">'+matN(k)+'</span></div>';}).join('')+
+      '</div></div>'+
+      '<div class="panel"><div class="section-title">📜 Fabriquer un Parchemin</div><p class="hint">'+PARCH_CRAFT.orbe+' 🔮 + '+fmt(PARCH_CRAFT.z)+' Zénis → 1 📜</p>'+
+      '<button class="btn'+(matN('orbe')>=PARCH_CRAFT.orbe&&zeni>=PARCH_CRAFT.z?'':' ghost')+'" onclick="craftParch()">Fabriquer</button></div>'+
+      '<div class="panel"><div class="section-title">♻ Doublons en trop</div><p class="hint">'+(function(){var r=recycleInfo();return r.n?r.n+' cartes en trop : +'+fmt(r.z)+' Zénis et +'+r.o+' 🔮':'Aucune carte en trop pour le moment.';})()+'</p>'+
+      '<button class="btn small" onclick="recycle();renderInv()">Recycler</button></div>';
+  }
+  else if(invTab==='train'){
+    var ids=ownedChars();
+    if(invFilter==='team')ids=ids.filter(function(id){return myTeam.indexOf(id)>=0;});
+    ids.sort(function(a,b){return (myTeam.indexOf(b)>=0)-(myTeam.indexOf(a)>=0)||RIDX[CARDS[b].rar]-RIDX[CARDS[a].rar]||trOf(b)-trOf(a);});
+    h='<div class="panel"><p class="hint">Chaque niveau d’entraînement donne +'+TR_PCT+' % d’ATK, de DEF et de PV au personnage, dans tous les modes (jusqu’à +'+(TR_MAX*TR_PCT)+' % au niveau '+TR_MAX+'). Le coût augmente vite, et encore plus pour les cartes rares.</p>'+
+      '<div class="filters"><button class="fchip'+(invFilter==='team'?' on':'')+'" onclick="invFilter=\'team\';renderInv()">Mon équipe</button><button class="fchip'+(invFilter==='all'?' on':'')+'" onclick="invFilter=\'all\';renderInv()">Tous mes personnages</button></div>';
+    if(!ids.length)h+='<p class="hint">Aucun personnage ici.</p>';
+    ids.forEach(function(id){
+      var lv=trOf(id),b=trBlock(id),bar='';for(var k=1;k<=TR_MAX;k++)bar+='<i class="'+(k<=lv?'on':'')+'"></i>';
+      h+='<div class="trrow">'+cardHTML(id,{noi:true})+'<div class="trinfo"><b>'+CARDS[id].n+'</b> <span class="hint">· niveau '+lv+'/'+TR_MAX+(lv?' · +'+(lv*TR_PCT)+' %':'')+'</span><div class="trbar">'+bar+'</div>'+
+        (b?'<span class="hint">Niveau '+(lv+1)+' : '+costTxt(b.c)+'</span>':'<span class="status-ok">Niveau maximum !</span>')+'</div>'+
+        (b?'<button class="btn small'+(b.ok?'':' ghost')+'" onclick="trainCard(\''+id+'\')">Entraîner</button>':'')+'</div>';
+    });
+    h+='</div>';
+  }
+  else {
+    var who=window.Online&&Online.who();
+    h='<div class="panel"><div class="section-title">🎁 Entrer un code</div>'+
+      (who?'<div class="codebox"><input id="gift_code" placeholder="DCZ-XXXX-XXXX" maxlength="24" autocomplete="off" onkeydown="if(event.key===\'Enter\')redeemCode()"><button class="btn" id="gift_btn" onclick="redeemCode()">Valider</button></div><p class="hint" id="gift_msg">Chaque code ne peut être utilisé qu’une fois par compte.</p>':
+        '<p style="font-weight:800">Connecte-toi au mode Online pour utiliser un code (c’est ce qui empêche de l’utiliser plusieurs fois).</p><button class="btn" onclick="Online.open(\'account\')">Se connecter</button>')+'</div>';
+  }
+  $('inv_box').innerHTML=res+h;
+}
+async function redeemCode(){
+  var inp=$('gift_code'),code=(inp&&inp.value||'').toUpperCase().replace(/\s+/g,'');
+  if(code.length<4){sfxError();$('gift_msg').textContent='Écris ton code.';return;}
+  $('gift_btn').disabled=true;$('gift_msg').textContent='Vérification…';
+  try{var R=await Online.redeem(code);inp.value='';await grantGift(R,code);}
+  catch(e){sfxError();if($('gift_msg'))$('gift_msg').textContent=e.message;}
+  if($('gift_btn'))$('gift_btn').disabled=false;
+}
+/* Récompense d'un code : {z, tk, orbe, parch, cards:[ids], pack:'db'|'z'|'gt'|'s', msg} */
+async function grantGift(R,code){
+  R=R||{};var lines=[],cards=(R.cards||[]).filter(function(id){return CARDS[id]&&!CARDS[id].en;});
+  if(R.z>0){setZeni(zeni+(R.z|0));lines.push('<i class="coin"></i> +'+fmt(R.z)+' Zénis');}
+  if(R.tk>0){setTickets(meta.tickets+(R.tk|0));lines.push('🎫 +'+R.tk+' ticket'+(R.tk>1?'s':'')+' booster');}
+  if(R.orbe>0){giveMat('orbe',R.orbe|0,true);lines.push('🔮 +'+R.orbe+' Orbes de Ki');}
+  if(R.parch>0){giveMat('parch',R.parch|0,true);lines.push('📜 +'+R.parch+' Parchemin'+(R.parch>1?'s':'')+' de Kaïo');}
+  cards.forEach(addCard);
+  meta.codes[code]=Date.now();saveMeta();track('code');
+  await playAnim('cadeau');
+  sfxVictory();renderTop();renderInv();
+  openModal('<h3 class="mtitle">🎁 Cadeau !</h3>'+(R.msg?'<p style="font-weight:800">'+String(R.msg).replace(/[<>&]/g,'')+'</p>':'')+
+    (lines.length?'<div class="abl" style="font-size:16px">'+lines.join('<br>')+'</div>':'')+
+    (cards.length?'<div class="section-title" style="margin-top:12px">Cartes</div><div class="rewards">'+cards.map(function(id,i){return cardHTML(id,{cls:'popin',i:i});}).join('')+'</div>':'')+
+    '<div class="endbtns"><button class="btn big" onclick="closeModal()'+(ERAS[R.pack]?';openGiftPack(\''+R.pack+'\')':'')+'">'+(ERAS[R.pack]?'Ouvrir le booster '+ERAS[R.pack].short+' !':'Super !')+'</button></div>');
+  if(Online.markDirty)Online.markDirty();
+}
+function openGiftPack(era){meta.tickets++;saveMeta();show('screen-shop');openPack(era,true);}
+
 /* --- Recyclage des doublons en trop --- */
 var RECY={c:5,u:10,r:25,e:60,l:150,m:400,x:0};
 function excessOf(id){var c=CARDS[id];if(!c)return 0;var cap=c.t==='p'?6:RAR[c.rar].max;return Math.max(0,(col[id]||0)-cap);}
-function recycleInfo(){var n=0,z=0;Object.keys(col).forEach(function(id){var e=excessOf(id);if(e){n+=e;z+=e*RECY[CARDS[id].rar];}});return {n:n,z:z};}
+var RECY_O={c:1,u:1,r:2,e:4,l:8,m:15,x:0};
+function recycleInfo(){var n=0,z=0,o=0;Object.keys(col).forEach(function(id){var e=excessOf(id);if(e){n+=e;z+=e*RECY[CARDS[id].rar];o+=e*RECY_O[CARDS[id].rar];}});return {n:n,z:z,o:o};}
 function recycle(){
   var r=recycleInfo();if(!r.n){sfxError();return;}
-  Object.keys(col).forEach(function(id){col[id]-=excessOf(id);});saveCol();setZeni(zeni+r.z);sfxCoin();
-  toast('♻ Doublons recyclés','+'+r.z+' Zénis ('+r.n+' cartes en trop)','gold');renderDeck();
+  Object.keys(col).forEach(function(id){col[id]-=excessOf(id);});saveCol();setZeni(zeni+r.z);giveMat('orbe',r.o,true);sfxCoin();
+  toast('♻ Doublons recyclés','+'+r.z+' Zénis · +'+r.o+' 🔮 ('+r.n+' cartes en trop)','gold');renderDeck();
 }
 
 /* --- Booster gratuit (toutes les 4 h) et garantie Légendaire --- */
@@ -3108,13 +3262,14 @@ function endTower(won,L){
     if(R.card!=null){var eras=Object.keys(ERAS),id=pullCard(eras[Math.floor(Math.random()*eras.length)],R.card);if(!col[id])rew.isNew=true;addCard(id);rew.push(id);}
   }
   setZeni(zeni+gain);var ups=addXP(won?R.xp:8);
+  var orb=won?(n%5===0?5:2):0,parch=won&&n%10===0?1:0;giveMat('orbe',orb,true);giveMat('parch',parch,true);
   if(won)sfxVictory();else sfxDefeat();
   var hero=alive(P)[0],box=$('battle_end');
   box.innerHTML='<div class="endbox '+(won?'win':'lose')+'"><div class="endrays"></div>'+
     '<div class="endtitle">'+(won?'ÉTAGE '+n+' !':'DÉFAITE…')+'</div>'+
     '<div class="hero">'+(won&&hero!==undefined?artSVG(P.units[hero].id):bossPortrait(L))+'</div>'+
     '<p>'+(won?'Tu montes à l’étage '+(n+1)+' de la Tour de Karin !'+(n===meta.tower.best?' Nouveau record !':''):'L’étage '+n+' résiste encore. Ajuste ton équipe et retente ta chance !')+'</p>'+
-    '<div class="zgain"><i class="coin"></i>+'+gain+' Zénis</div><div class="xpgain">+'+(won?R.xp:8)+' XP</div>'+
+    '<div class="zgain"><i class="coin"></i>+'+gain+' Zénis</div><div class="xpgain">+'+(won?R.xp:8)+' XP</div>'+orbHTML(orb,parch)+
     ups.map(function(u){return '<div class="lvup">NIVEAU '+u.l+' !</div>';}).join('')+
     (rew.length?'<div class="section-title" style="margin-top:12px">Carte de palier</div><div class="rewards">'+rew.map(function(r,i){return cardHTML(r,{cls:'popin',i:i,isNew:rew.isNew});}).join('')+'</div>':'')+
     '<div class="endbtns">'+(won?'<button class="btn big" onclick="startTower()">Étage suivant ▶</button>':'<button class="btn big" onclick="startTower()">Réessayer</button><button class="btn blue big" onclick="$(\'battle_end\').classList.add(\'hidden\');openDeckScreen()">Mon équipe</button>')+
@@ -3378,10 +3533,11 @@ function startBattle(li,Lobj){
     if(!L.tuto)shuffle(ed);
   }
   P=newSide('me','Ton équipe',pteam,pdeck,[],1);
-  if(L.live)applyAwaken(P,L.me.aw);else if(!L.tuto)applyAwaken(P);
+  if(L.live){applyAwaken(P,L.me.aw);applyTraining(P,L.me.tr);}else if(!L.tuto){applyAwaken(P);applyTraining(P);}
   E=newSide('foe',L.name,parseTeam(L.team),ed,parseTeam(L.reserve),L.bx||1);
   if(L.scale)applyScale(E,L.scale);
   if(L.aw)applyAwaken(E,L.aw);
+  if(L.tr)applyTraining(E,L.tr);
   if(!L.tuto&&!L.pvp)applyFoeBoost(E);
   applySynergies(P);applySynergies(E);
   [P,E].forEach(function(s){
@@ -4065,7 +4221,8 @@ function endGame(won){
     starChests();
   }
   setZeni(zeni+gain);
-  var xp=won?(first?60:30):12,ups=addXP(xp);
+  var xp=won?(first?60:30):12,ups=addXP(xp),orb=won&&!L.tuto?(first?3:1):0;
+  giveMat('orbe',orb,true);
   if(won)sfxVictory();else sfxDefeat();
   var next=first&&curLevel+1<LEVELS.length?LEVELS[curLevel+1]:null,hero=alive(P)[0];
   var box=$('battle_end');
@@ -4074,7 +4231,7 @@ function endGame(won){
     '<div class="hero">'+(won&&hero!==undefined?artSVG(P.units[hero].id):bossPortrait(L))+'</div>'+
     '<p>'+(won?(first?'Tu as vaincu '+L.name+' pour la première fois !':'Tu as encore battu '+L.name+' !'):L.name+' a vaincu ton équipe… Réessaie, tu vas y arriver !')+'</p>'+
     (won&&!L.tuto?'<div style="font-size:30px">'+starsHTML(st)+'</div><div class="hint">'+STAR_TXT.map(function(t,k){return (k<st?'★ ':'☆ ')+t;}).join('<br>')+'</div>'+(st>oldSt&&oldSt?'<div class="xpgain">Nouvelles étoiles : +'+(st-oldSt)*25+' Z</div>':''):'')+
-    '<div class="zgain"><i class="coin"></i>+'+gain+' Zénis</div><div class="xpgain">+'+xp+' XP</div>'+
+    '<div class="zgain"><i class="coin"></i>+'+gain+' Zénis</div><div class="xpgain">+'+xp+' XP</div>'+orbHTML(orb,0)+
     ups.map(function(u){return '<div class="lvup">NIVEAU '+u.l+' !</div>';}).join('')+
     (rew.length?'<div class="section-title" style="margin-top:12px">Cartes obtenues</div><div class="rewards">'+rew.map(function(r,i){return cardHTML(r,{cls:'popin',i:i});}).join('')+'</div>':'')+
     (next?'<p style="color:#4ade80">Niveau débloqué : '+next.arc+' — '+next.name+'</p>':'')+
@@ -4114,7 +4271,7 @@ function init(){
 init();
 </script>
 <!-- Augmenter le numéro à chaque modification de online.js, pour que les navigateurs ne gardent pas l'ancienne version en cache -->
-<script src="online.js?v=7"></script>
-<script src="live.js?v=1"></script>
+<script src="online.js?v=8"></script>
+<script src="live.js?v=2"></script>
 </body>
 </html>

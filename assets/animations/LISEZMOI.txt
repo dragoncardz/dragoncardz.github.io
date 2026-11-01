@@ -14,6 +14,10 @@ Noms des fichiers (en .webm ou .mp4) :
   invocation_legendaire.webm
   invocation_mythique.webm
 
+AUTRES ANIMATIONS (même principe : jouées si le fichier existe, sinon rien)
+  cadeau.webm         → quand un joueur valide un code cadeau, avant d'afficher ses récompenses
+  entrainement.webm   → quand un personnage passe un niveau d'entraînement (Inventaire)
+
 Conseils pour les animateurs :
   - Vidéo de 2 à 6 secondes, 1920 x 1080 (elle remplit l'écran et est recadrée sur les bords
     sur téléphone : garder l'action importante au centre).
