@@ -9,7 +9,7 @@
 var SUPA_URL='https://tugraajxznhtyqwzkosb.supabase.co';
 var SUPA_KEY='sb_publishable_iEhjmAoVo3xE-qJUM81mKw_4EANtdiE';
 
-var ONLINE_V=8;
+var ONLINE_V=9;
 var Online=(function(){
   var SESS_KEY='dczo_session',SYNC_KEY='dczo_sync',OWNER_KEY='dczo_owner';
   var sess=null,me=null,rank=null,tab='account',lbTab='all',pushTimer=null,dirty=false,lastSync=null,busyNet=false,opps=null,friendsData=null,friendsLoading=false,searchRes=null,msg='';
@@ -417,14 +417,18 @@ var Online=(function(){
     /* Code cadeau : vérifié côté serveur (fonction redeem_code), une seule fois par compte */
     redeem:async function(code){
       if(!me)throw new Error('Connecte-toi d’abord.');
-      try{return await req('/rest/v1/rpc/redeem_code',{method:'POST',body:{p_code:code}});}
+      var C={invalid_code:'Ce code n’existe pas.',already_used:'Tu as déjà utilisé ce code.',expired:'Ce code a expiré.',exhausted:'Ce code a déjà été utilisé le nombre maximum de fois.',
+          too_many:'Trop d’essais : réessaie dans une heure.',not_logged_in:'Connecte-toi d’abord.'},R,m;
+      try{R=await req('/rest/v1/rpc/redeem_code',{method:'POST',body:{p_code:code}});}
       catch(e){
-        var m=e.message||'',C={invalid_code:'Ce code n’existe pas.',already_used:'Tu as déjà utilisé ce code.',expired:'Ce code a expiré.',exhausted:'Ce code a déjà été utilisé le nombre maximum de fois.',
-          too_many:'Trop d’essais : réessaie dans une heure.',not_logged_in:'Connecte-toi d’abord.'};
+        m=e.message||'';
         for(var k in C)if(m.indexOf(k)>=0)throw new Error(C[k]);
         if(/redeem_code|PGRST202|404/.test(m))throw new Error('Les codes cadeaux ne sont pas encore activés sur le serveur.');
         throw e;
       }
+      // Refus renvoyé par le serveur : {error:'...'}
+      if(R&&R.error)throw new Error(C[R.error]||R.error);
+      return R;
     },
     who:function(){return me&&uid()?{uid:uid(),pseudo:me.pseudo,lvl:meta.lvl||1}:null;},
     friendIds:function(){var o={};if(friendsData)friendsData.rows.forEach(function(r){if(r.status==='accepted')o[r.user_id===uid()?r.friend_id:r.user_id]=1;});return o;},

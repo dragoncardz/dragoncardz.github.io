@@ -44,23 +44,24 @@ declare
   v_hash text;
   v_gift public.gift_codes;
 begin
-  if v_uid is null then raise exception 'not_logged_in'; end if;
+  -- Les refus sont renvoyés (et non levés en erreur) pour que l'essai raté reste bien enregistré
+  if v_uid is null then return jsonb_build_object('error','not_logged_in'); end if;
 
   -- 20 codes faux maximum par heure et par compte
   if (select count(*) from public.gift_attempts where user_id = v_uid and at > now() - interval '1 hour') >= 20 then
-    raise exception 'too_many';
+    return jsonb_build_object('error','too_many');
   end if;
 
-  v_hash := encode(extensions.digest(convert_to(upper(regexp_replace(coalesce(p_code,''), '\s', '', 'g')), 'UTF8'), 'sha256'), 'hex');
+  v_hash := encode(extensions.digest(convert_to(upper(regexp_replace(coalesce(p_code,''), '[^A-Za-z0-9-]', '', 'g')), 'UTF8'), 'sha256'), 'hex');
 
   select * into v_gift from public.gift_codes where code_hash = v_hash for update;
   if not found then
     insert into public.gift_attempts(user_id) values (v_uid);
-    raise exception 'invalid_code';
+    return jsonb_build_object('error','invalid_code','len',length(p_code));
   end if;
-  if v_gift.expires_at is not null and v_gift.expires_at < now() then raise exception 'expired'; end if;
-  if exists(select 1 from public.gift_redemptions where code_hash = v_hash and user_id = v_uid) then raise exception 'already_used'; end if;
-  if v_gift.max_uses > 0 and v_gift.uses >= v_gift.max_uses then raise exception 'exhausted'; end if;
+  if v_gift.expires_at is not null and v_gift.expires_at < now() then return jsonb_build_object('error','expired'); end if;
+  if exists(select 1 from public.gift_redemptions where code_hash = v_hash and user_id = v_uid) then return jsonb_build_object('error','already_used'); end if;
+  if v_gift.max_uses > 0 and v_gift.uses >= v_gift.max_uses then return jsonb_build_object('error','exhausted'); end if;
 
   insert into public.gift_redemptions(code_hash, user_id) values (v_hash, v_uid);
   update public.gift_codes set uses = uses + 1 where code_hash = v_hash;
