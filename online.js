@@ -6,8 +6,8 @@
 /* Configuration : remplis ces deux valeurs avec celles de ton projet Supabase
    (Project Settings > API : « Project URL » et la clé « anon public » / « publishable »).
    La clé publique est faite pour être visible : la sécurité vient des règles du schéma. */
-var SUPA_URL='';
-var SUPA_KEY='';
+var SUPA_URL='https://tugraajxznhtyqwzkosb.supabase.co';
+var SUPA_KEY='sb_publishable_iEhjmAoVo3xE-qJUM81mKw_4EANtdiE';
 
 var Online=(function(){
   var SESS_KEY='dczo_session',SYNC_KEY='dczo_sync',OWNER_KEY='dczo_owner';
@@ -23,7 +23,9 @@ var Online=(function(){
   async function req(path,opt){
     opt=opt||{};
     if(opt.auth!==false)await ensureFresh();
-    var h={'apikey':SUPA_KEY,'Content-Type':'application/json','Authorization':'Bearer '+(sess&&opt.auth!==false?sess.access_token:SUPA_KEY)};
+    /* La clé publique va dans « apikey » ; « Authorization » ne porte que le jeton d'un joueur connecté */
+    var h={'apikey':SUPA_KEY,'Content-Type':'application/json'};
+    if(sess&&opt.auth!==false)h.Authorization='Bearer '+sess.access_token;
     if(opt.prefer)h.Prefer=opt.prefer;
     var r;
     try{r=await fetch(SUPA_URL+path,{method:opt.method||'GET',headers:h,body:opt.body!=null?JSON.stringify(opt.body):undefined,keepalive:!!opt.keepalive});}
