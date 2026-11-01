@@ -9,7 +9,7 @@
 var SUPA_URL='https://tugraajxznhtyqwzkosb.supabase.co';
 var SUPA_KEY='sb_publishable_iEhjmAoVo3xE-qJUM81mKw_4EANtdiE';
 
-var ONLINE_V=4;
+var ONLINE_V=5;
 var Online=(function(){
   var SESS_KEY='dczo_session',SYNC_KEY='dczo_sync',OWNER_KEY='dczo_owner';
   var sess=null,me=null,rank=null,tab='account',lbTab='all',pushTimer=null,dirty=false,lastSync=null,busyNet=false,opps=null,friendsData=null,friendsLoading=false,searchRes=null,msg='';
@@ -85,9 +85,25 @@ var Online=(function(){
   }
   async function resetPassword(email){await req('/auth/v1/recover?redirect_to='+encodeURIComponent(location.href.split('#')[0]),{method:'POST',auth:false,body:{email:email}});}
   async function setPassword(pass){await req('/auth/v1/user',{method:'PUT',body:{password:pass}});}
+  /* Connexion Google / Facebook / Discord : les boutons n'apparaissent que si le fournisseur est activé dans Supabase */
+  var PROV={google:['Google','#fff','#1f1f1f'],facebook:['Facebook','#1877f2','#fff'],discord:['Discord','#5865f2','#fff']},provOn=[];
+  async function loadProviders(){
+    try{var s=await req('/auth/v1/settings',{auth:false});provOn=Object.keys(PROV).filter(function(k){return s&&s.external&&s.external[k];});}catch(e){provOn=[];}
+  }
+  function oauth(p){location.href=SUPA_URL+'/auth/v1/authorize?provider='+p+'&redirect_to='+encodeURIComponent(location.href.split('#')[0]);}
+  function oauthHTML(){
+    if(!provOn.length)return '';
+    return '<div class="panel"><div class="section-title">Connexion rapide</div><div class="endbtns" style="justify-content:flex-start">'+
+      provOn.map(function(k){var P=PROV[k];return '<button class="btn" style="background:'+P[1]+';color:'+P[2]+';box-shadow:0 4px 0 rgba(0,0,0,.35)" onclick="Online.doOAuth(\''+k+'\')">Continuer avec '+P[0]+'</button>';}).join('')+
+      '</div><p class="hint">Aucun mot de passe à retenir. Tu choisiras ton pseudo juste après.</p></div>';
+  }
 
   /* Retour depuis un lien reçu par email (confirmation de compte ou mot de passe oublié) */
   function readHash(){
+    if(/error_description=/.test(location.hash)){
+      var m=decodeURIComponent((location.hash.match(/error_description=([^&]*)/)||[])[1]||'').replace(/\+/g,' ');
+      history.replaceState(null,'',location.pathname+location.search);toast('Connexion impossible',m);return null;
+    }
     if(!location.hash||location.hash.indexOf('access_token=')<0)return null;
     var p={};location.hash.slice(1).split('&').forEach(function(kv){var i=kv.indexOf('=');p[decodeURIComponent(kv.slice(0,i))]=decodeURIComponent(kv.slice(i+1));});
     history.replaceState(null,'',location.pathname+location.search);
@@ -301,7 +317,7 @@ var Online=(function(){
     if(tab==='board')renderBoard();
   }
   function accountHTML(){
-    if(!sess)return '<div class="panel"><div class="section-title">Connexion</div>'+
+    if(!sess)return oauthHTML()+'<div class="panel"><div class="section-title">Connexion'+(provOn.length?' par email':'')+'</div>'+
       '<div class="ofrm"><input id="o_email" type="email" placeholder="Email" autocomplete="email"><input id="o_pass" type="password" placeholder="Mot de passe" autocomplete="current-password">'+
       '<div class="endbtns"><button class="btn" onclick="Online.doSignIn()">Se connecter</button><button class="linkbtn" onclick="Online.doReset()">Mot de passe oublié ?</button></div></div></div>'+
       '<div class="panel"><div class="section-title">Créer un compte</div>'+
@@ -365,6 +381,7 @@ var Online=(function(){
     updateBadge();
     if(!configured())return;
     try{sess=JSON.parse(lsGet(SESS_KEY)||'null');}catch(e){sess=null;}
+    loadProviders().then(function(){if(!sess&&!$('screen-online').classList.contains('hidden'))render();});
     var hp=readHash();
     if(hp&&hp.access_token){
       setSessFromToken({access_token:hp.access_token,refresh_token:hp.refresh_token,expires_in:+hp.expires_in||3600});
@@ -387,6 +404,7 @@ var Online=(function(){
   return {
     init:init,open:open,render:render,markDirty:markDirty,isPvp:function(L){return !!(L&&L.pvp);},endPvp:endPvp,showProfile:act(showProfile),fightFriend:act(fightFriend),
     keepCloud:keepCloud,keepLocal:act(keepLocal),setBoard:function(t){lbTab=t;render();},
+    doOAuth:function(p){oauth(p);},
     doSignIn:act(async function(){await signIn(val('o_email'),$('o_pass').value);}),
     doSignUp:act(async function(){var p=$('o_spass').value;if(p.length<8)throw new Error('Le mot de passe doit faire au moins 8 caractères.');var r=await signUp(val('o_semail'),p,val('o_pseudo'));if(r==='confirm')openModal('<h3 class="mtitle">Vérifie tes emails</h3><p style="font-weight:800">Un lien de confirmation vient d’être envoyé à '+esc(val('o_semail'))+'. Clique dessus pour activer ton compte : tu reviendras ici connecté.</p>');}),
     doReset:act(async function(){var e=val('o_email');if(!e)throw new Error('Écris ton email dans le champ ci-dessus.');await resetPassword(e);openModal('<h3 class="mtitle">Email envoyé</h3><p style="font-weight:800">Si un compte existe pour '+esc(e)+', tu vas recevoir un lien pour choisir un nouveau mot de passe.</p>');}),

@@ -24,6 +24,19 @@ INSTALLER LE MODE ONLINE (Supabase) — environ 10 minutes
    - Cette clé publique est faite pour être visible dans le jeu : la sécurité vient des règles du schéma.
    - NE METS JAMAIS la clé « service_role » (ou « secret ») dans le jeu : elle donne tous les droits.
 
+5. (Optionnel) Connexion avec Google, sans email ni mot de passe à taper
+   - Va sur https://console.cloud.google.com > crée un projet > « API et services » > « Écran de consentement OAuth »
+     (type Externe, nom : Dragon Card Z), puis « Identifiants » > « Créer des identifiants » > « ID client OAuth »,
+     type « Application Web ».
+   - Dans « URI de redirection autorisés », colle l'adresse indiquée par Supabase :
+       https://tugraajxznhtyqwzkosb.supabase.co/auth/v1/callback
+   - Copie l'ID client et le Code secret client dans Supabase : « Authentication » > « Sign In / Providers » > Google,
+     active-le et enregistre.
+   - Le bouton « Continuer avec Google » apparaît alors tout seul dans le jeu (rien à modifier dans le code).
+   - Même principe pour Facebook (developers.facebook.com) ou Discord (discord.com/developers) : le bouton
+     apparaît dès que le fournisseur est activé dans Supabase.
+   - Le code secret client reste dans Supabase : ne le mets jamais dans le jeu.
+
 Ce qui est protégé
    - Chaque joueur ne peut lire et modifier que SA sauvegarde.
    - Les profils (pseudo, équipe, collection) sont publics, mais seul leur propriétaire peut les modifier.

@@ -124,8 +124,8 @@ main{position:relative;z-index:1;padding:16px;max-width:1000px;margin:0 auto}
   background-size:250% 100%,100% 100%;background-position:180% 0,0 0;-webkit-background-clip:text;background-clip:text;color:transparent;
   animation:titleShine 4.5s ease-in-out infinite}
 @keyframes titleShine{0%,55%{background-position:180% 0,0 0}100%{background-position:-80% 0,0 0}}
-@keyframes logoFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
-.title .z{display:inline-block;font-size:1.3em;transform:rotate(-8deg);margin-left:.05em;
+@keyframes logoFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
+.title .z{display:inline-block;font-size:1.3em;line-height:1.05;transform:rotate(-8deg);margin-left:-.02em;padding:.1em .14em .06em .08em;
   background:linear-gradient(180deg,#fff1a8,#ff5a00 55%,#a10000);-webkit-background-clip:text;background-clip:text;color:transparent}
 .tagline{display:inline-block;margin-top:8px;font-family:var(--font-ui);font-size:15px;letter-spacing:1px;padding:5px 16px;border-radius:20px;
   background:rgba(0,0,0,.35);border:1px solid rgba(255,210,63,.4);color:#ffe9b0}
@@ -134,8 +134,8 @@ main{position:relative;z-index:1;padding:16px;max-width:1000px;margin:0 auto}
   animation:fanIn 1s cubic-bezier(.2,1.2,.3,1) backwards;animation-delay:var(--d)}
 .sc.mid{top:0;z-index:2}
 @keyframes fanIn{from{transform:translateX(-50%) translate(0,90px) rotate(0) scale(.3);opacity:0}}
-.floaty{animation:floaty 4s ease-in-out infinite;animation-delay:var(--d)}
-@keyframes floaty{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+.floaty{animation:floaty 6s ease-in-out infinite;animation-delay:var(--d)}
+@keyframes floaty{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
 .sc .card{--w:124px}
 .sc.mid .card{--w:146px}
 .menu-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;width:min(580px,100%);margin-top:18px}
@@ -402,7 +402,7 @@ main{position:relative;z-index:1;padding:16px;max-width:1000px;margin:0 auto}
 .foe .slot .card{animation-delay:-1.5s}
 .slot .card.summon{animation:summon .65s cubic-bezier(.2,1.4,.4,1),idle 3s ease-in-out .65s infinite}
 .slot .card.tfin{animation:tfin .8s ease-out,idle 3s ease-in-out .8s infinite}
-@keyframes idle{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
+@keyframes idle{0%,100%{transform:translateY(0)}50%{transform:translateY(-2px)}}
 @keyframes summon{from{transform:translateY(-120px) scale(1.4);opacity:0;filter:brightness(3)}}
 @keyframes tfin{from{transform:scale(1.35);filter:brightness(3.5) saturate(0)}}
 .plat{width:150px;height:22px;border-radius:50%;background:radial-gradient(ellipse,rgba(0,0,0,.6),transparent 70%);margin-top:-6px}
@@ -422,7 +422,7 @@ main{position:relative;z-index:1;padding:16px;max-width:1000px;margin:0 auto}
 @keyframes breathe{50%{border-color:rgba(255,210,63,.9);box-shadow:0 0 18px rgba(255,210,63,.35)}}
 .vsmark{position:absolute;left:50%;top:44%;transform:translate(-50%,-50%);font-family:var(--font-title);font-size:clamp(34px,7vw,56px);color:#ffd23f;
   -webkit-text-stroke:2px #3a0d00;text-shadow:0 4px 0 #3a0d00,0 0 22px rgba(255,160,0,.8);z-index:3;animation:vsPulse 1.6s ease-in-out infinite;pointer-events:none}
-@keyframes vsPulse{50%{transform:translate(-50%,-50%) scale(1.12) rotate(-4deg)}}
+@keyframes vsPulse{50%{transform:translate(-50%,-50%) scale(1.05) rotate(-2deg)}}
 .fxlayer{position:absolute;inset:0;pointer-events:none;z-index:6}
 .spark{position:absolute;border-radius:50%;box-shadow:0 0 8px currentColor}
 .ring{position:absolute;width:60px;height:60px;margin:-30px 0 0 -30px;border-radius:50%;border:4px solid #fff}
@@ -464,17 +464,38 @@ main{position:relative;z-index:1;padding:16px;max-width:1000px;margin:0 auto}
 .db{width:15px;height:15px;border-radius:50%;background:rgba(255,255,255,.1);box-shadow:inset 0 0 0 1px rgba(255,255,255,.22)}
 .db.on{background:radial-gradient(circle at 35% 30%,#fff6c9,#ffb020 45%,#d45a00);box-shadow:0 0 8px #ff9a00}
 .db.pop{animation:kipop .6s cubic-bezier(.2,1.8,.4,1)}
-.handwrap{margin-top:14px}
-.hand{display:flex;justify-content:center;flex-wrap:wrap;gap:10px;min-height:150px;padding:10px 0 6px}
-.hand .card{--w:112px}
-.log{background:rgba(0,0,0,.45);border:1px solid var(--line);border-radius:14px;padding:8px 12px;font-size:12.5px;max-height:120px;overflow-y:auto;font-weight:700;margin-top:8px}
-.log div{padding:1px 0;color:rgba(255,240,220,.75)}
-.log div:first-child{color:#ffd23f;animation:fadeUp .3s}
+/* Combat plein écran : tout tient sans scroller */
+body.inbattle main{padding:6px 10px 4px;max-width:1100px}
+body.inbattle{overflow:hidden}
+#screen-battle{display:flex;flex-direction:column;height:calc(100vh - var(--tbh,56px) - 10px);height:calc(100dvh - var(--tbh,56px) - 10px)}
+#screen-battle .arena{flex:none}
+.kiline{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.kiline .boules{padding:2px 6px;gap:3px;margin-top:5px;background:rgba(0,0,0,.3);border:none}
+.kiline .db{width:11px;height:11px}
+.bbar{flex:1 1 auto;min-height:0;display:flex;align-items:center;gap:10px;padding:2px 0}
+.bside{display:flex;flex-direction:column;align-items:center;gap:8px;flex:none}
+.bside .cineb{height:28px;padding:0 8px;font-size:11px}
+.hand{flex:1 1 auto;min-width:0;display:flex;flex-wrap:nowrap;gap:8px;overflow-x:auto;overflow-y:hidden;padding:12px 4px 6px;scrollbar-width:thin}
+.hand>.card:first-child,.hand>.empty:first-child{margin-left:auto}.hand>.card:last-child,.hand>.empty:last-child{margin-right:auto}
+.hand .card{--w:var(--hw,96px)}
+#btn_end{flex:none;align-self:center;flex-direction:column;gap:2px;padding:12px 16px;min-width:96px;line-height:1.1}
+#btn_end svg{width:24px;height:24px}
+#btn_end:not(:disabled){animation:endGlow 1.6s ease-in-out infinite}
+@keyframes endGlow{50%{box-shadow:0 4px 0 #0f2f7a,0 0 22px rgba(124,199,255,.8),inset 0 1px 0 rgba(255,255,255,.5)}}
+.ticker{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:5;max-width:min(560px,80%);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  background:rgba(0,0,0,.62);border:1px solid rgba(255,220,170,.3);border-radius:20px;padding:4px 14px;font-size:13px;font-weight:800;color:#ffe9b0;pointer-events:none;opacity:0;transition:opacity .3s}
+.ticker.on{opacity:1}
+.logbtn{position:absolute;left:8px;top:50%;transform:translateY(-50%);z-index:7;width:34px;height:34px;border-radius:50%;border:none;cursor:pointer;background:rgba(0,0,0,.55);box-shadow:inset 0 0 0 1.5px rgba(255,220,170,.4);font-size:16px}
+.log{position:absolute;left:8px;right:8px;top:8px;bottom:8px;z-index:8;display:none;background:rgba(10,5,15,.94);border:1px solid var(--line);border-radius:14px;padding:10px 14px;font-size:13px;overflow-y:auto;font-weight:700;cursor:pointer}
+.log.open{display:block}
+.log::before{content:"📜 Historique du combat · touche pour fermer";display:block;font-family:var(--font-ui);font-size:14px;color:#ffd23f;margin-bottom:6px}
+.log div{padding:2px 0;color:rgba(255,240,220,.8)}
+.log div:nth-child(1){color:#ffd23f}
 @keyframes fadeUp{from{opacity:0;transform:translateY(6px)}}
 @keyframes fadeIn{from{opacity:0}}
 
 /* ---------- Tutoriel ---------- */
-.guideportrait{width:62px;height:62px;flex:none;border-radius:50%;overflow:hidden;border:3px solid #7fd0ff;box-shadow:0 0 16px rgba(127,208,255,.6);animation:floaty 2.6s ease-in-out infinite}
+.guideportrait{width:62px;height:62px;flex:none;border-radius:50%;overflow:hidden;border:3px solid #7fd0ff;box-shadow:0 0 16px rgba(127,208,255,.6)}
 .guideportrait svg{width:100%;height:100%;display:block}
 .guidename{font-family:var(--font-ui);color:#e85d00;font-size:13px;margin-bottom:2px}
 .tipn{display:inline-block;background:#2563eb;color:#fff;border-radius:10px;padding:0 6px;font-size:11px;margin-left:4px}
@@ -486,8 +507,21 @@ main{position:relative;z-index:1;padding:16px;max-width:1000px;margin:0 auto}
 .tipbox .btn.ghost{color:#2a1608;box-shadow:inset 0 0 0 2px rgba(42,22,8,.25)}
 .tipc{flex:1;min-width:0}
 @keyframes tipIn{from{opacity:0;transform:translateX(-50%) translateY(-24px) scale(.9)}}
-.tfocus{outline:3px solid #ffd23f!important;outline-offset:4px;animation:focusPulse 1s ease-in-out infinite!important;position:relative;z-index:5}
-@keyframes focusPulse{50%{outline-color:rgba(255,210,63,.25)}}
+.tipbox.low{top:auto;bottom:calc(14px + env(safe-area-inset-bottom,0px))}
+.tipbox .gtap{font-size:12.5px;font-weight:900;color:#c2410c;align-self:center}
+#tutoblock{position:fixed;inset:0;z-index:74;cursor:not-allowed}
+#tutoblock.dim{background:rgba(5,2,10,.62)}
+#tuthole{position:fixed;border-radius:14px;pointer-events:none;box-shadow:0 0 0 200vmax rgba(5,2,10,.62);outline:3px solid #ffd23f;outline-offset:2px;animation:focusPulse 1.2s ease-in-out infinite;transition:left .2s,top .2s,width .2s,height .2s}
+@keyframes focusPulse{50%{outline-color:rgba(255,210,63,.3)}}
+.kaiotip{position:fixed;left:12px;bottom:calc(12px + env(safe-area-inset-bottom,0px));z-index:80;display:flex;gap:10px;align-items:center;max-width:min(380px,calc(100vw - 24px));
+  background:#fffaf0;color:#2a1608;border-radius:14px;padding:8px 12px 8px 8px;font-size:13px;font-weight:700;box-shadow:0 10px 26px rgba(0,0,0,.5),0 0 0 2px #7fd0ff;cursor:pointer;animation:toastIn .4s ease both}
+.kaiotip .guideportrait{width:40px;height:40px;border-width:2px}
+.kaiotip.out{transition:.4s;opacity:0;transform:translateY(10px)}
+.mbtn.locked{filter:grayscale(.85) brightness(.55);cursor:not-allowed}
+.mbtn.locked::after{display:none}
+.mbtn.locked .mic svg{opacity:.35}
+.mbtn.locked .mic::after{content:"🔒";position:absolute;font-size:20px}
+.mbtn .mic{position:relative}
 
 /* ---------- Modales ---------- */
 .modal{position:fixed;inset:0;z-index:70;display:flex;align-items:center;justify-content:center;padding:16px;background:rgba(5,2,10,.8);
@@ -541,7 +575,7 @@ main{position:relative;z-index:1;padding:16px;max-width:1000px;margin:0 auto}
 .pack{--pw:150px;width:var(--pw);height:calc(var(--pw)*1.45);position:relative;cursor:pointer;flex:none;perspective:800px;animation:packFloat 3.6s ease-in-out infinite}
 .packcol:nth-child(2) .pack{animation-delay:-1.2s}.packcol:nth-child(3) .pack{animation-delay:-2.4s}.packcol:nth-child(4) .pack{animation-delay:-.6s}
 .pack.poor{filter:grayscale(.6) brightness(.7)}
-@keyframes packFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
+@keyframes packFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
 .pack-inner{position:absolute;inset:0;transform:rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg));transition:transform .35s ease}
 .pack-body{position:absolute;inset:0;border-radius:8px;overflow:hidden;display:flex;flex-direction:column;align-items:center;
   background:radial-gradient(circle at 50% 42%,var(--pa) 0,var(--pb) 55%,var(--pc) 100%);
@@ -630,7 +664,6 @@ main{position:relative;z-index:1;padding:16px;max-width:1000px;margin:0 auto}
   .fighter{--fw:94px;width:44%}
   .fighter.me{left:1%}.fighter.foe{right:1%}
   .passive{font-size:9px}
-  .hand .card{--w:94px}
   .cardrow .card{--w:96px}
   .cardrow{gap:12px}
   .flip,.flip-front .card{--w:104px}
@@ -645,7 +678,7 @@ main{position:relative;z-index:1;padding:16px;max-width:1000px;margin:0 auto}
 }
 
 /* ---------- Combat en équipe ---------- */
-.arena.team{--tw:clamp(56px,calc((min(100vw,1000px) - 90px)/5.4),124px);height:calc(var(--tw)*3.1 + 60px);min-height:0}
+.arena.team{--tw:clamp(44px,min(calc((min(100vw,1100px) - 60px)/5.6),calc((100dvh - var(--tbh,56px) - 360px)/3.1)),124px);height:calc(var(--tw)*3.1 + 40px);min-height:0;margin:8px 0 6px}
 .row{position:absolute;left:0;right:0;display:flex;justify-content:center;gap:calc(var(--tw)*.1);z-index:2}
 .row.foe{top:12px}.row.me{bottom:12px}
 .slotx{position:relative;width:var(--tw);height:calc(var(--tw)*1.42);cursor:pointer;flex:none}
@@ -710,19 +743,20 @@ main{position:relative;z-index:1;padding:16px;max-width:1000px;margin:0 auto}
 /* ---------- Cut-ins 2.5D ---------- */
 .cutin{position:fixed;inset:0;z-index:90;overflow:hidden;display:block}
 .cutin .ci-dim{position:absolute;inset:0;background:radial-gradient(ellipse at center,rgba(0,0,0,.3),rgba(0,0,0,.88));animation:fadeIn .2s both}
-.ci-band{position:absolute;left:-10%;right:-10%;top:50%;height:min(50vh,400px);transform:translateY(-50%) skewY(-7deg);overflow:hidden;
-  background:linear-gradient(90deg,var(--c2),var(--c1) 50%,var(--c2));box-shadow:0 0 0 6px #fff,0 0 0 11px #000,0 0 70px var(--c1);
+.ci-band{position:absolute;left:-10%;right:-10%;top:50%;height:min(30vh,230px);transform:translateY(-50%) skewY(-5deg);overflow:hidden;
+  background:linear-gradient(90deg,var(--c2),var(--c1) 50%,var(--c2));box-shadow:0 0 0 4px #fff,0 0 0 8px #000,0 0 50px var(--c1);
   animation:bandIn .28s cubic-bezier(.2,.9,.3,1.2) both}
-.cutin.ult .ci-band{height:min(66vh,540px)}
-.cutin.team .ci-band{height:min(62vh,500px)}
-@keyframes bandIn{from{transform:translateY(-50%) skewY(-7deg) scaleY(0)}}
+.cutin.special .ci-dim{background:rgba(0,0,0,.35)}
+.cutin.ult .ci-band{height:min(44vh,340px)}
+.cutin.team .ci-band{height:min(42vh,320px)}
+@keyframes bandIn{from{transform:translateY(-50%) skewY(-5deg) scaleY(0)}}
 .ci-lines{position:absolute;inset:-30% -10%;background:repeating-linear-gradient(90deg,transparent 0 30px,rgba(255,255,255,.4) 30px 34px,transparent 34px 90px);animation:cilines .22s linear infinite}
 .cutin.foe .ci-lines{animation-direction:reverse}
 @keyframes cilines{to{transform:translateX(-90px)}}
 .ci-burst{position:absolute;left:30%;top:50%;width:160vmax;height:160vmax;margin:-80vmax;opacity:.35;animation:spin 6s linear infinite;
   background:repeating-conic-gradient(#fff 0 4deg,transparent 4deg 14deg);-webkit-mask:radial-gradient(circle,#000,transparent 45%);mask:radial-gradient(circle,#000,transparent 45%)}
 .cutin.foe .ci-burst{left:70%}
-.ci-stage{position:absolute;inset:0;transform:skewY(7deg);perspective:900px}
+.ci-stage{position:absolute;inset:0;transform:skewY(5deg);perspective:900px}
 .ci-aura,.ci-char{position:absolute;left:8%;top:-8%;height:116%;aspect-ratio:10/9}
 .ci-aura{filter:blur(16px) brightness(1.7) saturate(1.6);opacity:.75;animation:auraCam 1.8s ease-out both}
 .ci-char{filter:drop-shadow(10px 10px 0 rgba(0,0,0,.45));animation:charCam 1.8s cubic-bezier(.15,.8,.25,1) both}
@@ -734,7 +768,7 @@ main{position:relative;z-index:1;padding:16px;max-width:1000px;margin:0 auto}
 .cutin.foe .ci-char{animation-name:charCamF}.cutin.foe .ci-aura{animation-name:auraCamF}
 @keyframes charCamF{0%{transform:translateX(70%) rotateY(-38deg) scale(1.35);opacity:0}16%{opacity:1}34%{transform:translateX(0) rotateY(6deg) scale(1.06)}100%{transform:translateX(-5%) rotateY(14deg) scale(1)}}
 @keyframes auraCamF{0%{transform:translateX(35%) scale(1.6);opacity:0}30%{opacity:.8}100%{transform:translateX(2%) scale(1.25)}}
-.ci-team{position:absolute;inset:0;display:flex;transform:skewY(7deg)}
+.ci-team{position:absolute;inset:0;display:flex;transform:skewY(5deg)}
 .ci-pan{position:relative;flex:1;overflow:hidden;border-left:5px solid #000;animation:panIn .4s cubic-bezier(.2,1.2,.4,1) backwards;animation-delay:calc(var(--k)*.13s)}
 .ci-pan:first-child{border-left:none}
 .ci-pan svg,.ci-pan img{position:absolute;left:50%;top:50%;height:120%;width:auto;transform:translate(-50%,-50%);animation:panZoom 2s ease-out both}
@@ -743,8 +777,8 @@ main{position:relative;z-index:1;padding:16px;max-width:1000px;margin:0 auto}
 .ci-title{position:absolute;right:5%;top:50%;transform:translateY(-50%);text-align:right;max-width:58%;z-index:3;animation:ciTitle .5s .12s cubic-bezier(.2,1.3,.4,1) both}
 .cutin.foe .ci-title{right:auto;left:5%;text-align:left}
 .cutin.team .ci-title{right:50%;transform:translate(50%,-50%);text-align:center;max-width:90%;top:auto;bottom:6%;animation-delay:.55s}
-.ci-title small{display:block;font-family:var(--font-ui);font-size:clamp(13px,2.4vw,22px);letter-spacing:5px;color:#fff;text-shadow:0 2px 0 #000,0 0 10px #000}
-.ci-title b{display:block;font-family:var(--font-title);font-weight:400;font-size:clamp(32px,7vw,86px);line-height:.95;color:#fff;-webkit-text-stroke:2px #000;text-shadow:0 5px 0 #000,0 0 30px var(--c1)}
+.ci-title small{display:block;font-family:var(--font-ui);font-size:clamp(11px,1.8vw,17px);letter-spacing:4px;color:#fff;text-shadow:0 2px 0 #000,0 0 10px #000}
+.ci-title b{display:block;font-family:var(--font-title);font-weight:400;font-size:clamp(26px,5vw,60px);line-height:.95;color:#fff;-webkit-text-stroke:2px #000;text-shadow:0 5px 0 #000,0 0 30px var(--c1)}
 @keyframes ciTitle{from{opacity:0;transform:translate(40%,-50%) skewX(-20deg)}}
 .cutin.foe .ci-title{animation-name:ciTitleF}
 @keyframes ciTitleF{from{opacity:0;transform:translate(-40%,-50%) skewX(20deg)}}
@@ -766,9 +800,36 @@ main{position:relative;z-index:1;padding:16px;max-width:1000px;margin:0 auto}
 .synrow .chip.off{opacity:.45}
 .costgem.pw{background:radial-gradient(circle at 35% 30%,#fff3c4 0,#ffb000 30%,#c2410c 75%,#7c2d12 100%);box-shadow:0 0 .7em rgba(255,170,0,.8);text-shadow:0 .1em 0 #5a1a00}
 @media (max-width:560px){
-  .abtn{min-width:120px;padding:6px 9px}
+  .abtn{min-width:120px;padding:6px 9px;flex:none}
+  .actbar{flex-wrap:nowrap;overflow-x:auto;justify-content:flex-start;min-height:54px;padding-bottom:2px}
+  .actbar>.ab-hint,.actbar>.ab-prompt{flex:1;font-size:12.5px}
   .teamrow .card{--w:92px}.tslot{width:92px;height:129px}
+  .tbtns{gap:5px}
+  .brand span{display:none}
+  .iconbtn{padding:0 9px}
+  .lvlchip .xpb{display:none}
+  .hand{--hw:72px;gap:6px}
+  #btn_end{min-width:64px;padding:10px;font-size:13px}
+  #cineLbl{display:none}
+  .hside{padding:6px 8px;gap:6px}
+  .hmeta{gap:5px;font-size:10px}
+  .ticker{font-size:11px;max-width:92%}
 }
+@media (max-width:420px){
+  .hav{display:none}
+  .showcase{height:170px}
+  .sc .card{--w:82px}.sc.mid .card{--w:98px}
+  .sc.l{--x:-66px!important}.sc.r{--x:66px!important}
+  .menu-grid{gap:10px}
+  .mbtn{font-size:15px;padding:10px 8px}
+  .mbtn .mic{width:32px;height:32px;border-radius:10px}.mbtn .mic svg{width:18px;height:18px}
+  .zeni{padding:0 7px}
+  .tkchip{display:none}
+}
+/* Mouvements réduits (Paramètres) */
+body.calm .ftk,body.calm .slot .card,body.calm .floaty,body.calm .dav,body.calm .bossav,body.calm .pack,body.calm .title,body.calm .sunburst,
+body.calm .rock,body.calm .vsmark,body.calm .ci-lines,body.calm .ci-burst,body.calm .logo-orb,body.calm .logo-orb::before,body.calm .brand .bo,body.calm .mbtn::after,
+body.calm .arena .sun,body.calm .grid,body.calm .emptyslot,body.calm .stunb,body.calm .cloud,body.calm #btn_end{animation:none!important}
 </style>
 </head>
 <body>
@@ -862,7 +923,7 @@ main{position:relative;z-index:1;padding:16px;max-width:1000px;margin:0 auto}
       <div class="hud">
         <div class="hside me" id="hud_me">
           <div class="hav" id="me_av"></div>
-          <div class="hinfo"><div class="hname">Ton équipe<span class="synmini" id="p_syn"></span></div><div class="hp"><div class="hpfill" id="p_hpfill"></div><span class="hpnum" id="p_life"></span></div><div id="p_ki"></div></div>
+          <div class="hinfo"><div class="hname">Ton équipe<span class="synmini" id="p_syn"></span></div><div class="hp"><div class="hpfill" id="p_hpfill"></div><span class="hpnum" id="p_life"></span></div><div class="kiline"><div id="p_ki"></div><div class="boules" id="p_boules" title="Boules de cristal jouées"></div></div></div>
         </div>
         <div class="turnchip"><small>TOUR</small><b id="p_turn">1</b><span class="tension" id="tension"></span></div>
         <div class="hside foe" id="hud_foe">
@@ -880,6 +941,9 @@ main{position:relative;z-index:1;padding:16px;max-width:1000px;margin:0 auto}
           <div class="slotx" id="s_foe_0" onclick="clickSlot('foe',0)"></div><div class="slotx" id="s_foe_1" onclick="clickSlot('foe',1)"></div><div class="slotx" id="s_foe_2" onclick="clickSlot('foe',2)"></div><div class="slotx" id="s_foe_3" onclick="clickSlot('foe',3)"></div><div class="slotx" id="s_foe_4" onclick="clickSlot('foe',4)"></div>
         </div>
         <div class="vsmark">VS</div>
+        <div class="ticker" id="log_tick"></div>
+        <button class="logbtn" id="logbtn" onclick="toggleLog()" title="Historique du combat">📜</button>
+        <div class="log" id="battle_log" onclick="toggleLog()"></div>
         <div class="row me" id="row_me">
           <div class="slotx" id="s_me_0" onclick="clickSlot('me',0)"></div><div class="slotx" id="s_me_1" onclick="clickSlot('me',1)"></div><div class="slotx" id="s_me_2" onclick="clickSlot('me',2)"></div><div class="slotx" id="s_me_3" onclick="clickSlot('me',3)"></div><div class="slotx" id="s_me_4" onclick="clickSlot('me',4)"></div>
         </div>
@@ -887,17 +951,14 @@ main{position:relative;z-index:1;padding:16px;max-width:1000px;margin:0 auto}
         <div class="banner" id="banner"></div>
       </div>
       <div class="actbar" id="actbar"></div>
-      <div class="actions">
-        <div class="pile" id="p_pile" title="Ton deck de soutien"><b id="p_deckn">0</b><small>Deck</small></div>
-        <div class="boules" id="p_boules" title="Boules de cristal jouées"></div>
-        <button class="iconbtn cineb" id="cineBtn" onclick="cycleCine()" title="Cinématiques">🎬 <span id="cineLbl">Toutes</span></button>
-        <button class="btn blue big" id="btn_end" onclick="endTurn()"><svg viewBox="0 0 24 24"><path d="M12 4V1L7 5l5 4V6a6 6 0 11-6 6H4a8 8 0 108-8z"/></svg>Fin du tour</button>
+      <div class="bbar">
+        <div class="bside">
+          <div class="pile" id="p_pile" title="Ton deck de soutien"><b id="p_deckn">0</b></div>
+          <button class="iconbtn cineb" id="cineBtn" onclick="cycleCine()" title="Cinématiques : toutes, ultimes seulement ou aucune">🎬 <span id="cineLbl">Toutes</span></button>
+        </div>
+        <div class="hand" id="p_hand" title="Cartes de soutien : clique pour jouer, « i » ou clic droit pour les détails"></div>
+        <button class="btn blue big" id="btn_end" onclick="endTurn()"><svg viewBox="0 0 24 24"><path d="M12 4V1L7 5l5 4V6a6 6 0 11-6 6H4a8 8 0 108-8z"/></svg><span>Fin du tour</span></button>
       </div>
-      <div class="handwrap">
-        <div class="section-title">Cartes de soutien <span class="hint">· clique pour jouer · « i » ou clic droit pour les détails</span></div>
-        <div class="hand" id="p_hand"></div>
-      </div>
-      <div class="log" id="battle_log"></div>
     </section>
 
     <section id="screen-shop" class="screen hidden">
@@ -941,6 +1002,7 @@ main{position:relative;z-index:1;padding:16px;max-width:1000px;margin:0 auto}
 <div id="battle_end" class="endoverlay hidden"></div>
 <div id="pack_overlay" class="pack-ov hidden"></div>
 <div id="modal" class="modal hidden" onclick="if(event.target===this)closeModal()"></div>
+<div id="tutoblock" class="hidden" onclick="tutoClick(event)" oncontextmenu="event.preventDefault()"><div id="tuthole"></div></div>
 <div id="tip" class="tipbox hidden"></div>
 
 <script>
@@ -2328,6 +2390,7 @@ function setVol(k,v){
   }
   if(k==='sv'&&sfxBus)sfxBus.gain.value=sfxVol();
 }
+function setCalm(v){SET.calm=!!v;saveLS('dcz_settings',SET);document.body.classList.toggle('calm',SET.calm);openSettings();}
 function setCine(m){cineMode=m;saveLS('dcz4_cine',cineMode);openSettings();if(P&&!gameOver)renderBattle();}
 function openSettings(){
   var cin=[['all','Toutes'],['ult','Ultimes seulement'],['off','Aucune']];
@@ -2336,6 +2399,7 @@ function openSettings(){
     '<div class="setrow" id="set_music"><span class="setlbl">🎵 Musique</span><button class="btn small'+(Music.on?'':' ghost')+'" onclick="toggleMusic()">'+(Music.on?'Activée':'Coupée')+'</button></div>'+
     slider('mv','Volume de la musique')+slider('sv','🔊 Volume des effets sonores')+
     '<div class="setrow"><span class="setlbl">🎬 Cinématiques en combat</span><div class="segs">'+cin.map(function(c){return '<button class="btn small'+(cineMode===c[0]?' on':' ghost')+'" onclick="setCine(\''+c[0]+'\')">'+c[1]+'</button>';}).join('')+'</div></div>'+
+    '<div class="setrow"><span class="setlbl">🌊 Mouvements réduits<br><span class="hint">Cartes et décors immobiles</span></span><button class="btn small'+(SET.calm?'':' ghost')+'" onclick="setCalm(!SET.calm)">'+(SET.calm?'Activés':'Désactivés')+'</button></div>'+
     '<div class="setrow"><span class="setlbl">💬 Tutoriels de Kaïo</span><button class="btn small ghost" onclick="closeModal();resetTips()">Les revoir</button></div>'+
     '<p class="hint" style="margin-top:12px">Les réglages sont gardés sur cet appareil.</p>');
 }
@@ -2459,14 +2523,14 @@ function confetti(ct){
    TUTORIELS DE KAÏO (chacun n'apparaît qu'une fois)
    ===================================================================== */
 var TIPS={
- welcome:{t:'Bienvenue dans Dragon Card Z ! Je suis Kaïo, ton guide. Tu vas revivre toute l’histoire de Dragon Ball, de DB jusqu’à Super, avec une équipe de 5 combattants. Commence par le mode Histoire !',f:'mb_story'},
- story:{t:'Voici le mode Histoire : les niveaux suivent la chronologie, arc par arc. Chaque victoire rapporte des Zénis, et la première fois, des cartes exclusives. Le premier niveau est un entraînement avec moi !',f:'lvl_0'},
- intro:{t:'Avant chaque combat, regarde l’équipe adverse : chaque boss a ses synergies, ses renforts et ses pièges (Saibamen explosifs, Provocation, esquives…).'},
- b_start:{t:'Combat en équipe ! Chaque camp aligne jusqu’à 5 combattants. Tu gagnes quand toute l’équipe adverse (et ses renforts) est K.O. Ton Ki ⚡ sert à payer les Spéciaux, les attaques d’équipe et les cartes de soutien.',f:'hud_me'},
- b_select:{t:'Clique sur un de tes combattants pour choisir son action. Chacun agit une fois par tour (les combattants prêts sont entourés de blanc).',f:'row_me'},
- b_actions:{t:'Attaque : gratuite, dégâts = ATK − DEF, charge la jauge jaune. Spécial : coûte du Ki. Ultime : quand la jauge jaune est pleine. Équipe : attaque combinée quand les bons membres sont réunis !',f:'actbar'},
- b_combo:{t:'COMBO ! Plusieurs attaques de base sur la même cible dans le même tour font +400 dégâts à chaque coup supplémentaire. Concentrez vos coups !'},
- b_hand:{t:'En bas, tes cartes de soutien : techniques, objets, transformations, boules. Clique pour jouer, puis choisis la cible si besoin. « i » ou clic droit pour les détails.',f:'p_hand'},
+ welcome:{t:'Bienvenue dans Dragon Card Z ! Je suis Kaïo, ton guide. Tu vas revivre toute l’histoire de Dragon Ball avec une équipe de 5 combattants. Clique sur « Histoire » pour commencer.',f:'mb_story',go:1},
+ story:{t:'Le mode Histoire suit la chronologie, arc par arc. Le premier niveau est un entraînement avec moi : clique sur « Combattre » !',f:'lvl_0',go:1},
+ intro:{t:'Avant chaque combat, regarde l’équipe adverse : chaque boss a ses synergies, ses renforts et ses pièges. Lance le combat !',f:'btn_fight',go:1},
+ b_start:{t:'Combat en équipe ! Tu gagnes quand toute l’équipe adverse est K.O. Ton Ki ⚡ (ici) paie les Spéciaux, les attaques d’équipe et les cartes de soutien.',f:'hud_me'},
+ b_select:{t:'À toi ! Clique sur un de tes combattants pour choisir son action. Chacun agit une fois par tour.',f:'row_me',go:1},
+ b_actions:{t:'Attaque : gratuite, charge la jauge jaune. Spécial : coûte du Ki. Ultime : quand la jauge est pleine. Choisis une action !',f:'actbar',go:1},
+ b_combo:{t:'COMBO ! Plusieurs attaques de base sur la même cible dans le même tour font +400 dégâts par coup supplémentaire.',c:1},
+ b_hand:{t:'Ici, tes cartes de soutien : techniques, objets, transformations, boules. Clique pour jouer, « i » ou clic droit pour les détails. 📜 à gauche du terrain = historique du combat.',f:'p_hand'},
  b_gauge:{t:'Une jauge d’Ultime est pleine ! Sélectionne ce combattant pour déclencher son attaque ultime.'},
  b_team:{t:'Une attaque d’équipe est disponible ! Elle utilise l’action de tous les membres concernés, mais elle est dévastatrice.'},
  b_syn:{t:'Synergies : réunir certains personnages (École de la Tortue, Commando Ginyu, Saiyans…) donne des bonus. Ils sont affichés à côté du nom de chaque équipe (survole les icônes).',f:'p_syn'},
@@ -2475,7 +2539,7 @@ var TIPS={
  b_tech:{t:'Les Techniques frappent un ennemi au choix en ignorant la DEF et la Provocation.'},
  b_obj:{t:'Les Objets soignent, renforcent, font piocher ou donnent du Ki. Lis leur effet avec le bouton « i ».'},
  b_boule:{t:'Les Boules de Cristal coûtent 1 Ki et font piocher. Joues-en 7 dans un combat pour invoquer Shenron : soin de toute l’équipe et résurrection !',f:'p_boules'},
- b_end:{t:'Tous tes combattants ont agi. Clique sur « Fin du tour » : l’adversaire joue alors à son tour.',f:'btn_end'},
+ b_end:{t:'Tous tes combattants ont agi. Clique sur « Fin du tour » : l’adversaire joue alors à son tour.',f:'btn_end',go:1},
  b_enemy:{t:'C’est le tour de l’adversaire : il pioche, gagne du Ki, joue ses cartes, puis chacun de ses combattants agit.'},
  b_draw:{t:'Au début de chaque tour, tu pioches 1 carte de soutien et ton Ki maximum augmente de 1 (jusqu’à 10).',f:'p_pile'},
  b_passive:{t:'Chaque personnage a son propre passif (Zenkai, Régénération, Rage, Soigneur…) et le 1er de ton équipe est ton leader 👑. Touche « i » pour les lire.'},
@@ -2488,7 +2552,7 @@ var TIPS={
  b_cine:{t:'Tu peux régler les cinématiques avec le bouton 🎬 : toutes, ultimes seulement, ou aucune.',f:'cineBtn'},
  reward:{t:'Victoire ! Tu gagnes des Zénis et, la première fois, des cartes. Le niveau suivant est débloqué. Pense à améliorer ton équipe !'},
  defeat:{t:'Pas de panique ! Ouvre des boosters, améliore ton équipe et ton deck, puis réessaie. Tu gagnes quand même quelques Zénis.'},
- after_win:{t:'Tu as des Zénis ! Va à la Boutique pour ouvrir des boosters, puis renforce ton Équipe.',f:'mb_shop'},
+ after_win:{t:'Tout le jeu est débloqué ! Tu as des Zénis : clique sur la Boutique pour ouvrir des boosters, puis renforce ton Équipe.',f:'mb_shop',go:1},
  shop:{t:'La Boutique propose un booster par ère : DB, Z, GT et Super. 5 cartes par booster, dont au moins une Rare. Les Uniques ne s’obtiennent qu’en battant certains boss !'},
  m_quests:{t:'Nouveau : les Missions ! Chaque jour, 3 missions et un cadeau de connexion t’attendent. Les Succès te récompensent pour toute ta progression. Le point rouge t’indique qu’une récompense est prête.',f:'mb_quest'},
  m_tower:{t:'La Tour de Karin est un mode sans fin : chaque étage est plus dur, et tous les 5 étages un boss garde une carte garantie. Jusqu’où iras-tu ?',f:'mb_tower'},
@@ -2498,36 +2562,89 @@ var TIPS={
  deck:{t:'Ici tu prépares ton Équipe de 5 personnages (un seul exemplaire de chaque, Puissance totale max '+TEAM_MAX+') et ton Deck de soutien (20 à 40 cartes).',f:'team_panel'},
  deck2:{t:'Astuce : vise des synergies et des attaques d’équipe, puis ajoute les transformations de tes personnages dans le deck. Les boutons « auto » peuvent t’aider !',f:'btn_autoteam'}
 };
-var tipsSeen=loadLS('dcz4_tips',{}),tipQ=[],tipOpen=null,tipTimer=null,KAIO_SVG='';
-function tip(key){if(tipsSeen[key]||!TIPS[key]||tipQ.indexOf(key)>=0||tipOpen===key)return;tipQ.push(key);if(!tipOpen)nextTip();}
-function clearFocus(){document.querySelectorAll('.tfocus').forEach(function(e){e.classList.remove('tfocus');});}
+// Astuces de situation : petite bulle en bas, sans bloquer le jeu
+['b_combo','b_gauge','b_team','b_syn','b_taunt','b_transfo','b_tech','b_obj','b_boule','b_enemy','b_draw','b_passive','b_ability','b_ko','b_summon','b_fusion','b_stun','b_tension','b_cine']
+  .forEach(function(k){TIPS[k].c=1;});
+var tipsSeen=loadLS('dcz4_tips',{}),tipQ=[],tipOpen=null,tipTimer=null,KAIO_SVG='',ctxQ=[],ctxOpen=false;
+// Parcours guidé : tant que l'entraînement n'est pas gagné (ou les tutos passés), seul le chemin de Kaïo est ouvert
+function guided(){return !prog.cleared.tuto&&!tipsSeen._skip;}
+function tip(key){
+  if(tipsSeen[key]||!TIPS[key]||tipQ.indexOf(key)>=0||tipOpen===key||ctxQ.indexOf(key)>=0)return;
+  if(TIPS[key].c){ctxQ.push(key);if(!ctxOpen)nextCtx();return;}
+  tipQ.push(key);if(!tipOpen)nextTip();
+}
+function nextCtx(){
+  var key=ctxQ.shift();if(!key){ctxOpen=false;return;}
+  if(tipsSeen._skip){ctxQ=[];ctxOpen=false;return;}
+  if(tipOpen){ctxQ.unshift(key);ctxOpen=true;setTimeout(function(){ctxOpen=false;if(!ctxOpen)nextCtx();},900);return;}
+  ctxOpen=true;tipsSeen[key]=true;saveLS('dcz4_tips',tipsSeen);
+  var d=document.createElement('div');d.className='kaiotip';d.title='Touche pour fermer';
+  d.innerHTML='<div class="guideportrait">'+KAIO_SVG+'</div><div>'+TIPS[key].t+'</div>';
+  document.body.appendChild(d);
+  var gone=false;function bye(){if(gone)return;gone=true;d.classList.add('out');setTimeout(function(){d.remove();nextCtx();},400);}
+  d.onclick=bye;setTimeout(bye,Math.max(5000,TIPS[key].t.length*55));
+}
+function tipTarget(T){
+  var el=T.f&&$(T.f);if(!el)return null;
+  var r=el.getBoundingClientRect();return r.width>4&&r.height>4?el:null;
+}
+var holeOn=false;
+function placeHole(){
+  if(!tipOpen){holeOn=false;return;}
+  var T=TIPS[tipOpen],el=tipTarget(T),h=$('tuthole'),ov=$('tutoblock');
+  if(el){var r=el.getBoundingClientRect();h.style.display='';h.style.left=(r.left-6)+'px';h.style.top=(r.top-6)+'px';h.style.width=(r.width+12)+'px';h.style.height=(r.height+12)+'px';ov.classList.remove('dim');
+    $('tip').classList.toggle('low',r.top<window.innerHeight*.45&&r.bottom<window.innerHeight*.62);}
+  else{h.style.display='none';ov.classList.add('dim');$('tip').classList.remove('low');}
+  requestAnimationFrame(placeHole);
+}
+function tutoClick(e){
+  var T=tipOpen&&TIPS[tipOpen],el=T&&tipTarget(T);
+  if(!el){nudgeTip();return;}
+  var r=el.getBoundingClientRect();
+  if(e.clientX<r.left-6||e.clientX>r.right+6||e.clientY<r.top-6||e.clientY>r.bottom+6){nudgeTip();return;}
+  var ov=$('tutoblock');ov.style.pointerEvents='none';var tg=document.elementFromPoint(e.clientX,e.clientY);ov.style.pointerEvents='';
+  closeTip();
+  if(tg)tg.dispatchEvent(new MouseEvent('click',{bubbles:true,cancelable:true,clientX:e.clientX,clientY:e.clientY,view:window}));
+}
+function nudgeTip(){var b=$('tip');b.animate([{transform:'translateX(-50%)'},{transform:'translateX(calc(-50% - 8px))'},{transform:'translateX(calc(-50% + 8px))'},{transform:'translateX(-50%)'}],{duration:300});}
 function nextTip(){
-  clearFocus();var key=tipQ.shift(),box=$('tip');
-  if(!key){tipOpen=null;box.classList.add('hidden');return;}
-  tipOpen=key;var T=TIPS[key];
-  box.innerHTML='<div class="guideportrait">'+KAIO_SVG+'</div><div class="tipc"><div class="guidename">Kaïo'+(tipQ.length?'<span class="tipn">+'+tipQ.length+'</span>':'')+'</div>'+
-    '<span class="gtxt" id="tip_txt"></span><div class="gbtns"><button class="btn small blue" onclick="closeTip()">Compris !</button><button class="btn ghost small" onclick="skipTips()">Passer les tutos</button></div></div>';
+  var key=tipQ.shift(),box=$('tip'),ov=$('tutoblock');
+  if(!key){tipOpen=null;box.classList.add('hidden');ov.classList.add('hidden');return;}
+  tipOpen=key;var T=TIPS[key],act=T.go&&tipTarget(T);
+  box.innerHTML='<div class="guideportrait">'+KAIO_SVG+'</div><div class="tipc"><div class="guidename">Kaïo</div>'+
+    '<span class="gtxt" id="tip_txt"></span><div class="gbtns">'+(act?'<span class="gtap">👉 Clique sur la zone en surbrillance</span>':'<button class="btn small blue" onclick="closeTip()">Compris !</button>')+
+    '<button class="btn ghost small" onclick="skipTips()">Passer les tutos</button></div></div>';
   box.classList.remove('hidden');box.style.animation='none';void box.offsetWidth;box.style.animation='';
+  ov.classList.remove('hidden');if(!holeOn){holeOn=true;placeHole();}
+  var tg=tipTarget(T);if(tg&&!document.body.classList.contains('inbattle')){var r=tg.getBoundingClientRect();if(r.top<70||r.bottom>innerHeight-20)tg.scrollIntoView({block:'center',behavior:'smooth'});}
   var el=$('tip_txt'),i=0;clearInterval(tipTimer);
   tipTimer=setInterval(function(){i+=2;el.textContent=T.t.slice(0,i);if(i>=T.t.length)clearInterval(tipTimer);},16);
-  if(T.f&&$(T.f))$(T.f).classList.add('tfocus');
 }
 function closeTip(){if(tipOpen){tipsSeen[tipOpen]=true;saveLS('dcz4_tips',tipsSeen);}tipOpen=null;nextTip();}
-function skipTips(){Object.keys(TIPS).forEach(function(k){tipsSeen[k]=true;});saveLS('dcz4_tips',tipsSeen);tipQ=[];tipOpen=null;nextTip();}
-function resetTips(){tipsSeen={};saveLS('dcz4_tips',tipsSeen);tip('welcome');}
+function skipTips(){
+  Object.keys(TIPS).forEach(function(k){tipsSeen[k]=true;});tipsSeen._skip=true;saveLS('dcz4_tips',tipsSeen);
+  tipQ=[];ctxQ=[];tipOpen=null;nextTip();
+  if(!$('screen-menu').classList.contains('hidden'))renderMenu();
+  toast('Tutoriels passés','Tout le jeu est débloqué. Tu peux les revoir dans les Paramètres.','gold');
+}
+function resetTips(){tipsSeen={};saveLS('dcz4_tips',tipsSeen);if(!$('screen-menu').classList.contains('hidden'))renderMenu();tip('welcome');}
 
 /* =====================================================================
    NAVIGATION ET ÉCRANS
    ===================================================================== */
+var GUIDE_LOCK=['screen-shop','screen-tower','screen-quests','screen-deck','screen-online'];
+function lockedMsg(){sfxError();toast('🔒 Termine d’abord l’entraînement','Kaïo te guide : mode Histoire, premier niveau. (« Passer les tutos » débloque tout.)');}
 function show(id){
+  if(guided()&&GUIDE_LOCK.indexOf(id)>=0){lockedMsg();return;}
   document.querySelectorAll('.screen').forEach(function(s){s.classList.add('hidden');});
   $(id).classList.remove('hidden');
   var theme=id==='screen-battle'?'battle':(id==='screen-shop'?'shop':(id==='screen-deck'?'deck':'menu'));
   document.querySelectorAll('.bgl').forEach(function(l){l.classList.toggle('on',l.getAttribute('data-bg')===theme);});
   BG.setTheme(theme);Music.setScreen(id,id==='screen-battle'?'battle':'menu');
+  document.body.classList.toggle('inbattle',id==='screen-battle');setTopH();
   window.scrollTo(0,0);
   if(id==='screen-menu'){renderMenu();tip('welcome');if(Object.keys(prog.cleared).length&&zeni>=100)tip('after_win');if(prog.cleared.tuto){tip('m_quests');tip('m_tower');}
-    if(!loginAsked&&loginState().can&&tipsSeen.welcome){loginAsked=true;setTimeout(function(){if(!tipOpen&&$('modal').classList.contains('hidden'))openLoginModal();},700);}}
+    if(!loginAsked&&loginState().can&&tipsSeen.welcome&&!guided()){loginAsked=true;setTimeout(function(){if(!tipOpen&&$('modal').classList.contains('hidden'))openLoginModal();},700);}}
   if(id==='screen-story'){renderStory();tip('story');}
   if(id==='screen-online'&&window.Online)Online.render();
   if(id==='screen-shop'){renderShop();tip('shop');}
@@ -2535,11 +2652,14 @@ function show(id){
   if(id==='screen-quests'){renderQuests();tip('quests');}
   renderTop();
 }
+function setTopH(){var t=document.querySelector('.topbar');if(t)document.documentElement.style.setProperty('--tbh',t.offsetHeight+'px');}
+window.addEventListener('resize',setTopH);
 var loginAsked=false;
 function totalCards(){var n=0;Object.keys(col).forEach(function(k){n+=col[k];});return n;}
 function unlockedIdx(){var i=0;while(i<LEVELS.length-1&&prog.cleared[LEVELS[i].id])i++;return i;}
 function renderMenu(){
   var done=LEVELS.filter(function(L){return prog.cleared[L.id];}).length;
+  var g=guided();['mb_tower','mb_shop','mb_deck','mb_quest','mb_online','mb_daily'].forEach(function(b){$(b).classList.toggle('locked',g);});
   $('menu_stats').textContent='Niveau '+meta.lvl+' · Histoire : '+done+'/'+LEVELS.length+' (⭐ '+totalStars()+') · Tour : étage '+meta.tower.best+' · Collection : '+distinctOwned()+'/'+ALLN;
   $('mb_story_sub').textContent=done?('Prochain : '+LEVELS[unlockedIdx()].name):'De DB à Super';
 }
@@ -2600,7 +2720,7 @@ function openLevel(i){
     (L.tuto?'':'<div class="abl"><b>Objectifs '+starsHTML(meta.stars[L.id]||0)+'</b><br>'+STAR_TXT.map(function(t,k){return (k<(meta.stars[L.id]||0)?'★ ':'☆ ')+t;}).join('<br>')+'<br><span class="hint">+25 Z par nouvelle étoile · un ticket booster tous les 9 ★</span></div>')+
     (L.tuto?'<div class="abl"><b>Tutoriel</b><br>Tu utilises l’équipe et le deck d’entraînement préparés par Kaïo.</div>':'')+
     (err?'<div class="warn">⚠ '+err+'</div><div class="endbtns"><button class="btn big blue" onclick="closeModal();openDeckScreen()">Modifier mon équipe</button></div>':
-      '<div class="endbtns"><button class="btn big" onclick="startBattle('+i+')">Combattre !</button><button class="btn ghost big" onclick="closeModal()">Retour</button></div>'));
+      '<div class="endbtns"><button class="btn big" id="btn_fight" onclick="startBattle('+i+')">Combattre !</button><button class="btn ghost big" onclick="closeModal()">Retour</button></div>'));
   tip('intro');
 }
 
@@ -3127,7 +3247,12 @@ function healU(u,n){var b=u.hp;u.hp=Math.min(u.maxHp,u.hp+n);return u.hp-b;}
 function isTaunt(u){return !!u&&(hasAb(u,'taunt')||u.taunt>0);}
 function colsOf(u){var R=RACES[u.race]||RACES.autre,v=VIS[u.id]||VIS[u.baseId];return {c1:(v&&v.aura)||R.a,c2:R.b};}
 function nm(u){return CARDS[u.id].n;}
-function logMsg(msg){LOG.unshift(msg);LOG=LOG.slice(0,9);$('battle_log').innerHTML=LOG.map(function(m){return '<div>• '+m+'</div>';}).join('');}
+var tickT=null;
+function logMsg(msg){
+  LOG.unshift(msg);LOG=LOG.slice(0,40);$('battle_log').innerHTML=LOG.map(function(m){return '<div>• '+m+'</div>';}).join('');
+  var t=$('log_tick');t.textContent=msg;t.classList.add('on');clearTimeout(tickT);tickT=setTimeout(function(){t.classList.remove('on');},2600);
+}
+function toggleLog(){$('battle_log').classList.toggle('open');}
 function cardTarget(c){
   if(c.t==='t')return 'ally';if(c.t==='b'||!c.fx)return null;
   var k=c.fx.map(function(f){return f[0];});
@@ -3253,7 +3378,7 @@ function startBattle(li,Lobj){
   P.hand=P.deck.splice(0,5);E.hand=E.deck.splice(0,5);P._fresh=5;
   gameOver=false;busy=true;slotCache={};SEL=null;TGT=null;LOG=[];
   $('foe_name').textContent=L.name;$('foe_av').innerHTML=bossPortrait(L);$('me_av').innerHTML=artSVG(pteam[0].id);
-  show('screen-battle');$('battle_log').innerHTML='';
+  show('screen-battle');$('battle_log').innerHTML='';$('battle_log').classList.remove('open');
   logMsg('Le combat commence contre '+L.name+' !');
   if(P.ld)logMsg('Ton leader 👑 '+CARDS[P.ld.id].n+' — '+P.ld.n+' : ATK, DEF et PV +'+P.ld.pct+'% pour '+ldCondTxt(P.ld.cd)+'.');
   if(E.ld)logMsg('Leader adverse 👑 '+CARDS[E.ld.id].n+' — '+E.ld.n+' : +'+E.ld.pct+'% pour '+ldCondTxt(E.ld.cd)+'.');
@@ -3272,7 +3397,7 @@ async function beginPlayerTurn(first){
   renderBattle();
   await banner(first?'COMBAT !':'TON TOUR','');
   busy=false;renderBattle();
-  if(first){tip('b_start');tip('b_select');tip('b_hand');if(P.syn.length)tip('b_syn');}
+  if(first){tip('b_start');tip('b_hand');tip('b_select');if(P.syn.length)tip('b_syn');}
   checkTips();
 }
 async function drawCards(s,n){
@@ -3938,6 +4063,10 @@ function init(){
   if(validDeck())autoDeck(true);
   $('zeni_n').textContent=zeni;
   $('brand_orb').innerHTML=orbSVG(4);$('logo_orb').innerHTML=orbSVG(4);
+  document.body.classList.toggle('calm',!!SET.calm);setTopH();
+  document.querySelector('.menu-grid').addEventListener('click',function(e){
+    var b=e.target.closest&&e.target.closest('.mbtn.locked');if(b){e.stopPropagation();e.preventDefault();lockedMsg();}
+  },true);
   $('showcase').innerHTML=
     '<div class="sc l" style="--x:-112px;--y:28px;--r:-13deg;--d:.25s"><div class="floaty">'+cardHTML('vegeta_ue',{noi:true})+'</div></div>'+
     '<div class="sc r" style="--x:112px;--y:28px;--r:13deg;--d:.4s"><div class="floaty">'+cardHTML('gohan_beast',{noi:true})+'</div></div>'+
@@ -3950,6 +4079,6 @@ function init(){
 init();
 </script>
 <!-- Augmenter le numéro à chaque modification de online.js, pour que les navigateurs ne gardent pas l'ancienne version en cache -->
-<script src="online.js?v=4"></script>
+<script src="online.js?v=5"></script>
 </body>
 </html>
