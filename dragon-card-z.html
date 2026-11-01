@@ -2218,20 +2218,50 @@ var THEMES={
   bassPat:'x.xo.xx.xo.xx.ox',kick:'x...x...x...x.x.',snare:'....x.......x...',hat:'X.x.X.x.X.x.X.xx',
   lead:[[0,71,3],[3,76,3],[6,79,2],[8,78,2],[10,76,2],[12,74,2],[14,76,2],[16,79,3],[19,76,3],[22,72,2],[24,74,4],[28,76,4],[32,78,3],[35,81,3],[38,78,2],[40,74,4],[44,69,4],[48,71,2],[50,75,2],[52,78,4],[56,83,6],[62,81,2]]}
 };
-var Music={on:false,theme:'menu',next:'menu',step:0,t:0,timer:null,
-  start:function(){
+/* Musiques en fichier par écran (assets/music) ; les autres écrans gardent la musique générée */
+var TRACKS={'screen-story':'assets/music/Story_Menu.mp3','screen-shop':'assets/music/Boutique_Menu.mp3','screen-deck':'assets/music/Deck_Menu.mp3'};
+var TRACK_VOL=.45,TRACK_KO={};
+var Music={on:false,theme:'menu',next:'menu',step:0,t:0,timer:null,screen:'screen-menu',file:null,fileSrc:null,fade:null,
+  start:function(){if(!audioCtx())return;this.on=true;this.apply();},
+  stop:function(){this.on=false;this.stopSynth();this.stopFile();},
+  setTheme:function(th){this.next=th;},
+  setScreen:function(id,th){this.screen=id;this.next=th;if(this.on)this.apply();},
+  apply:function(){
+    var src=TRACKS[this.screen];
+    if(src&&!TRACK_KO[src]){this.stopSynth();this.playFile(src);}
+    else{this.stopFile();this.startSynth();}
+  },
+  startSynth:function(){
     var c=audioCtx();if(!c||this.timer)return;
-    this.on=true;this.theme=this.next;this.step=0;this.t=c.currentTime+.08;
+    this.theme=this.next;this.step=0;this.t=c.currentTime+.08;
     var g=musicBus.gain;g.cancelScheduledValues(c.currentTime);g.setValueAtTime(.0001,c.currentTime);g.exponentialRampToValueAtTime(MUSIC_VOL,c.currentTime+1.2);
     var s=this;this.timer=setInterval(function(){s.tick();},25);
   },
-  stop:function(){
-    this.on=false;clearInterval(this.timer);this.timer=null;
+  stopSynth:function(){
+    if(!this.timer)return;clearInterval(this.timer);this.timer=null;
     if(AC){var g=musicBus.gain,t=AC.currentTime;g.cancelScheduledValues(t);g.setValueAtTime(g.value,t);g.linearRampToValueAtTime(.0001,t+.4);}
   },
-  setTheme:function(th){this.next=th;},
+  fadeTo:function(a,vol,ms,done){
+    clearInterval(this.fade);var v0=a.volume,t0=Date.now(),s=this;
+    this.fade=setInterval(function(){var k=Math.min(1,(Date.now()-t0)/ms);a.volume=Math.max(0,Math.min(1,v0+(vol-v0)*k));if(k>=1){clearInterval(s.fade);if(done)done();}},40);
+  },
+  playFile:function(src){
+    if(this.fileSrc===src&&this.file&&!this.file.paused){this.fadeTo(this.file,TRACK_VOL,600);return;}
+    this.stopFile(true);
+    var a=new Audio(src),s=this;a.loop=true;a.volume=0;this.file=a;this.fileSrc=src;
+    a.onerror=function(){TRACK_KO[src]=1;if(s.file===a){s.file=null;s.fileSrc=null;if(s.on)s.startSynth();}};
+    var p=a.play();if(p&&p.catch)p.catch(function(){});
+    this.fadeTo(a,TRACK_VOL,1200);
+  },
+  stopFile:function(quick){
+    var a=this.file;if(!a)return;this.file=null;this.fileSrc=null;
+    if(quick){a.pause();return;}
+    clearInterval(this.fade);var v0=a.volume,t0=Date.now();
+    var iv=setInterval(function(){var k=Math.min(1,(Date.now()-t0)/400);a.volume=v0*(1-k);if(k>=1){clearInterval(iv);a.pause();}},40);
+  },
   duck:function(sec){
-    if(!AC||!this.on)return;var g=musicBus.gain,t=AC.currentTime;
+    if(this.file){var a=this.file,s=this;this.fadeTo(a,.08,200,function(){setTimeout(function(){if(s.file===a)s.fadeTo(a,TRACK_VOL,1200);},sec*1000);});}
+    if(!AC||!this.on||!this.timer)return;var g=musicBus.gain,t=AC.currentTime;
     g.cancelScheduledValues(t);g.setValueAtTime(g.value,t);g.linearRampToValueAtTime(.08,t+.2);g.setValueAtTime(.08,t+sec);g.linearRampToValueAtTime(MUSIC_VOL,t+sec+1.2);
   },
   tick:function(){
@@ -2443,7 +2473,7 @@ function show(id){
   $(id).classList.remove('hidden');
   var theme=id==='screen-battle'?'battle':(id==='screen-shop'?'shop':(id==='screen-deck'?'deck':'menu'));
   document.querySelectorAll('.bgl').forEach(function(l){l.classList.toggle('on',l.getAttribute('data-bg')===theme);});
-  BG.setTheme(theme);Music.setTheme(id==='screen-battle'?'battle':'menu');
+  BG.setTheme(theme);Music.setScreen(id,id==='screen-battle'?'battle':'menu');
   window.scrollTo(0,0);
   if(id==='screen-menu'){renderMenu();tip('welcome');if(Object.keys(prog.cleared).length&&zeni>=100)tip('after_win');if(prog.cleared.tuto){tip('m_quests');tip('m_tower');}
     if(!loginAsked&&loginState().can&&tipsSeen.welcome){loginAsked=true;setTimeout(function(){if(!tipOpen&&$('modal').classList.contains('hidden'))openLoginModal();},700);}}
