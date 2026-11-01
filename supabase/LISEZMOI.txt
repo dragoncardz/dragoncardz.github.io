@@ -1,0 +1,36 @@
+INSTALLER LE MODE ONLINE (Supabase) — environ 10 minutes
+=========================================================
+
+1. Créer le projet
+   - Va sur https://supabase.com et crée un compte (gratuit).
+   - « New project » : donne un nom (ex. dragon-card-z), choisis un mot de passe de base de données
+     (garde-le pour toi, le jeu n'en a pas besoin) et la région la plus proche (ex. Paris / Frankfurt).
+
+2. Créer les tables et les règles de sécurité
+   - Dans le projet : menu « SQL Editor » > « New query ».
+   - Copie TOUT le contenu du fichier supabase/schema.sql, colle-le, puis clique « Run ».
+   - Tu dois voir « Success. No rows returned ».
+
+3. Régler les emails de connexion
+   - Menu « Authentication » > « URL Configuration » :
+       Site URL : l'adresse où le jeu est publié (ex. https://<ton-pseudo-github>.github.io/dragon-card-z/dragon-card-z.html)
+       Redirect URLs : ajoute la même adresse, et http://localhost:* si tu testes en local.
+   - Par défaut, chaque joueur doit confirmer son email avant de jouer en ligne : c'est plus sûr, garde-le.
+
+4. Donner l'adresse et la clé publique au jeu
+   - Menu « Project Settings » > « API » (ou « Data API ») :
+       « Project URL »            → à mettre dans SUPA_URL, en haut de online.js
+       clé « anon public » (ou « publishable »)  → à mettre dans SUPA_KEY
+   - Cette clé publique est faite pour être visible dans le jeu : la sécurité vient des règles du schéma.
+   - NE METS JAMAIS la clé « service_role » (ou « secret ») dans le jeu : elle donne tous les droits.
+
+Ce qui est protégé
+   - Chaque joueur ne peut lire et modifier que SA sauvegarde.
+   - Les profils (pseudo, équipe, collection) sont publics, mais seul leur propriétaire peut les modifier.
+   - Les points de classement ne peuvent pas être modifiés directement : seul le serveur les calcule
+     (fonction report_pvp), avec une limite de 60 combats classés par jour et 20 secondes entre deux combats.
+
+Limite à connaître
+   - Le jeu tourne dans le navigateur du joueur : un tricheur motivé peut modifier sa sauvegarde
+     ou déclarer une fausse victoire. Pour l'empêcher complètement, il faudrait faire calculer les
+     combats par le serveur (étape possible plus tard).

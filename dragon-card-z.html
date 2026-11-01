@@ -160,6 +160,24 @@ main{position:relative;z-index:1;padding:16px;max-width:1000px;margin:0 auto}
 .mbtn.tower{background:linear-gradient(145deg,#66c4ff,#2563eb 55%,#3b1c8c)}
 .mbtn.quest{background:linear-gradient(145deg,#6ee7b7,#059669 55%,#064e3b)}
 .mbtn.gift{background:linear-gradient(145deg,#ff9ad5,#e11d74 55%,#6b0f3f)}
+.mbtn.online{background:linear-gradient(145deg,#7dd3fc,#0ea5e9 45%,#7c3aed);grid-column:1/-1}
+/* Mode Online */
+.ofrm{display:flex;flex-direction:column;gap:10px;max-width:420px}
+.ofrm.row{flex-direction:row;flex-wrap:wrap}
+.ofrm input{font:inherit;font-weight:700;padding:10px 12px;border-radius:12px;border:1px solid var(--line);background:rgba(0,0,0,.35);color:#fff;min-width:0}
+.ofrm.row input{flex:1 1 180px}
+.ofrm input:focus{outline:2px solid #ffd23f}
+.orow{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.1)}
+.oinfo{flex:1 1 140px;display:flex;flex-direction:column;min-width:0}
+.oinfo b{overflow:hidden;text-overflow:ellipsis}
+.oinfo small{color:var(--muted);font-weight:700}
+.oteam{display:flex;gap:4px}
+.oteam .hav{width:34px;height:34px;border-width:2px}
+.otable{width:100%;border-collapse:collapse;font-weight:800}
+.otable th,.otable td{padding:8px 6px;text-align:left;border-bottom:1px solid rgba(255,255,255,.1)}
+.otable th{color:var(--muted);font-size:13px}
+.otable tr.me td{color:#ffd23f}
+.otable a{color:inherit}
 .mbtn:nth-child(5){animation-delay:.9s}.mbtn:nth-child(6){animation-delay:1s}
 .mbtn:nth-child(5)::after{animation-delay:1.5s}.mbtn:nth-child(6)::after{animation-delay:2.5s}
 .dot{position:absolute;top:8px;right:10px;min-width:22px;height:22px;padding:0 6px;border-radius:11px;background:#ef4444;color:#fff;font:900 13px/22px var(--font-body);text-align:center;
@@ -807,6 +825,7 @@ main{position:relative;z-index:1;padding:16px;max-width:1000px;margin:0 auto}
           <button class="mbtn shop" id="mb_shop" onclick="show('screen-shop')"><span class="mic"><svg viewBox="0 0 24 24" fill="#fff"><path d="M3 9h18v4H3zM5 13h14v8H5z"/><path d="M11 9h2v12h-2z" fill="rgba(0,0,0,.25)"/><path d="M12 9C9 9 6.5 7.5 7.5 5.5S11 5 12 9zm0 0c3 0 5.5-1.5 4.5-3.5S13 5 12 9z"/></svg></span><span>Boutique<small>Boosters par ère</small></span></button>
           <button class="mbtn deck" id="mb_deck" onclick="openDeckScreen()"><span class="mic"><svg viewBox="0 0 24 24" fill="#fff"><rect x="3" y="6" width="11" height="15" rx="2" transform="rotate(-12 8.5 13.5)" opacity=".55"/><rect x="9" y="3" width="11" height="15" rx="2"/></svg></span><span>Deck<small>Ta collection</small></span></button>
           <button class="mbtn quest" id="mb_quest" onclick="show('screen-quests')"><span class="mic"><svg viewBox="0 0 24 24" fill="#fff"><path d="M12 2l2.9 6.3 6.9.7-5.2 4.6 1.5 6.8L12 17l-6.1 3.4 1.5-6.8L2.2 9l6.9-.7z"/></svg></span><span>Missions<small id="mb_quest_sub">Quotidiennes &amp; succès</small></span></button>
+          <button class="mbtn online" id="mb_online" onclick="Online.open()"><span class="mic"><svg viewBox="0 0 24 24" fill="#fff"><path d="M12 2a10 10 0 100 20 10 10 0 000-20zm6.9 6h-3a15.6 15.6 0 00-1.3-3.9A8 8 0 0118.9 8zM12 4c.8 1.2 1.5 2.5 1.9 4h-3.8c.4-1.5 1.1-2.8 1.9-4zM4.3 14a8 8 0 010-4h3.4a16.5 16.5 0 000 4zm.8 2h3a15.6 15.6 0 001.3 3.9A8 8 0 015.1 16zm3-8h-3a8 8 0 014.3-3.9C8.9 5.3 8.4 6.6 8.1 8zM12 20c-.8-1.2-1.5-2.5-1.9-4h3.8c-.4 1.5-1.1 2.8-1.9 4zm2.3-6H9.7a14.7 14.7 0 010-4h4.6a14.7 14.7 0 010 4zm.3 5.9c.6-1.2 1-2.5 1.3-3.9h3a8 8 0 01-4.3 3.9zM16.3 14a16.5 16.5 0 000-4h3.4a8 8 0 010 4z"/></svg></span><span>Online<small id="mb_online_sub">Compte, Arène, amis</small></span></button>
           <button class="mbtn gift" id="mb_daily" onclick="openLoginModal()"><span class="mic"><svg viewBox="0 0 24 24" fill="#fff"><path d="M4 9h16v12H4z"/><path d="M3 6h18v4H3z"/><path d="M11 6h2v15h-2z" fill="rgba(0,0,0,.3)"/><path d="M12 6C9 6 7 4 8 2.5S11 3 12 6zm0 0c3 0 5-2 4-3.5S13 3 12 6z"/></svg></span><span>Cadeau du jour<small id="mb_daily_sub">Connecte-toi chaque jour</small></span></button>
         </div>
         <div class="menustats" id="menu_stats"></div>
@@ -821,13 +840,10 @@ main{position:relative;z-index:1;padding:16px;max-width:1000px;margin:0 auto}
       <div class="levels" id="levels"></div>
     </section>
 
-    <section id="screen-multi" class="screen hidden">
-      <h2 class="h2">Multijoueur</h2>
-      <div class="panel center">
-        <div class="duel"><div class="dav" id="multi_a"></div><div class="dvs">VS</div><div class="dav b flipx" id="multi_b"></div></div>
-        <p style="font-weight:800">Le mode Multi arrive bientôt ! En attendant, entraîne-toi en mode Histoire et construis ton deck.</p>
-        <button class="btn" onclick="show('screen-menu')">Retour</button>
-      </div>
+    <section id="screen-online" class="screen hidden">
+      <h2 class="h2">Monde Online</h2>
+      <p class="lead">Ton compte, ta sauvegarde partout, l’Arène, le classement et tes amis.</p>
+      <div id="online_box"></div>
     </section>
 
     <section id="screen-tower" class="screen hidden">
@@ -2513,6 +2529,7 @@ function show(id){
   if(id==='screen-menu'){renderMenu();tip('welcome');if(Object.keys(prog.cleared).length&&zeni>=100)tip('after_win');if(prog.cleared.tuto){tip('m_quests');tip('m_tower');}
     if(!loginAsked&&loginState().can&&tipsSeen.welcome){loginAsked=true;setTimeout(function(){if(!tipOpen&&$('modal').classList.contains('hidden'))openLoginModal();},700);}}
   if(id==='screen-story'){renderStory();tip('story');}
+  if(id==='screen-online'&&window.Online)Online.render();
   if(id==='screen-shop'){renderShop();tip('shop');}
   if(id==='screen-tower'){renderTower();tip('tower');}
   if(id==='screen-quests'){renderQuests();tip('quests');}
@@ -2879,7 +2896,7 @@ var AW=[[0,0,0,0],[1200,0,0,0],[1200,400,0,0],[2400,400,0,0],[2400,400,400,0],[3
 function awakeOf(id){var c=CARDS[id];if(!c||c.t!=='p')return 0;return Math.max(0,Math.min(5,(col[id]||0)-1));}
 function awakeTxt(st){var w=AW[st];return st?'★'+st+' : +'+fmt(w[0])+' PV'+(w[1]?', +'+fmt(w[1])+' ATK':'')+(w[2]?', +'+fmt(w[2])+' DEF':'')+(w[3]?', jauge d’Ultime à '+w[3]+'%':''):'Pas encore éveillé';}
 function recalcTot(s){s.maxTot=0;s.units.forEach(function(u){if(u)s.maxTot+=u.maxHp;});s.reserve.forEach(function(r){s.maxTot+=resHp(s,r);});}
-function applyAwaken(s){s.units.forEach(function(u){if(!u)return;var w=AW[awakeOf(u.baseId)];u.hp+=w[0];u.maxHp+=w[0];u.nH+=w[0];u.atk+=w[1];u.nA+=w[1];u.def+=w[2];u.nD+=w[2];u.gauge=Math.max(u.gauge,w[3]);});recalcTot(s);}
+function applyAwaken(s,map){s.units.forEach(function(u){if(!u)return;var w=AW[map?Math.max(0,Math.min(5,map[u.baseId]|0)):awakeOf(u.baseId)];u.hp+=w[0];u.maxHp+=w[0];u.nH+=w[0];u.atk+=w[1];u.nA+=w[1];u.def+=w[2];u.nD+=w[2];u.gauge=Math.max(u.gauge,w[3]);});recalcTot(s);}
 
 /* --- Recyclage des doublons en trop --- */
 var RECY={c:5,u:10,r:25,e:60,l:150,m:400,x:0};
@@ -3223,10 +3240,11 @@ function startBattle(li,Lobj){
   if(!L.tuto)applyAwaken(P);
   E=newSide('foe',L.name,parseTeam(L.team),ed,parseTeam(L.reserve),L.bx||1);
   if(L.scale)applyScale(E,L.scale);
-  if(!L.tuto)applyFoeBoost(E);
+  if(L.aw)applyAwaken(E,L.aw);
+  if(!L.tuto&&!L.pvp)applyFoeBoost(E);
   applySynergies(P);applySynergies(E);
   [P,E].forEach(function(s){
-    if(s===P)refreshLeader(s);
+    if(s===P||L.pvp)refreshLeader(s);
     s.units.forEach(function(u){
       if(!u)return;var aa=abVal(u,'allyatk'),ad=abVal(u,'allydef');
       if(aa||ad)s.units.forEach(function(x){if(x){x.atk+=pctOf(x,'a',aa);x.def+=pctOf(x,'d',ad);}});
@@ -3238,6 +3256,7 @@ function startBattle(li,Lobj){
   show('screen-battle');$('battle_log').innerHTML='';
   logMsg('Le combat commence contre '+L.name+' !');
   if(P.ld)logMsg('Ton leader 👑 '+CARDS[P.ld.id].n+' — '+P.ld.n+' : ATK, DEF et PV +'+P.ld.pct+'% pour '+ldCondTxt(P.ld.cd)+'.');
+  if(E.ld)logMsg('Leader adverse 👑 '+CARDS[E.ld.id].n+' — '+E.ld.n+' : +'+E.ld.pct+'% pour '+ldCondTxt(E.ld.cd)+'.');
   [P,E].forEach(function(s){s.syn.forEach(function(a){logMsg((s===P?'Ta synergie':'Synergie adverse')+' : '+a.S.i+' '+a.S.n+' — '+a.tiers.map(function(t){return t[3];}).join(', '));});});
   [P,E].forEach(function(s){
     s.units.forEach(function(u){
@@ -3699,7 +3718,7 @@ async function transformUnit(s,t,id){
   if(mui){ga=K;gd=K;title='Pas encore maîtrisé…';logMsg('Ultra Instinct pas encore maîtrisé : effet minime.');}
   u.atk+=ga;u.def+=gd;u.nA+=ga;u.nD+=gd;u.id=id;u.lv=c.lv;if(!mui)addPassive(u,c.ab);
   if(c.pn&&!mui)logMsg('Passif : '+c.pn+' !');
-  if(s===P)refreshLeader(s);
+  if(s===P||(curL&&curL.pvp))refreshLeader(s);
   u.acted=true;u._tf=true;logMsg(c.n+' ! (+'+fmt(ga)+' ATK, +'+fmt(gd)+' DEF)');renderBattle();
   var p=posOf(s,t);floatText(p.x,p.y-30,'+'+fmt(ga)+' ATK','buff');
   await unitCut(s,u,RIDX[c.rar]>=4?'ult':'special',title,c.fus?'FUSION':'TRANSFORMATION');
@@ -3875,6 +3894,7 @@ function endGame(won){
   gameOver=true;busy=false;SEL=null;TGT=null;Music.duck(3);
   var L=curL;
   if(L.tower)return endTower(won,L);
+  if(L.pvp)return Online.endPvp(won,L);
   var first=won&&!prog.cleared[L.id],gain=won?(first?L.zeni:Math.round(L.zeni*.3)):Math.round(L.zeni*.1),rew=[];
   if(first){rew=L.rew||[];rew.forEach(addCard);prog.cleared[L.id]=true;saveProg();}
   var st=0,oldSt=meta.stars[L.id]||0;
@@ -3922,8 +3942,6 @@ function init(){
     '<div class="sc l" style="--x:-112px;--y:28px;--r:-13deg;--d:.25s"><div class="floaty">'+cardHTML('vegeta_ue',{noi:true})+'</div></div>'+
     '<div class="sc r" style="--x:112px;--y:28px;--r:13deg;--d:.4s"><div class="floaty">'+cardHTML('gohan_beast',{noi:true})+'</div></div>'+
     '<div class="sc mid" style="--x:0px;--y:0px;--r:0deg;--d:.55s"><div class="floaty">'+cardHTML('u_mui',{noi:true})+'</div></div>';
-  $('multi_a').innerHTML=artSVG('goku_blue');
-  $('multi_b').innerHTML=artSVG('vegeta');
   updateMusicBtn();
   rollDaily();renderTop();
   setInterval(updateDots,60000);
@@ -3931,5 +3949,6 @@ function init(){
 }
 init();
 </script>
+<script src="online.js"></script>
 </body>
 </html>
