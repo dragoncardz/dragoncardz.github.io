@@ -3159,12 +3159,27 @@ async function redeemCode(){
   var inp=$('gift_code'),code=(inp&&inp.value||'').toUpperCase().replace(/[‐-―−]/g,'-').replace(/[^A-Z0-9-]/g,'');
   if(code.length<4){sfxError();$('gift_msg').textContent='Écris ton code.';return;}
   $('gift_btn').disabled=true;$('gift_msg').textContent='Vérification…';
-  try{var R=await Online.redeem(code);inp.value='';await grantGift(R,code);}
+  try{var R=await Online.redeem(code);inp.value='';await grantGift(R,await sha256hex(code));}
   catch(e){sfxError();if($('gift_msg'))$('gift_msg').textContent=e.message;}
   if($('gift_btn'))$('gift_btn').disabled=false;
 }
+async function sha256hex(s){var b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(s));return Array.from(new Uint8Array(b)).map(function(x){return x.toString(16).padStart(2,'0');}).join('');}
+/* Redonne les récompenses des codes utilisés par ce compte qui manquent dans la sauvegarde */
+var giftSyncing=false;
+async function syncGifts(){
+  if(giftSyncing||!window.Online||!Online.who())return;giftSyncing=true;
+  try{
+    // Anciennes entrées enregistrées avec le code en clair : converties en empreinte
+    for(var k in meta.codes){if(/^DCZ/i.test(k)){var h=await sha256hex(k.toUpperCase());meta.codes[h]=meta.codes[k];delete meta.codes[k];}}
+    saveMeta();
+    var rows=await Online.myGifts();
+    for(var i=0;i<rows.length;i++){if(!meta.codes[rows[i].code_hash])await grantGift(rows[i].reward,rows[i].code_hash,true);}
+  }catch(e){console.warn(e);}
+  giftSyncing=false;
+}
 /* Récompense d'un code : {z, tk, orbe, parch, cards:[ids], pack:'db'|'z'|'gt'|'s', msg} */
-async function grantGift(R,code){
+async function grantGift(R,code,recovered){
+  if(meta.codes[code])return;
   R=R||{};var lines=[],cards=(R.cards||[]).filter(function(id){return CARDS[id]&&!CARDS[id].en;});
   if(R.z>0){setZeni(zeni+(R.z|0));lines.push('<i class="coin"></i> +'+fmt(R.z)+' Zénis');}
   if(R.tk>0){setTickets(meta.tickets+(R.tk|0));lines.push('🎫 +'+R.tk+' ticket'+(R.tk>1?'s':'')+' booster');}
@@ -3174,7 +3189,7 @@ async function grantGift(R,code){
   meta.codes[code]=Date.now();saveMeta();track('code');
   await playAnim('cadeau');
   sfxVictory();renderTop();renderInv();
-  openModal('<h3 class="mtitle">🎁 Cadeau !</h3>'+(R.msg?'<p style="font-weight:800">'+String(R.msg).replace(/[<>&]/g,'')+'</p>':'')+
+  openModal('<h3 class="mtitle">🎁 Cadeau !</h3>'+(recovered?'<p class="hint">Récompense d’un code déjà utilisé sur ton compte, récupérée dans ta sauvegarde.</p>':'')+(R.msg?'<p style="font-weight:800">'+String(R.msg).replace(/[<>&]/g,'')+'</p>':'')+
     (lines.length?'<div class="abl" style="font-size:16px">'+lines.join('<br>')+'</div>':'')+
     (cards.length?'<div class="section-title" style="margin-top:12px">Cartes</div><div class="rewards">'+cards.map(function(id,i){return cardHTML(id,{cls:'popin',i:i});}).join('')+'</div>':'')+
     '<div class="endbtns"><button class="btn big" onclick="closeModal()'+(ERAS[R.pack]?';openGiftPack(\''+R.pack+'\')':'')+'">'+(ERAS[R.pack]?'Ouvrir le booster '+ERAS[R.pack].short+' !':'Super !')+'</button></div>');
@@ -4272,7 +4287,7 @@ function init(){
 init();
 </script>
 <!-- Augmenter le numéro à chaque modification de online.js, pour que les navigateurs ne gardent pas l'ancienne version en cache -->
-<script src="online.js?v=9"></script>
+<script src="online.js?v=10"></script>
 <script src="live.js?v=2"></script>
 </body>
 </html>

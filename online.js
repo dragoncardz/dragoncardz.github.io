@@ -9,7 +9,7 @@
 var SUPA_URL='https://tugraajxznhtyqwzkosb.supabase.co';
 var SUPA_KEY='sb_publishable_iEhjmAoVo3xE-qJUM81mKw_4EANtdiE';
 
-var ONLINE_V=9;
+var ONLINE_V=10;
 var Online=(function(){
   var SESS_KEY='dczo_session',SYNC_KEY='dczo_sync',OWNER_KEY='dczo_owner';
   var sess=null,me=null,rank=null,tab='account',lbTab='all',pushTimer=null,dirty=false,lastSync=null,busyNet=false,opps=null,friendsData=null,friendsLoading=false,searchRes=null,msg='';
@@ -195,6 +195,7 @@ var Online=(function(){
     if(me&&window.Live)Live.start();
     if(me)await syncOnLogin(interactive);
     refreshUI();
+    if(me&&window.syncGifts)syncGifts();
   }
 
   /* ---------- Arène (PvP asynchrone) ---------- */
@@ -430,6 +431,7 @@ var Online=(function(){
       if(R&&R.error)throw new Error(C[R.error]||R.error);
       return R;
     },
+    myGifts:async function(){if(!me)return [];try{return await req('/rest/v1/rpc/my_gifts',{method:'POST',body:{}})||[];}catch(e){return [];}},
     who:function(){return me&&uid()?{uid:uid(),pseudo:me.pseudo,lvl:meta.lvl||1}:null;},
     friendIds:function(){var o={};if(friendsData)friendsData.rows.forEach(function(r){if(r.status==='accepted')o[r.user_id===uid()?r.friend_id:r.user_id]=1;});return o;},
     loadFriendsQuiet:function(){if(me&&!friendsData)loadFriends().catch(function(){});},

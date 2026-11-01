@@ -72,6 +72,23 @@ $$;
 revoke all on function public.redeem_code(text) from public, anon;
 grant execute on function public.redeem_code(text) to authenticated;
 
+-- Codes déjà utilisés par le joueur connecté : le jeu redonne une récompense
+-- si elle a disparu de sa sauvegarde (changement d'appareil, ancienne sauvegarde cloud…)
+create or replace function public.my_gifts()
+returns table(code_hash text, reward jsonb, redeemed_at timestamptz)
+language sql
+stable
+security definer
+set search_path = public
+as $$
+  select r.code_hash, g.reward, r.redeemed_at
+  from public.gift_redemptions r join public.gift_codes g on g.code_hash = r.code_hash
+  where r.user_id = auth.uid()
+  order by r.redeemed_at;
+$$;
+revoke all on function public.my_gifts() from public, anon;
+grant execute on function public.my_gifts() to authenticated;
+
 -- ---------------------------------------------------------------------
 -- Créer un nouveau code plus tard (remplace MONCODE et la récompense) :
 --
