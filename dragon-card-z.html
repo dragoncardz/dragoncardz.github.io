@@ -157,6 +157,55 @@ main{position:relative;z-index:1;padding:16px;max-width:1000px;margin:0 auto}
 .mbtn.multi{background:linear-gradient(145deg,#66c4ff,#2563eb 55%,#3b1c8c)}
 .mbtn.shop{background:linear-gradient(145deg,#ffe66b,#f59e0b 55%,#b45309)}
 .mbtn.deck{background:linear-gradient(145deg,#c39bff,#7c3aed 55%,#3b0f7a)}
+.mbtn.tower{background:linear-gradient(145deg,#66c4ff,#2563eb 55%,#3b1c8c)}
+.mbtn.quest{background:linear-gradient(145deg,#6ee7b7,#059669 55%,#064e3b)}
+.mbtn.gift{background:linear-gradient(145deg,#ff9ad5,#e11d74 55%,#6b0f3f)}
+.mbtn:nth-child(5){animation-delay:.9s}.mbtn:nth-child(6){animation-delay:1s}
+.mbtn:nth-child(5)::after{animation-delay:1.5s}.mbtn:nth-child(6)::after{animation-delay:2.5s}
+.dot{position:absolute;top:8px;right:10px;min-width:22px;height:22px;padding:0 6px;border-radius:11px;background:#ef4444;color:#fff;font:900 13px/22px var(--font-body);text-align:center;
+  box-shadow:0 0 0 2px #fff,0 0 12px rgba(239,68,68,.8);animation:dotpulse 1.2s ease-in-out infinite;text-shadow:none;z-index:2}
+@keyframes dotpulse{50%{transform:scale(1.18)}}
+/* --- Progression --- */
+.lvlchip{display:inline-flex;align-items:center;gap:7px;height:36px;padding:0 10px 0 6px;border-radius:12px;background:rgba(0,0,0,.35);border:none;color:#fff;cursor:pointer;font-family:var(--font-body)}
+.lvlchip b{display:grid;place-items:center;width:26px;height:26px;border-radius:50%;background:linear-gradient(145deg,#ffe66b,#f59e0b);color:#4a2500;font:900 13px var(--font-body)}
+.lvlchip .xpb{width:58px;height:7px;border-radius:4px;background:rgba(255,255,255,.15);overflow:hidden}
+.lvlchip .xpb i{display:block;height:100%;background:linear-gradient(90deg,#4ade80,#a3e635);transition:width .6s}
+.tkchip{display:inline-flex;align-items:center;gap:5px;height:36px;padding:0 10px;border-radius:12px;background:rgba(0,0,0,.35);font-weight:900}
+#toasts{position:fixed;top:64px;right:12px;z-index:9000;display:flex;flex-direction:column;gap:8px;pointer-events:none;max-width:min(320px,calc(100vw - 24px))}
+.toast{background:linear-gradient(135deg,rgba(20,40,30,.95),rgba(10,20,15,.95));border:1px solid #4ade80;border-radius:14px;padding:10px 14px;box-shadow:0 10px 30px rgba(0,0,0,.5);animation:toastIn .45s cubic-bezier(.2,1.4,.4,1)}
+.toast.gold{border-color:#ffd23f;background:linear-gradient(135deg,rgba(60,40,5,.95),rgba(25,15,5,.95))}
+.toast b{display:block;font-family:var(--font-ui);font-size:17px;letter-spacing:.4px}
+.toast small{display:block;font-weight:800;color:var(--muted);font-size:12px}
+.toast.out{transition:.45s;opacity:0;transform:translateX(40px)}
+@keyframes toastIn{from{opacity:0;transform:translateX(60px) scale(.9)}}
+.stars{display:inline-flex;gap:1px;margin-left:6px;vertical-align:middle}
+.stars .star{font-style:normal;color:rgba(255,255,255,.18);font-size:15px}
+.stars .star.on{color:#ffd23f;text-shadow:0 0 6px rgba(255,210,63,.7)}
+.tabs{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap}
+.qrow{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:14px;background:rgba(255,255,255,.05);margin-bottom:8px;flex-wrap:wrap}
+.qrow.done{background:rgba(74,222,128,.12)}
+.qrow.claimed{opacity:.5}
+.qrow .qi{font-size:26px;width:36px;text-align:center;flex:none}
+.qrow .qt{flex:1;min-width:150px}
+.qrow .qt b{display:block;font-weight:900}
+.qbar{height:9px;border-radius:5px;background:rgba(255,255,255,.12);overflow:hidden;margin-top:5px}
+.qbar i{display:block;height:100%;background:linear-gradient(90deg,#4ade80,#a3e635)}
+.qrow .qr{font-weight:900;font-size:13px;color:#ffe4b0;white-space:nowrap}
+.cal{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px;margin:8px 0}
+.cal div{border-radius:12px;padding:8px 4px;text-align:center;background:rgba(255,255,255,.06);font-weight:900;font-size:12px}
+.cal div small{display:block;font-size:10px;color:var(--muted)}
+.cal div.got{background:rgba(74,222,128,.2);color:#bbf7d0}
+.cal div.today{box-shadow:0 0 0 2px var(--gold),0 0 16px rgba(255,210,63,.5);animation:dotpulse 1.4s infinite}
+.tower-hero{display:flex;align-items:center;gap:18px;flex-wrap:wrap}
+.tower-floor{font-family:var(--font-ui);font-size:64px;line-height:1;color:var(--gold);text-shadow:0 4px 0 rgba(0,0,0,.4),0 0 24px rgba(255,210,63,.5)}
+.tower-floor small{display:block;font-size:14px;color:var(--muted);letter-spacing:2px}
+.ladder{display:flex;flex-direction:column-reverse;gap:6px;margin-top:10px}
+.ladder div{display:flex;justify-content:space-between;gap:10px;padding:7px 12px;border-radius:10px;background:rgba(255,255,255,.05);font-weight:800;font-size:13px}
+.ladder div.boss{background:rgba(239,68,68,.15)}
+.ladder div.cur{box-shadow:0 0 0 2px var(--gold)}
+.xpgain{font-weight:900;color:#a3e635;margin-top:4px}
+.lvup{font-family:var(--font-ui);font-size:26px;color:var(--gold);animation:popIn .5s backwards;text-shadow:0 0 16px rgba(255,210,63,.7)}
+@media(max-width:560px){.lvlchip .xpb{width:34px}.tkchip{padding:0 6px}.tower-floor{font-size:48px}}
 .menustats{margin-top:16px;font-weight:800;font-size:13px;color:#ffe4b0;background:rgba(0,0,0,.35);padding:6px 14px;border-radius:20px;animation:btnIn .6s .9s backwards}
 .credit{margin-top:10px;font-size:11px;color:rgba(255,235,200,.6);font-weight:700}
 .linkbtn{background:none;border:none;color:rgba(255,235,200,.75);font-weight:800;font-size:12px;text-decoration:underline;cursor:pointer;margin-top:6px}
@@ -717,6 +766,8 @@ main{position:relative;z-index:1;padding:16px;max-width:1000px;margin:0 auto}
   <div class="topbar">
     <button class="brand" onclick="show('screen-menu')"><span class="bo" id="brand_orb"></span><span>DRAGON CARD Z</span></button>
     <div class="tbtns">
+      <button class="lvlchip" id="lvlchip" onclick="show('screen-quests')" title="Niveau joueur"></button>
+      <span class="tkchip" id="tkchip" title="Tickets booster (utilisables dans la Boutique)">🎫 <b id="tk_n">0</b></span>
       <span class="zeni" id="zeni" title="Zénis"><i class="coin"></i><b id="zeni_n">0</b></span>
       <button class="iconbtn off" id="musicBtn" onclick="toggleMusic()">
         <svg viewBox="0 0 24 24"><path d="M9 18V5l11-2v13" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="6.5" cy="18" r="2.8" fill="currentColor"/><circle cx="17.5" cy="16" r="2.8" fill="currentColor"/><path class="slash" d="M3 3l18 18" stroke="currentColor" stroke-width="2.4"/></svg>
@@ -739,9 +790,11 @@ main{position:relative;z-index:1;padding:16px;max-width:1000px;margin:0 auto}
         <div class="showcase" id="showcase"></div>
         <div class="menu-grid">
           <button class="mbtn story" id="mb_story" onclick="show('screen-story')"><span class="mic"><svg viewBox="0 0 24 24" fill="#fff"><path d="M3 5.2C3 4.5 3.6 4 4.3 4H11v16H4.3c-.7 0-1.3.3-1.3.3zM21 5.2c0-.7-.6-1.2-1.3-1.2H13v16h6.7c.7 0 1.3.3 1.3.3z"/></svg></span><span>Histoire<small id="mb_story_sub">De DB à Super</small></span></button>
-          <button class="mbtn multi" id="mb_multi" onclick="show('screen-multi')"><span class="mic"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round"><path d="M4 4l11 11M20 4L9 15M14 17l3 3M10 17l-3 3M16.5 13.5l-3 3M7.5 13.5l3 3"/></svg></span><span>Multi<small>Bientôt</small></span></button>
+          <button class="mbtn tower" id="mb_tower" onclick="show('screen-tower')"><span class="mic"><svg viewBox="0 0 24 24" fill="#fff"><path d="M9 2h6v3h-1v4h2v3h-1v10H9V12H8V9h2V5H9z"/><path d="M5 22h14v-2H5z" opacity=".6"/></svg></span><span>Tour de Karin<small id="mb_tower_sub">Combats sans fin</small></span></button>
           <button class="mbtn shop" id="mb_shop" onclick="show('screen-shop')"><span class="mic"><svg viewBox="0 0 24 24" fill="#fff"><path d="M3 9h18v4H3zM5 13h14v8H5z"/><path d="M11 9h2v12h-2z" fill="rgba(0,0,0,.25)"/><path d="M12 9C9 9 6.5 7.5 7.5 5.5S11 5 12 9zm0 0c3 0 5.5-1.5 4.5-3.5S13 5 12 9z"/></svg></span><span>Boutique<small>Boosters par ère</small></span></button>
           <button class="mbtn deck" id="mb_deck" onclick="openDeckScreen()"><span class="mic"><svg viewBox="0 0 24 24" fill="#fff"><rect x="3" y="6" width="11" height="15" rx="2" transform="rotate(-12 8.5 13.5)" opacity=".55"/><rect x="9" y="3" width="11" height="15" rx="2"/></svg></span><span>Deck<small>Ta collection</small></span></button>
+          <button class="mbtn quest" id="mb_quest" onclick="show('screen-quests')"><span class="mic"><svg viewBox="0 0 24 24" fill="#fff"><path d="M12 2l2.9 6.3 6.9.7-5.2 4.6 1.5 6.8L12 17l-6.1 3.4 1.5-6.8L2.2 9l6.9-.7z"/></svg></span><span>Missions<small id="mb_quest_sub">Quotidiennes &amp; succès</small></span></button>
+          <button class="mbtn gift" id="mb_daily" onclick="openLoginModal()"><span class="mic"><svg viewBox="0 0 24 24" fill="#fff"><path d="M4 9h16v12H4z"/><path d="M3 6h18v4H3z"/><path d="M11 6h2v15h-2z" fill="rgba(0,0,0,.3)"/><path d="M12 6C9 6 7 4 8 2.5S11 3 12 6zm0 0c3 0 5-2 4-3.5S13 3 12 6z"/></svg></span><span>Cadeau du jour<small id="mb_daily_sub">Connecte-toi chaque jour</small></span></button>
         </div>
         <div class="menustats" id="menu_stats"></div>
         <button class="linkbtn" onclick="resetTips()">Revoir les tutoriels de Kaïo</button>
@@ -762,6 +815,18 @@ main{position:relative;z-index:1;padding:16px;max-width:1000px;margin:0 auto}
         <p style="font-weight:800">Le mode Multi arrive bientôt ! En attendant, entraîne-toi en mode Histoire et construis ton deck.</p>
         <button class="btn" onclick="show('screen-menu')">Retour</button>
       </div>
+    </section>
+
+    <section id="screen-tower" class="screen hidden">
+      <h2 class="h2">Tour de Karin</h2>
+      <p class="lead">Une ascension sans fin. Chaque étage est plus dur que le précédent. Un boss garde chaque palier de 5 étages, avec une carte garantie à la clé.</p>
+      <div id="tower_box"></div>
+    </section>
+
+    <section id="screen-quests" class="screen hidden">
+      <h2 class="h2">Missions</h2>
+      <div class="tabs" id="q_tabs"></div>
+      <div id="q_box"></div>
     </section>
 
     <section id="screen-battle" class="screen hidden">
@@ -836,7 +901,7 @@ main{position:relative;z-index:1;padding:16px;max-width:1000px;margin:0 auto}
         <div class="cardrow" id="deck_list"></div>
       </div>
       <div class="panel">
-        <div class="deckhead"><div class="section-title" style="margin:0">Ma collection <span class="hint">· clique pour ajouter</span></div><span class="hint" id="col_stats"></span></div>
+        <div class="deckhead"><div class="section-title" style="margin:0">Ma collection <span class="hint">· clique pour ajouter · ★ = éveil (chaque doublon d’un perso le renforce)</span></div><span class="hint" id="col_stats"></span><button class="btn small" id="btn_recy" onclick="recycle()"></button></div>
         <div class="filters" id="filters"></div>
         <div class="cardrow" id="deck_collection"></div>
       </div>
@@ -1826,6 +1891,7 @@ function showDetails(id){
     h+='<div class="abl"><b>Effet</b><br>'+c.fx.map(function(f){return fxText(f[0],f[1]);}).join('<br>')+'</div>';
     h+='<div class="abl"><b>Cible</b><br>'+(tw==='enemy'?'Un ennemi au choix (ignore la Provocation).':(tw==='ally'?'Un allié au choix.':'Aucune : effet immédiat.'))+'</div>';
   }
+  if(c.t==='p'&&!c.en){var aw=awakeOf(id);h+='<div class="abl"><b>✴ Éveil '+(aw?'★'+aw:'')+'</b><br>'+awakeTxt(aw)+(aw<5?'<br><span class="hint">Prochain : '+awakeTxt(aw+1)+' (encore 1 exemplaire)</span>':'')+'</div>';}
   if(c.fl)h+='<div class="flavor">« '+c.fl+' »</div>';
   h+='<div class="kv"><span class="chip">Possédées : '+(col[id]||0)+'</span><span class="chip">Max '+(c.t==='p'?'1 par équipe':rr.max+' par deck')+'</span>'+(c.en?'<span class="chip">Réservée aux ennemis</span>':'')+'</div>';
   openModal('<div class="det"><div class="cardcol">'+cardHTML(id,{noi:true})+'</div><div class="det-info"><h3 class="mtitle">'+c.n+'</h3>'+chips+h+'</div></div>');
@@ -2144,6 +2210,10 @@ var TIPS={
  defeat:{t:'Pas de panique ! Ouvre des boosters, améliore ton équipe et ton deck, puis réessaie. Tu gagnes quand même quelques Zénis.'},
  after_win:{t:'Tu as des Zénis ! Va à la Boutique pour ouvrir des boosters, puis renforce ton Équipe.',f:'mb_shop'},
  shop:{t:'La Boutique propose un booster par ère : DB, Z, GT et Super. 5 cartes par booster, dont au moins une Rare. Les Uniques ne s’obtiennent qu’en battant certains boss !'},
+ m_quests:{t:'Nouveau : les Missions ! Chaque jour, 3 missions et un cadeau de connexion t’attendent. Les Succès te récompensent pour toute ta progression. Le point rouge t’indique qu’une récompense est prête.',f:'mb_quest'},
+ m_tower:{t:'La Tour de Karin est un mode sans fin : chaque étage est plus dur, et tous les 5 étages un boss garde une carte garantie. Jusqu’où iras-tu ?',f:'mb_tower'},
+ tower:{t:'Ici, ton équipe et ton deck habituels affrontent des adversaires générés étage par étage. Tu peux voir à l’avance l’équipe de l’étage suivant pour t’y préparer.'},
+ quests:{t:'Récupère tes récompenses ici. Termine les 3 missions du jour pour le bonus : un ticket booster ! Les tickets ouvrent gratuitement le booster de ton choix dans la Boutique.'},
  pack:{t:'Touche les cartes pour les révéler. Plus le dos brille, plus la carte est rare !'},
  deck:{t:'Ici tu prépares ton Équipe de 5 personnages (un seul exemplaire de chaque, Puissance totale max '+TEAM_MAX+') et ton Deck de soutien (20 à 40 cartes).',f:'team_panel'},
  deck2:{t:'Astuce : vise des synergies et des attaques d’équipe, puis ajoute les transformations de tes personnages dans le deck. Les boutons « auto » peuvent t’aider !',f:'btn_autoteam'}
@@ -2176,15 +2246,20 @@ function show(id){
   document.querySelectorAll('.bgl').forEach(function(l){l.classList.toggle('on',l.getAttribute('data-bg')===theme);});
   BG.setTheme(theme);Music.setTheme(id==='screen-battle'?'battle':'menu');
   window.scrollTo(0,0);
-  if(id==='screen-menu'){renderMenu();tip('welcome');if(Object.keys(prog.cleared).length&&zeni>=100)tip('after_win');}
+  if(id==='screen-menu'){renderMenu();tip('welcome');if(Object.keys(prog.cleared).length&&zeni>=100)tip('after_win');if(prog.cleared.tuto){tip('m_quests');tip('m_tower');}
+    if(!loginAsked&&loginState().can&&tipsSeen.welcome){loginAsked=true;setTimeout(function(){if(!tipOpen&&$('modal').classList.contains('hidden'))openLoginModal();},700);}}
   if(id==='screen-story'){renderStory();tip('story');}
   if(id==='screen-shop'){renderShop();tip('shop');}
+  if(id==='screen-tower'){renderTower();tip('tower');}
+  if(id==='screen-quests'){renderQuests();tip('quests');}
+  renderTop();
 }
+var loginAsked=false;
 function totalCards(){var n=0;Object.keys(col).forEach(function(k){n+=col[k];});return n;}
 function unlockedIdx(){var i=0;while(i<LEVELS.length-1&&prog.cleared[LEVELS[i].id])i++;return i;}
 function renderMenu(){
   var done=LEVELS.filter(function(L){return prog.cleared[L.id];}).length;
-  $('menu_stats').textContent='Histoire : '+done+'/'+LEVELS.length+' · Collection : '+totalCards()+' cartes · Équipe : '+myTeam.length+'/5 · Deck : '+myDeck.length+' cartes';
+  $('menu_stats').textContent='Niveau '+meta.lvl+' · Histoire : '+done+'/'+LEVELS.length+' (⭐ '+totalStars()+') · Tour : étage '+meta.tower.best+' · Collection : '+distinctOwned()+'/'+ALLN;
   $('mb_story_sub').textContent=done?('Prochain : '+LEVELS[unlockedIdx()].name):'De DB à Super';
 }
 
@@ -2200,7 +2275,7 @@ function renderStory(){
     var done=!!prog.cleared[L.id],locked=i>cur;
     h+='<div class="lvl'+(locked?' locked':'')+(done?' done':'')+(i===cur&&!done?' cur':'')+'">'+
       '<div class="av">'+(locked?LOCK:bossPortrait(L))+'</div>'+
-      '<div class="info"><div class="arc">'+L.arc+'</div><div class="ttl">'+(locked?'???':L.name)+(done?' ✓':'')+'</div>'+
+      '<div class="info"><div class="arc">'+L.arc+'</div><div class="ttl">'+(locked?'???':L.name)+(done&&!L.tuto?starsHTML(meta.stars[L.id]||0):(done?' ✓':''))+'</div>'+
       '<div class="sub">'+(locked?'Termine le niveau précédent pour débloquer':L.sub)+'</div>'+
       (locked?'':'<div class="rw">💰 '+(done?Math.round(L.zeni*.3)+' Z (rejouer)':L.zeni+' Z')+(L.rew&&!done?' · 🎴 '+L.rew.map(function(r){return CARDS[r].n;}).join(', '):'')+'</div>')+'</div>'+
       (locked?'':'<button class="btn" id="lvl_'+i+'" onclick="openLevel('+i+')">'+(done?'Rejouer':'Combattre')+'</button>')+'</div>';
@@ -2241,6 +2316,7 @@ function openLevel(i){
     '<div class="kv">'+(L.bx?'<span class="chip">👑 Boss : PV ×'+L.bx+'</span>':'')+'<span class="chip">🃏 Deck : '+ed.length+' cartes</span><span class="chip"><i class="coin"></i> '+(done?Math.round(L.zeni*.3):L.zeni)+' Zénis</span>'+
     syn.map(function(a){return '<span class="chip" title="'+a.tiers.map(function(t){return t[3];}).join(' · ')+'">'+a.S.i+' '+a.S.n+'</span>';}).join('')+'</div>'+
     '<div class="abl"><b>Stratégie adverse</b><br>'+L.desc+'</div>'+rew+
+    (L.tuto?'':'<div class="abl"><b>Objectifs '+starsHTML(meta.stars[L.id]||0)+'</b><br>'+STAR_TXT.map(function(t,k){return (k<(meta.stars[L.id]||0)?'★ ':'☆ ')+t;}).join('<br>')+'<br><span class="hint">+25 Z par nouvelle étoile · un ticket booster tous les 9 ★</span></div>')+
     (L.tuto?'<div class="abl"><b>Tutoriel</b><br>Tu utilises l’équipe et le deck d’entraînement préparés par Kaïo.</div>':'')+
     (err?'<div class="warn">⚠ '+err+'</div><div class="endbtns"><button class="btn big blue" onclick="closeModal();openDeckScreen()">Modifier mon équipe</button></div>':
       '<div class="endbtns"><button class="btn big" onclick="startBattle('+i+')">Combattre !</button><button class="btn ghost big" onclick="closeModal()">Retour</button></div>'));
@@ -2274,8 +2350,13 @@ function renderShop(){
   Object.keys(ERAS).forEach(function(e){
     var E_=ERAS[e],can=zeni>=E_.price;
     h+='<div class="packcol"><div class="pack tilt'+(can?'':' poor')+'" id="pack_'+e+'" style="'+packStyle(e)+'" onclick="openPack(\''+e+'\')">'+packInner(e)+'</div>'+
-      '<button class="btn small'+(can?'':' ghost')+'" onclick="openPack(\''+e+'\')"><i class="coin"></i> '+E_.price+'</button></div>';
+      '<button class="btn small'+(can?'':' ghost')+'" onclick="openPack(\''+e+'\')"><i class="coin"></i> '+E_.price+'</button>'+
+      (meta.tickets>0?'<button class="btn small green" onclick="openPack(\''+e+'\',true)">🎫 Ticket</button>':'')+'</div>';
   });
+  var free=Date.now()>=meta.freeAt;
+  h='<div class="panel center" style="width:100%"><b>🎫 Tickets : '+meta.tickets+'</b> · '+
+    (free?'<button class="btn small" onclick="claimFree()">Récupérer le booster gratuit</button>':'Booster gratuit dans '+fmtLeft(meta.freeAt-Date.now()))+
+    '<div class="hint" style="margin-top:6px">Légendaire ou mieux garanti dans '+Math.max(1,PITY-(meta.pity||0))+' booster(s)</div></div>'+h;
   $('packs').innerHTML=h;
   var tot=0;RKEYS.forEach(function(r){tot+=RAR[r].w;});
   $('odds').innerHTML=RKEYS.map(function(r){return '<span class="chip"><span class="rgem" style="--rc:'+RAR[r].col+'"></span>'+RAR[r].n+' '+(RAR[r].w?(RAR[r].w/tot*100).toFixed(RAR[r].w<1?1:0)+'%':'— boss')+'</span>';}).join('');
@@ -2283,13 +2364,17 @@ function renderShop(){
   $('shop_stats').textContent='Ta collection : '+totalCards()+' cartes · '+own+' / '+all+' cartes différentes découvertes';
 }
 var packBusy=false;
-async function openPack(era){
+async function openPack(era,useTk){
   if(packBusy)return;
   var E_=ERAS[era];
-  if(zeni<E_.price){sfxError();nope($('pack_'+era));openModal('<h3 class="mtitle">Pas assez de Zénis</h3><p style="font-weight:800">Ce booster coûte '+E_.price+' Zénis et tu en as '+zeni+'. Gagne des combats en mode Histoire pour en obtenir !</p><div class="endbtns"><button class="btn" onclick="closeModal();show(\'screen-story\')">Mode Histoire</button></div>');return;}
-  packBusy=true;setZeni(zeni-E_.price);sfxCoin();
+  if(useTk&&meta.tickets<1)return;
+  if(!useTk&&zeni<E_.price){sfxError();nope($('pack_'+era));openModal('<h3 class="mtitle">Pas assez de Zénis</h3><p style="font-weight:800">Ce booster coûte '+E_.price+' Zénis et tu en as '+zeni+'. Gagne des combats en mode Histoire pour en obtenir !</p><div class="endbtns"><button class="btn" onclick="closeModal();show(\'screen-story\')">Mode Histoire</button></div>');return;}
+  packBusy=true;if(useTk)setTickets(meta.tickets-1);else setZeni(zeni-E_.price);sfxCoin();
   var pulled=[],isNew={};
-  for(var i=0;i<5;i++){pulled.push(pullCard(era,i===4?2:0));}
+  meta.pity=(meta.pity||0)+1;
+  for(var i=0;i<5;i++){pulled.push(pullCard(era,i===4?(meta.pity>=PITY?4:2):0));}
+  if(pulled.some(function(id){return RIDX[CARDS[id].rar]>=4;}))meta.pity=0;
+  saveMeta();track('pack');
   pulled.forEach(function(id,i){if(!col[id]&&!isNew[id])isNew[i]=true;addCard(id);});
   var ov=$('pack_overlay');
   ov.innerHTML='<div class="po-rays"></div><div class="po-stage" id="po_stage"><div class="po-pack" style="'+packStyle(era)+'">'+packInner(era)+'</div></div><div class="po-cards" id="po_cards"></div><div class="po-actions" id="po_actions"></div>';
@@ -2325,7 +2410,277 @@ function flipCard(el){
   if(!document.querySelector('#po_cards .flip:not(.flipped)'))setTimeout(function(){if($('po_actions'))$('po_actions').innerHTML='<button class="btn big" style="animation:popIn .4s backwards" onclick="closePackResult()">Super !</button> <button class="btn blue big" style="animation:popIn .4s backwards" onclick="closePackResult();openDeckScreen()">Voir mon deck</button>';},500);
 }
 function revealAll(){Array.prototype.forEach.call(document.querySelectorAll('#po_cards .flip:not(.flipped)'),function(el,i){setTimeout(function(){flipCard(el);},i*300);});}
-function closePackResult(){var ov=$('pack_overlay');ov.classList.add('hidden');ov.innerHTML='';renderShop();}
+function closePackResult(){var ov=$('pack_overlay');ov.classList.add('hidden');ov.innerHTML='';renderShop();checkAchToasts();}
+
+/* =====================================================================
+   PROGRESSION : niveau joueur, missions, connexion, succès, étoiles, éveil, Tour
+   ===================================================================== */
+var meta=loadLS('dcz5_meta',null)||{};
+['stats','ach','stars','daily','login','tower','achSeen'].forEach(function(k){if(!meta[k])meta[k]={};});
+if(meta.xp==null){meta.xp=0;meta.lvl=1;meta.tickets=1;meta.pity=0;meta.chests=0;meta.freeAt=0;}
+if(!meta.tower.floor){meta.tower.floor=1;meta.tower.best=0;meta.tower.seed=1+Math.floor(Math.random()*99999);}
+function saveMeta(){saveLS('dcz5_meta',meta);}
+function mstat(k){return meta.stats[k]||0;}
+function rngSeed(a){return function(){a|=0;a=a+0x6D2B79F5|0;var t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
+function dayNum(){var d=new Date();return Math.floor((d.getTime()-d.getTimezoneOffset()*6e4)/864e5);}
+function fmtLeft(ms){var m=Math.max(0,Math.ceil(ms/6e4)),h=Math.floor(m/60);return h?h+' h '+(m%60<10?'0':'')+m%60:m+' min';}
+function toast(t,s,cls){
+  var w=$('toasts');if(!w){w=document.createElement('div');w.id='toasts';document.body.appendChild(w);}
+  var d=document.createElement('div');d.className='toast '+(cls||'');d.innerHTML='<b>'+t+'</b>'+(s?'<small>'+s+'</small>':'');w.appendChild(d);
+  setTimeout(function(){d.classList.add('out');},3400);setTimeout(function(){d.remove();},3900);
+}
+function setTickets(v){meta.tickets=v;saveMeta();renderTop();}
+
+/* --- Niveau joueur --- */
+function xpNeed(l){return 80+l*40;}
+function addXP(n){
+  meta.xp+=n;var ups=[];
+  while(meta.xp>=xpNeed(meta.lvl)){meta.xp-=xpNeed(meta.lvl);meta.lvl++;var z=60+meta.lvl*15,tk=meta.lvl%3===0?1:0;zeni+=z;meta.tickets+=tk;ups.push({l:meta.lvl,z:z,tk:tk});}
+  saveMeta();if(ups.length)setZeni(zeni);renderTop();
+  ups.forEach(function(u,k){setTimeout(function(){toast('🎖 Niveau '+u.l+' !','+'+u.z+' Zénis'+(u.tk?' · +1 ticket booster 🎫':''),'gold');sfxCoin();},600+k*700);});
+  return ups;
+}
+function renderTop(){
+  var c=$('lvlchip');if(!c)return;
+  c.innerHTML='<b>'+meta.lvl+'</b><span class="xpb"><i style="width:'+pct(meta.xp,xpNeed(meta.lvl))+'"></i></span>';
+  c.title='Niveau '+meta.lvl+' · '+meta.xp+' / '+xpNeed(meta.lvl)+' XP';
+  $('tk_n').textContent=meta.tickets;
+  updateDots();
+}
+function setDot(id,n){var b=$(id);if(!b)return;var d=b.querySelector('.dot');if(!n){if(d)d.remove();return;}if(!d){d=document.createElement('span');d.className='dot';b.appendChild(d);}d.textContent=n;}
+function updateDots(){
+  rollDaily();
+  var n=meta.daily.list.filter(function(m){return !m.c&&m.p>=MBYID[m.id].n;}).length+(dailyAllDone()&&!meta.daily.bonus?1:0)+ACH.filter(achClaimable).length;
+  setDot('mb_quest',n);setDot('mb_daily',loginState().can?1:0);
+  var free=Date.now()>=meta.freeAt;setDot('mb_shop',free?1:0);
+  if($('mb_daily_sub'))$('mb_daily_sub').textContent=loginState().can?'Disponible !':'Série : '+(meta.login.streak||0)+' jour'+((meta.login.streak||0)>1?'s':'');
+  if($('mb_tower_sub'))$('mb_tower_sub').textContent='Étage '+meta.tower.floor+(meta.tower.best?' · record '+meta.tower.best:'');
+}
+
+/* --- Missions du jour --- */
+var MISSIONS=[
+ {id:'win2',k:'win',n:2,i:'🏆',t:'Gagne 2 combats',z:120,xp:40},
+ {id:'win4',k:'win',n:4,i:'🏆',t:'Gagne 4 combats',z:220,xp:70},
+ {id:'dmg',k:'dmg',n:400,i:'⚔',t:'Inflige 400 dégâts',z:120,xp:40},
+ {id:'ko',k:'ko',n:15,i:'💥',t:'Mets 15 ennemis K.O.',z:120,xp:40},
+ {id:'ult',k:'ult',n:3,i:'🌟',t:'Déclenche 3 Ultimes',z:130,xp:45},
+ {id:'team',k:'team',n:2,i:'🤝',t:'Réalise 2 attaques d’équipe',z:140,xp:45},
+ {id:'card',k:'card',n:15,i:'🃏',t:'Joue 15 cartes de soutien',z:100,xp:35},
+ {id:'pack',k:'pack',n:1,i:'🎴',t:'Ouvre 1 booster',z:80,xp:30},
+ {id:'tower',k:'tower',n:2,i:'🗼',t:'Franchis 2 étages de la Tour',z:150,xp:50},
+ {id:'flaw',k:'flaw',n:1,i:'🛡',t:'Gagne un combat sans perdre de personnage',z:160,xp:50},
+ {id:'combo',k:'combo3',n:2,i:'👊',t:'Réalise 2 combos ×3',z:110,xp:40},
+ {id:'star',k:'star3',n:1,i:'⭐',t:'Gagne un niveau d’Histoire avec 3 étoiles',z:150,xp:50}
+];
+var MBYID={};MISSIONS.forEach(function(m){MBYID[m.id]=m;});
+function rollDaily(){
+  var dn=dayNum();if(meta.daily.day===dn&&meta.daily.list)return;
+  var r=rngSeed(dn*31+(meta.tower.seed||7)),pool=MISSIONS.slice(),pick=[];
+  while(pick.length<3){var m=pool.splice(Math.floor(r()*pool.length),1)[0];if(pick.some(function(p){return MBYID[p].k===m.k;}))continue;pick.push(m.id);}
+  meta.daily={day:dn,list:pick.map(function(id){return {id:id,p:0,c:false};}),bonus:false};saveMeta();
+}
+function dailyAllDone(){return meta.daily.list.every(function(m){return m.p>=MBYID[m.id].n;});}
+function track(k,v){
+  v=v||1;meta.stats[k]=(meta.stats[k]||0)+v;rollDaily();
+  meta.daily.list.forEach(function(m){var M=MBYID[m.id];if(M.k!==k||m.p>=M.n)return;m.p=Math.min(M.n,m.p+v);if(m.p>=M.n){toast('🎯 Mission accomplie !',M.t+' · va la récupérer dans Missions');sfxCoin();}});
+  saveMeta();updateDots();
+}
+function claimMission(i){
+  var m=meta.daily.list[i],M=MBYID[m.id];if(!m||m.c||m.p<M.n)return;
+  m.c=true;saveMeta();setZeni(zeni+M.z);sfxCoin();addXP(M.xp);renderQuests();
+}
+function claimBonus(){if(meta.daily.bonus||!dailyAllDone())return;meta.daily.bonus=true;meta.tickets++;saveMeta();setZeni(zeni+150);sfxVictory();addXP(60);toast('🎁 Bonus du jour !','+1 ticket booster · +150 Zénis','gold');renderQuests();}
+
+/* --- Cadeau de connexion (série de 7 jours) --- */
+var LOGIN=[{z:100},{z:150},{tk:1},{z:250},{z:300},{tk:1,z:150},{tk:2,z:500}];
+function loginTxt(R){return [R.z?R.z+' Z':'',R.tk?R.tk+' 🎫':''].filter(Boolean).join(' + ');}
+function loginState(){var dn=dayNum(),L=meta.login;if(L.last===dn)return {can:false,day:L.streak};return {can:true,day:L.last===dn-1?(L.streak%7)+1:1};}
+function calHTML(){
+  var s=loginState(),h='<div class="cal">';
+  for(var d=1;d<=7;d++){var got=s.can?d<s.day:d<=s.day,today=s.can&&d===s.day;h+='<div class="'+(got?'got':'')+(today?' today':'')+'">J'+d+'<small>'+(got?'✓':loginTxt(LOGIN[d-1]))+'</small></div>';}
+  return h+'</div>';
+}
+function openLoginModal(){
+  var s=loginState();
+  openModal('<h3 class="mtitle">🎁 Cadeau du jour</h3><p style="font-weight:800">Reviens chaque jour pour faire grimper ta série. Le 7e jour donne le gros lot ! Si tu rates un jour, la série recommence au jour 1.</p>'+calHTML()+
+    '<div class="endbtns">'+(s.can?'<button class="btn big" onclick="claimLogin()">Récupérer : '+loginTxt(LOGIN[s.day-1])+'</button>':'<button class="btn ghost big" onclick="closeModal()">Déjà récupéré · reviens demain !</button>')+'</div>');
+}
+function claimLogin(){
+  var s=loginState();if(!s.can)return;
+  meta.login={last:dayNum(),streak:s.day};var R=LOGIN[s.day-1];
+  meta.tickets+=R.tk||0;saveMeta();if(R.z)setZeni(zeni+R.z);sfxVictory();addXP(15);
+  toast('🎁 Jour '+s.day+' récupéré !',loginTxt(R),'gold');closeModal();renderTop();
+  if($('screen-quests')&&!$('screen-quests').classList.contains('hidden'))renderQuests();
+}
+
+/* --- Succès --- */
+var ACH=[];
+function achTier(g,i,t,f,steps){var prev=0;steps.forEach(function(s,k){if(s[0]<=prev)return;prev=s[0];ACH.push({id:g+k,g:g,i:i,t:t.replace('#',s[0]),f:f,n:s[0],z:s[1],tk:s[2]||0});});}
+function distinctOwned(){return Object.keys(col).filter(function(k){return CARDS[k]&&!CARDS[k].en&&col[k]>0;}).length;}
+function totalStars(){var t=0;Object.keys(meta.stars).forEach(function(k){t+=meta.stars[k];});return t;}
+function maxAwaken(){var m=0;Object.keys(col).forEach(function(id){m=Math.max(m,awakeOf(id));});return m;}
+var ALLN=Object.keys(CARDS).filter(function(k){return !CARDS[k].en;}).length;
+achTier('win','🏆','Gagne # combats',function(){return mstat('win');},[[1,50],[10,150],[50,400,1],[150,800,2],[400,1500,3]]);
+achTier('ko','💥','Mets # ennemis K.O.',function(){return mstat('ko');},[[25,80],[200,250],[1000,600,1],[3000,1200,2]]);
+achTier('dmg','⚔','Inflige # dégâts',function(){return mstat('dmg');},[[1000,100],[10000,400,1],[50000,1000,2]]);
+achTier('ult','🌟','Déclenche # Ultimes',function(){return mstat('ult');},[[5,80],[50,300],[250,800,1]]);
+achTier('team','🤝','Réalise # attaques d’équipe',function(){return mstat('team');},[[5,80],[50,300],[200,800,1]]);
+achTier('pack','🎴','Ouvre # boosters',function(){return mstat('pack');},[[5,100],[25,300,1],[100,800,2]]);
+achTier('col','📚','Découvre # cartes différentes',distinctOwned,[[30,100],[60,250],[100,500,1],[150,1000,2],[ALLN,3000,5]]);
+achTier('story','📖','Termine # niveaux d’Histoire',function(){return Object.keys(prog.cleared).length;},[[5,100],[15,300],[30,600,1],[LEVELS.length,1500,3]]);
+achTier('stars','⭐','Récolte # étoiles en Histoire',totalStars,[[10,100],[30,300],[60,700,1],[LEVELS.length*3,2000,3]]);
+achTier('tower','🗼','Atteins l’étage # de la Tour',function(){return meta.tower.best;},[[5,100],[10,250],[25,600,1],[50,1500,2],[100,4000,5]]);
+achTier('lvl','🎖','Atteins le niveau joueur #',function(){return meta.lvl;},[[5,150],[10,300,1],[20,800,2],[40,2000,3]]);
+achTier('aw','✴','Éveille un personnage à ★#',maxAwaken,[[1,80],[3,250],[5,800,1]]);
+achTier('flaw','🛡','Gagne # combats sans perdre personne',function(){return mstat('flaw');},[[1,80],[10,300],[50,900,1]]);
+achTier('combo','👊','Réalise # combos ×3',function(){return mstat('combo3');},[[5,80],[50,300],[200,800,1]]);
+function achClaimable(A){return !meta.ach[A.id]&&A.f()>=A.n;}
+function claimAch(id){
+  var A=ACH.filter(function(x){return x.id===id;})[0];if(!A||!achClaimable(A))return;
+  meta.ach[id]=true;meta.tickets+=A.tk;saveMeta();setZeni(zeni+A.z);sfxVictory();addXP(30);
+  toast(A.i+' Succès : '+A.t,'+'+A.z+' Zénis'+(A.tk?' · +'+A.tk+' 🎫':''),'gold');renderQuests();
+}
+function checkAchToasts(){ACH.forEach(function(A){if(achClaimable(A)&&!meta.achSeen[A.id]){meta.achSeen[A.id]=true;toast(A.i+' Succès débloqué !',A.t+' · récupère-le dans Missions','gold');}});saveMeta();updateDots();}
+
+/* --- Écran Missions --- */
+var qTab='daily';
+function setQTab(t){qTab=t;sfxClick();renderQuests();}
+function rwTxt(z,tk,xp){return [z?'<i class="coin"></i> '+z:'',tk?'🎫 '+tk:'',xp?'+'+xp+' XP':''].filter(Boolean).join(' · ');}
+function renderQuests(){
+  rollDaily();
+  var nA=ACH.filter(achClaimable).length;
+  $('q_tabs').innerHTML='<button class="fchip'+(qTab==='daily'?' on':'')+'" onclick="setQTab(\'daily\')">Du jour</button><button class="fchip'+(qTab==='ach'?' on':'')+'" onclick="setQTab(\'ach\')">Succès'+(nA?' ('+nA+')':'')+'</button>';
+  var h='';
+  if(qTab==='daily'){
+    var s=loginState(),next=new Date();next.setHours(24,0,0,0);
+    h+='<div class="panel"><div class="section-title" style="margin-top:0">🎁 Cadeau de connexion · série de '+(s.can?s.day-1:s.day)+' jour(s)</div>'+calHTML()+
+      (s.can?'<button class="btn" onclick="claimLogin()">Récupérer : '+loginTxt(LOGIN[s.day-1])+'</button>':'<span class="hint">Prochain cadeau dans '+fmtLeft(next-Date.now())+'</span>')+'</div>';
+    h+='<div class="panel"><div class="section-title" style="margin-top:0">🎯 Missions du jour <span class="hint">· nouvelles missions dans '+fmtLeft(next-Date.now())+'</span></div>';
+    meta.daily.list.forEach(function(m,i){
+      var M=MBYID[m.id],done=m.p>=M.n;
+      h+='<div class="qrow'+(m.c?' claimed':(done?' done':''))+'"><div class="qi">'+M.i+'</div><div class="qt"><b>'+M.t+'</b><div class="qbar"><i style="width:'+pct(m.p,M.n)+'"></i></div><small class="hint">'+m.p+' / '+M.n+'</small></div>'+
+        '<div class="qr">'+rwTxt(M.z,0,M.xp)+'</div>'+(m.c?'<span class="status-ok">✓</span>':'<button class="btn small'+(done?'':' ghost')+'" onclick="claimMission('+i+')"'+(done?'':' disabled')+'>Récupérer</button>')+'</div>';
+    });
+    var all=dailyAllDone();
+    h+='<div class="qrow'+(meta.daily.bonus?' claimed':(all?' done':''))+'"><div class="qi">🎁</div><div class="qt"><b>Bonus : termine les 3 missions</b></div><div class="qr">'+rwTxt(150,1,60)+'</div>'+
+      (meta.daily.bonus?'<span class="status-ok">✓</span>':'<button class="btn small'+(all?'':' ghost')+'" onclick="claimBonus()"'+(all?'':' disabled')+'>Récupérer</button>')+'</div></div>';
+  }else{
+    h+='<div class="panel">';
+    var groups=[];ACH.forEach(function(A){if(groups.indexOf(A.g)<0)groups.push(A.g);});
+    groups.sort(function(a,b){function rank(g){var t=ACH.filter(function(A){return A.g===g&&!meta.ach[A.id];})[0];return t?(achClaimable(t)?0:1):2;}return rank(a)-rank(b);});
+    groups.forEach(function(g){
+      var tiers=ACH.filter(function(A){return A.g===g;}),cur=tiers.filter(function(A){return !meta.ach[A.id];})[0],k=tiers.indexOf(cur);
+      if(!cur){var L=tiers[tiers.length-1];h+='<div class="qrow claimed"><div class="qi">'+L.i+'</div><div class="qt"><b>'+L.t+'</b><small class="hint">Tous les paliers terminés</small></div><span class="status-ok">✓ ★'+tiers.length+'</span></div>';return;}
+      var v=Math.min(cur.f(),cur.n),ok=achClaimable(cur);
+      h+='<div class="qrow'+(ok?' done':'')+'"><div class="qi">'+cur.i+'</div><div class="qt"><b>'+cur.t+'</b><div class="qbar"><i style="width:'+pct(v,cur.n)+'"></i></div><small class="hint">'+v+' / '+cur.n+' · palier '+(k+1)+'/'+tiers.length+'</small></div>'+
+        '<div class="qr">'+rwTxt(cur.z,cur.tk,30)+'</div><button class="btn small'+(ok?'':' ghost')+'" onclick="claimAch(\''+cur.id+'\')"'+(ok?'':' disabled')+'>Récupérer</button></div>';
+    });
+    h+='</div>';
+  }
+  $('q_box').innerHTML=h;updateDots();
+}
+
+/* --- Étoiles du mode Histoire --- */
+function starsHTML(n){var h='';for(var i=0;i<3;i++)h+='<i class="star'+(i<n?' on':'')+'">★</i>';return '<span class="stars">'+h+'</span>';}
+var STAR_TXT=['Victoire','Au moins 3 combattants debout à la fin','Victoire en 8 tours ou moins'];
+function starChests(){
+  var ch=Math.floor(totalStars()/9);
+  if(ch>meta.chests){var n=ch-meta.chests;meta.chests=ch;meta.tickets+=n;saveMeta();setTimeout(function(){toast('⭐ Coffre d’étoiles !','+'+n+' ticket booster 🎫 (tous les 9 ★)','gold');},900);}
+}
+
+/* --- Éveil des personnages (doublons) --- */
+var AW=[[0,0,0,0],[3,0,0,0],[3,1,0,0],[6,1,0,0],[6,1,1,0],[9,2,1,30]];
+function awakeOf(id){var c=CARDS[id];if(!c||c.t!=='p')return 0;return Math.max(0,Math.min(5,(col[id]||0)-1));}
+function awakeTxt(st){var w=AW[st];return st?'★'+st+' : +'+w[0]+' PV'+(w[1]?', +'+w[1]+' ATK':'')+(w[2]?', +'+w[2]+' DEF':'')+(w[3]?', jauge d’Ultime à '+w[3]+'%':''):'Pas encore éveillé';}
+function recalcTot(s){s.maxTot=0;s.units.forEach(function(u){if(u)s.maxTot+=u.maxHp;});s.reserve.forEach(function(r){s.maxTot+=Math.round(CARDS[r.id].h*HPX);});}
+function applyAwaken(s){s.units.forEach(function(u){if(!u)return;var w=AW[awakeOf(u.baseId)];u.hp+=w[0];u.maxHp+=w[0];u.atk+=w[1];u.def+=w[2];u.gauge=Math.max(u.gauge,w[3]);});recalcTot(s);}
+
+/* --- Recyclage des doublons en trop --- */
+var RECY={c:5,u:10,r:25,e:60,l:150,m:400,x:0};
+function excessOf(id){var c=CARDS[id];if(!c)return 0;var cap=c.t==='p'?6:RAR[c.rar].max;return Math.max(0,(col[id]||0)-cap);}
+function recycleInfo(){var n=0,z=0;Object.keys(col).forEach(function(id){var e=excessOf(id);if(e){n+=e;z+=e*RECY[CARDS[id].rar];}});return {n:n,z:z};}
+function recycle(){
+  var r=recycleInfo();if(!r.n){sfxError();return;}
+  Object.keys(col).forEach(function(id){col[id]-=excessOf(id);});saveCol();setZeni(zeni+r.z);sfxCoin();
+  toast('♻ Doublons recyclés','+'+r.z+' Zénis ('+r.n+' cartes en trop)','gold');renderDeck();
+}
+
+/* --- Booster gratuit (toutes les 4 h) et garantie Légendaire --- */
+var PITY=30;
+function claimFree(){if(Date.now()<meta.freeAt)return;meta.freeAt=Date.now()+4*36e5;meta.tickets++;saveMeta();sfxCoin();toast('🎫 Booster gratuit !','Utilise ton ticket sur le booster de ton choix');renderShop();renderTop();}
+
+/* --- Tour de Karin --- */
+var TOWER_POOL=Object.keys(CARDS).filter(function(id){return CARDS[id].t==='p'&&id!=='daimao';});
+var TF_LIST=Object.keys(CARDS).filter(function(id){var c=CARDS[id];return c.t==='t'&&!c.fus;});
+function towerRew(n){return {z:Math.min(400,40+n*8),xp:Math.min(120,25+n*2),card:n%25===0?5:(n%5===0?(n>=40?4:(n>=20?3:2)):null)};}
+function towerLevel(n){
+  var r=rngSeed(n*7919+meta.tower.seed),boss=n%5===0;
+  var maxC=Math.min(9,1+Math.floor(n/3)+(boss?1:0)),budget=Math.min(36,8+Math.round(n*1.15))+(boss?3:0);
+  var minC=Math.min(4,Math.floor(n/12));
+  var cand=TOWER_POOL.filter(function(id){var c=CARDS[id].c||0;return c<=maxC&&c>=minC&&(id!=='cellmax'||n>=40);}).map(function(id){return [r(),id];}).sort(function(a,b){return a[0]-b[0];}).map(function(x){return x[1];});
+  var theme=null;
+  if(r()<.45){
+    var opts=SYN.filter(function(S){return cand.filter(function(id){return synMember({fam:famOf(id),race:CARDS[id].r},S);}).length>=2;});
+    if(opts.length){theme=opts[Math.floor(r()*opts.length)];cand.sort(function(a,b){function m(id){return synMember({fam:famOf(id),race:CARDS[id].r},theme)?0:1;}return m(a)-m(b);});}
+  }
+  var team=[],fams={},cost=0;
+  if(boss){var bs=cand.filter(function(id){return (CARDS[id].c||0)>=Math.max(1,maxC-2);});if(bs.length){team.push(bs[0]);fams[famOf(bs[0])]=1;cost+=CARDS[bs[0]].c||0;}}
+  cand.forEach(function(id){if(team.length>=TEAM_SIZE)return;var f=famOf(id),c=CARDS[id].c||0;if(fams[f]||cost+c>budget)return;team.push(id);fams[f]=1;cost+=c;});
+  var tfp=Math.min(.75,(n-3)/30),maxLv=1+Math.floor(n/9);
+  var specs=team.map(function(id){
+    var c=CARDS[id],f=famOf(id);if(r()>=tfp)return id;
+    var ok=TF_LIST.filter(function(t){var T=CARDS[t];return T.lv<=maxLv&&((T.rq&&T.rq===f)||(T.rr&&T.rr===c.r));}).sort(function(a,b){return CARDS[b].lv-CARDS[a].lv;});
+    return ok.length?id+'>'+ok[0]:id;
+  });
+  var maxR=Math.min(5,1+Math.floor(n/8)),dpool=Object.keys(CARDS).filter(function(id){var c=CARDS[id];return (c.t==='q'||c.t==='o')&&!c.en&&RIDX[c.rar]<=maxR;});
+  var deck=[];for(var k=0;k<16;k++)deck.push(dpool[Math.floor(r()*dpool.length)]);
+  var lead=specs[0].split('>'),bn=CARDS[lead[1]||lead[0]].n;
+  return {tower:true,id:'tower',floor:n,name:boss?bn:'Étage '+n,boss:lead[1]||lead[0],team:specs.join(','),deck:deck.join(','),bx:boss?1.3+Math.min(1.2,n/50):1,
+    theme:theme,scale:{h:1+Math.max(0,n-6)*.035,a:Math.floor(n/12),d:Math.floor(n/20)},
+    quote:boss?'Tu es arrivé jusqu’ici ? Voyons si tu mérites l’étage suivant !':'Personne ne monte plus haut sans me vaincre !'};
+}
+function applyScale(s,sc){s.units.forEach(function(u){if(!u)return;u.maxHp=Math.round(u.maxHp*sc.h);u.hp=u.maxHp;u.atk+=sc.a;u.def+=sc.d;});recalcTot(s);}
+function renderTower(){
+  var n=meta.tower.floor,L=towerLevel(n),R=towerRew(n),team=parseTeam(L.team);
+  var h='<div class="panel"><div class="tower-hero"><div class="tower-floor"><small>ÉTAGE</small>'+n+'</div><div style="flex:1;min-width:200px">'+
+    '<div class="section-title" style="margin-top:0">'+(n%5===0?'👑 Étage de boss : '+L.name:'Prochain combat')+(L.theme?' · '+L.theme.i+' '+L.theme.n:'')+'</div>'+
+    '<div class="kv">'+team.map(function(s){return miniAv(s.tf||s.id);}).join('')+'</div>'+
+    '<div class="kv">'+(L.bx>1?'<span class="chip">👑 PV du boss ×'+L.bx.toFixed(1)+'</span>':'')+(L.scale.h>1?'<span class="chip">❤ PV ennemis ×'+L.scale.h.toFixed(2)+'</span>':'')+(L.scale.a?'<span class="chip">⚔ ATK ennemis +'+L.scale.a+'</span>':'')+(L.scale.d?'<span class="chip">🛡 DEF ennemis +'+L.scale.d+'</span>':'')+'</div>'+
+    '<div class="kv"><span class="chip"><i class="coin"></i> '+R.z+'</span><span class="chip">+'+R.xp+' XP</span>'+(R.card!=null?'<span class="chip" style="color:'+RAR[RKEYS[R.card]].col+'">🎴 Carte '+RAR[RKEYS[R.card]].n+' ou mieux</span>':'')+'</div>'+
+    '</div></div><div class="endbtns"><button class="btn big" onclick="startTower()">Combattre l’étage '+n+' !</button></div>'+
+    '<p class="hint center">Record : étage '+meta.tower.best+' · En cas de défaite, tu peux retenter l’étage autant de fois que tu veux.</p></div>';
+  h+='<div class="panel"><div class="section-title" style="margin-top:0">Les prochains étages</div><div class="ladder">';
+  for(var k=n;k<n+8;k++){var rr=towerRew(k);h+='<div class="'+(k%5===0?'boss':'')+(k===n?' cur':'')+'"><span>'+(k%5===0?'👑 ':'')+'Étage '+k+'</span><span>'+rr.z+' Z'+(rr.card!=null?' · 🎴 '+RAR[RKEYS[rr.card]].n:'')+'</span></div>';}
+  $('tower_box').innerHTML=h+'</div></div>';
+}
+function startTower(){
+  var err=validTeam()||validDeck();
+  if(err){openModal('<h3 class="mtitle">Équipe pas prête</h3><div class="warn">⚠ '+err+'</div><div class="endbtns"><button class="btn big blue" onclick="closeModal();openDeckScreen()">Modifier mon équipe</button></div>');return;}
+  startBattle(-1,towerLevel(meta.tower.floor));
+}
+function endTower(won,L){
+  var n=L.floor,R=towerRew(n),gain=won?R.z:15,rew=[];
+  if(won){
+    meta.tower.floor=n+1;if(n>meta.tower.best)meta.tower.best=n;saveMeta();
+    track('win');track('tower');if(!P.fallen.length)track('flaw');
+    if(R.card!=null){var eras=Object.keys(ERAS),id=pullCard(eras[Math.floor(Math.random()*eras.length)],R.card);if(!col[id])rew.isNew=true;addCard(id);rew.push(id);}
+  }
+  setZeni(zeni+gain);var ups=addXP(won?R.xp:8);
+  if(won)sfxVictory();else sfxDefeat();
+  var hero=alive(P)[0],box=$('battle_end');
+  box.innerHTML='<div class="endbox '+(won?'win':'lose')+'"><div class="endrays"></div>'+
+    '<div class="endtitle">'+(won?'ÉTAGE '+n+' !':'DÉFAITE…')+'</div>'+
+    '<div class="hero">'+(won&&hero!==undefined?artSVG(P.units[hero].id):bossPortrait(L))+'</div>'+
+    '<p>'+(won?'Tu montes à l’étage '+(n+1)+' de la Tour de Karin !'+(n===meta.tower.best?' Nouveau record !':''):'L’étage '+n+' résiste encore. Ajuste ton équipe et retente ta chance !')+'</p>'+
+    '<div class="zgain"><i class="coin"></i>+'+gain+' Zénis</div><div class="xpgain">+'+(won?R.xp:8)+' XP</div>'+
+    ups.map(function(u){return '<div class="lvup">NIVEAU '+u.l+' !</div>';}).join('')+
+    (rew.length?'<div class="section-title" style="margin-top:12px">Carte de palier</div><div class="rewards">'+rew.map(function(r,i){return cardHTML(r,{cls:'popin',i:i,isNew:rew.isNew});}).join('')+'</div>':'')+
+    '<div class="endbtns">'+(won?'<button class="btn big" onclick="startTower()">Étage suivant ▶</button>':'<button class="btn big" onclick="startTower()">Réessayer</button><button class="btn blue big" onclick="$(\'battle_end\').classList.add(\'hidden\');openDeckScreen()">Mon équipe</button>')+
+    '<button class="btn ghost big" onclick="$(\'battle_end\').classList.add(\'hidden\');show(\'screen-tower\')">La Tour</button></div></div>';
+  box.classList.remove('hidden');
+  if(won)confetti(box);
+  checkAchToasts();renderBattle();
+}
 
 /* ---------- Synergies ---------- */
 function synMember(u,S){return S.race?u.race===S.race:S.m.indexOf(u.fam)>=0;}
@@ -2355,7 +2710,8 @@ function renderDeck(hl){
   var counts=deckCounts(),ch='',dh='',th='',idx=0;
   var F=[['all','Tout'],['p','Persos'],['t','Transfos'],['q','Techniques'],['o','Objets'],['b','Boules']];
   $('filters').innerHTML=F.map(function(f){return '<button class="fchip'+(deckFilter===f[0]?' on':'')+'" onclick="setFilter(\''+f[0]+'\')">'+f[1]+'</button>';}).join('');
-  for(var i=0;i<TEAM_SIZE;i++){var id=myTeam[i];th+=id?cardHTML(id,{onclick:'removeFromTeam('+i+',this)',cls:id===hl?'popin':(deckFirst?'deal':''),i:i}):'<div class="tslot">Emplacement libre<br>+</div>';}
+  var ri=recycleInfo();$('btn_recy').textContent=ri.n?'♻ Recycler '+ri.n+' doublon(s) en trop (+'+ri.z+' Z)':'♻ Aucun doublon en trop';$('btn_recy').className='btn small'+(ri.n?' green':' ghost');
+  for(var i=0;i<TEAM_SIZE;i++){var id=myTeam[i];th+=id?cardHTML(id,{onclick:'removeFromTeam('+i+',this)',badge:awakeOf(id)?'★'+awakeOf(id):'',cls:id===hl?'popin':(deckFirst?'deal':''),i:i}):'<div class="tslot">Emplacement libre<br>+</div>';}
   $('team_list').innerHTML=th;
   var syn=activeSyn(teamUnitsOf(myTeam)),ta=teamAtksOf(myTeam);
   $('syn_list').innerHTML=(syn.length||ta.length)?syn.map(function(a){return '<span class="chip" title="'+a.tiers.map(function(t){return t[3];}).join(' · ')+'">'+a.S.i+' '+a.S.n+' ('+a.n+') : '+a.tiers.map(function(t){return t[3];}).join(' · ')+'</span>';}).join('')+
@@ -2365,7 +2721,7 @@ function renderDeck(hl){
   $('team_status').innerHTML=myTeam.length+'/5 · 🔶 '+tc+' / '+TEAM_MAX+' '+(te?'<span class="status-bad">(incomplète)</span>':'<span class="status-ok">✓</span>');
   sortIds(Object.keys(col).filter(function(id){return CARDS[id]&&col[id]>0&&!CARDS[id].en&&(deckFilter==='all'||CARDS[id].t===deckFilter);})).forEach(function(id){
     var c=CARDS[id],dim=c.t==='p'?!!canAddTeam(id):(counts[id]||0)>=maxCopies(id);
-    ch+=cardHTML(id,{onclick:(c.t==='p'?"addToTeam('":"addToDeck('")+id+"',this)",badge:'×'+col[id],dim:dim,cls:deckFirst?'deal':'',i:Math.min(idx++,20)});
+    ch+=cardHTML(id,{onclick:(c.t==='p'?"addToTeam('":"addToDeck('")+id+"',this)",badge:'×'+col[id]+(awakeOf(id)?' ★'+awakeOf(id):''),dim:dim,cls:deckFirst?'deal':'',i:Math.min(idx++,20)});
   });
   $('deck_collection').innerHTML=ch||'<p class="empty">Aucune carte de ce type. Ouvre des boosters !</p>';
   idx=0;
@@ -2446,7 +2802,7 @@ function autoDeck(silent){
 /* =====================================================================
    MOTEUR DE COMBAT EN ÉQUIPE (5 contre 5)
    ===================================================================== */
-var P,E,gameOver,busy=false,curLevel=0,SEL=null,TGT=null,slotCache={},UID=0,LOG=[];
+var P,E,gameOver,busy=false,curLevel=0,curL=null,SEL=null,TGT=null,slotCache={},UID=0,LOG=[];
 var cineMode=loadLS('dcz4_cine','all');
 function opp(s){return s===P?E:P;}
 function sk(s){return s===P?'me':'foe';}
@@ -2517,14 +2873,16 @@ function randAlive(s){var a=alive(s);return a.length?a[Math.floor(Math.random()*
 function sideDead(s){return !s.units.some(Boolean)&&!s.reserve.length;}
 
 /* --- Début de combat --- */
-function startBattle(li){
+function startBattle(li,Lobj){
   closeModal();$('battle_end').classList.add('hidden');
-  curLevel=li;var L=LEVELS[li];
+  curLevel=li;var L=Lobj||LEVELS[li];curL=L;
   var pteam=(L.tuto?TUTO_TEAM:myTeam).map(function(id){return {id:id};});
   var pdeck=L.tuto?TUTO_DECK.slice():shuffle(myDeck.slice()),ed=parseDeck(L.deck);
   if(!L.tuto)shuffle(ed);
   P=newSide('me','Ton équipe',pteam,pdeck,[],1);
+  if(!L.tuto)applyAwaken(P);
   E=newSide('foe',L.name,parseTeam(L.team),ed,parseTeam(L.reserve),L.bx||1);
+  if(L.scale)applyScale(E,L.scale);
   applySynergies(P);applySynergies(E);
   P.hand=P.deck.splice(0,5);E.hand=E.deck.splice(0,5);P._fresh=5;
   gameOver=false;busy=true;slotCache={};SEL=null;TGT=null;LOG=[];
@@ -2763,8 +3121,8 @@ function playCard(hi){
   var err=cardError(P,id);
   if(err){logMsg(err);sfxError();nope(el);return;}
   var tw=cardTarget(c);SEL=null;
-  if(tw)askTarget(tw,'Choisis la cible de « '+c.n+' »',function(j){return validCardTarget(P,c,tw,j);},function(j){runPlayer(function(){return playSupport(P,hi,j);});},hi);
-  else runPlayer(function(){return playSupport(P,hi,-1);});
+  if(tw)askTarget(tw,'Choisis la cible de « '+c.n+' »',function(j){return validCardTarget(P,c,tw,j);},function(j){track('card');runPlayer(function(){return playSupport(P,hi,j);});},hi);
+  else{track('card');runPlayer(function(){return playSupport(P,hi,-1);});}
 }
 
 /* --- Cut-ins 2.5D --- */
@@ -2842,6 +3200,7 @@ async function dealDmg(o,t,dmg,s,si){
   var red=u.race==='alien'?1:(u.race==='dieu'?2:0);
   dmg=Math.max(1,dmg-red)+tensionBonus();
   u.hp-=dmg;u.hurt=true;gainG(u,Math.max(3,10-Math.floor(u.maxHp/30)));
+  if(o===E)track('dmg',dmg);
   var p=posOf(o,t);floatText(p.x,p.y-20,'-'+dmg);renderBattle();
   if(u.hp<=0)await koUnit(o,t,s,si);
   return dmg;
@@ -2857,6 +3216,7 @@ async function koUnit(s,t,k,ki){
     u.revived=true;u.hp=Math.ceil(u.maxHp/2);logMsg(nm(u)+' est Immortel : il revient à la vie !');
     ringAt(s,t,'#ffffff');sfxHeal();var p=posOf(s,t);floatText(p.x,p.y-30,'RÉSURRECTION','heal small');renderBattle();tip('b_ability');await wait(500);return;
   }
+  if(s===E&&!u.token)track('ko');
   logMsg(nm(u)+' est K.O. !');await koFX(el);s.units[t]=null;if(!u.token)s.fallen.push(u);renderBattle();
   if(s===P)tip('b_ko');
   if(s.blood&&s.bloodSyn&&synMember(u,s.bloodSyn)){var any=false;s.units.forEach(function(x){if(x&&synMember(x,s.bloodSyn)){x.atk+=s.blood;any=true;}});if(any)logMsg('Famille Son : la colère monte, +'+s.blood+' ATK !');}
@@ -2880,7 +3240,7 @@ async function actBasic(s,i,t){
     var dmg=Math.max(1,u.atk-(hasAb(u,'pierce')?0:tg.def))+(n-1)+mBonus(u,tg);
     var ev=abVal(tg,'evade');
     if(ev&&Math.random()*100<ev){await lunge(s,i,o,t,true);var q=posOf(o,t);floatText(q.x,q.y-30,'ESQUIVE !','buff small');logMsg(nm(tg)+' esquive l’attaque de '+nm(u)+' !');tip('b_ability');continue;}
-    if(n>=2&&h===0){unitCut(s,u,'combo','COMBO ×'+n,'+'+(n-1)+' dégâts');if(s===P)tip('b_combo');}
+    if(n>=2&&h===0){unitCut(s,u,'combo','COMBO ×'+n,'+'+(n-1)+' dégâts');if(s===P){tip('b_combo');if(n===3)track('combo3');}}
     await lunge(s,i,o,t,false);
     var d=await dealDmg(o,t,dmg,s,i);
     if(s.units[i]===u){var hh=0;if(hasAb(u,'drain'))hh+=Math.floor(d/2);if(u.race==='majin')hh+=2;if(hh){var g=healU(u,hh);if(g){var p=posOf(s,i);floatText(p.x,p.y-30,'+'+g,'heal small');}}}
@@ -2892,7 +3252,7 @@ async function actBasic(s,i,t){
 async function actSkill(s,i,lvl,t){
   var u=s.units[i];if(!u)return;
   var d=lvl==='sp'?spOf(u):ulOf(u);
-  if(lvl==='sp'){s.ki-=spCost(u,d);gainG(u,15);}else u.gauge=0;
+  if(lvl==='sp'){s.ki-=spCost(u,d);gainG(u,15);}else{u.gauge=0;if(s===P)track('ult');}
   u.acted=true;renderBattle();
   logMsg(nm(u)+(lvl==='ul'?' déchaîne son ULTIME : ':' utilise ')+d[0]+' !');
   await unitCut(s,u,lvl==='ul'?'ult':'special',d[0],lvl==='ul'?'ULTIME':'SPÉCIAL');
@@ -2903,6 +3263,7 @@ async function actSkill(s,i,lvl,t){
 async function actTeam(s,T,t){
   var mem=teamMembers(s,T);if(!mem)return;
   s.ki-=T.c;mem.forEach(function(j){s.units[j].acted=true;});renderBattle();
+  if(s===P)track('team');
   logMsg('Attaque d’équipe : '+T.n+' !');
   var cc=colsOf(s.units[mem[0]]);
   await cutin({kind:'team',side:sk(s),ids:mem.map(function(j){return s.units[j].id;}),title:T.n,sub:'ATTAQUE D’ÉQUIPE',c1:cc.c1,c2:cc.c2});
@@ -3124,9 +3485,19 @@ function checkTips(){
 }
 function endGame(won){
   gameOver=true;busy=false;SEL=null;TGT=null;Music.duck(3);
-  var L=LEVELS[curLevel],first=won&&!prog.cleared[L.id],gain=won?(first?L.zeni:Math.round(L.zeni*.3)):Math.round(L.zeni*.1),rew=[];
+  var L=curL;
+  if(L.tower)return endTower(won,L);
+  var first=won&&!prog.cleared[L.id],gain=won?(first?L.zeni:Math.round(L.zeni*.3)):Math.round(L.zeni*.1),rew=[];
   if(first){rew=L.rew||[];rew.forEach(addCard);prog.cleared[L.id]=true;saveProg();}
+  var st=0,oldSt=meta.stars[L.id]||0;
+  if(won){
+    st=1+(alive(P).length>=3?1:0)+(P.turn<=8?1:0);
+    if(st>oldSt){gain+=(st-oldSt)*25;meta.stars[L.id]=st;saveMeta();}
+    track('win');if(!P.fallen.length)track('flaw');if(st===3)track('star3');
+    starChests();
+  }
   setZeni(zeni+gain);
+  var xp=won?(first?60:30):12,ups=addXP(xp);
   if(won)sfxVictory();else sfxDefeat();
   var next=first&&curLevel+1<LEVELS.length?LEVELS[curLevel+1]:null,hero=alive(P)[0];
   var box=$('battle_end');
@@ -3134,7 +3505,9 @@ function endGame(won){
     '<div class="endtitle">'+(won?'VICTOIRE !':'DÉFAITE…')+'</div>'+
     '<div class="hero">'+(won&&hero!==undefined?artSVG(P.units[hero].id):bossPortrait(L))+'</div>'+
     '<p>'+(won?(first?'Tu as vaincu '+L.name+' pour la première fois !':'Tu as encore battu '+L.name+' !'):L.name+' a vaincu ton équipe… Réessaie, tu vas y arriver !')+'</p>'+
-    '<div class="zgain"><i class="coin"></i>+'+gain+' Zénis</div>'+
+    (won&&!L.tuto?'<div style="font-size:30px">'+starsHTML(st)+'</div><div class="hint">'+STAR_TXT.map(function(t,k){return (k<st?'★ ':'☆ ')+t;}).join('<br>')+'</div>'+(st>oldSt&&oldSt?'<div class="xpgain">Nouvelles étoiles : +'+(st-oldSt)*25+' Z</div>':''):'')+
+    '<div class="zgain"><i class="coin"></i>+'+gain+' Zénis</div><div class="xpgain">+'+xp+' XP</div>'+
+    ups.map(function(u){return '<div class="lvup">NIVEAU '+u.l+' !</div>';}).join('')+
     (rew.length?'<div class="section-title" style="margin-top:12px">Cartes obtenues</div><div class="rewards">'+rew.map(function(r,i){return cardHTML(r,{cls:'popin',i:i});}).join('')+'</div>':'')+
     (next?'<p style="color:#4ade80">Niveau débloqué : '+next.arc+' — '+next.name+'</p>':'')+
     '<div class="endbtns">'+(won?'<button class="btn big" onclick="$(\'battle_end\').classList.add(\'hidden\');show(\'screen-story\')">Continuer</button>':
@@ -3143,7 +3516,7 @@ function endGame(won){
   box.classList.remove('hidden');
   if(won)confetti(box);
   tip(won?'reward':'defeat');
-  renderBattle();
+  checkAchToasts();renderBattle();
 }
 document.addEventListener('keydown',function(e){if(e.key==='Escape'&&(SEL||TGT))clearSel();});
 
@@ -3164,6 +3537,8 @@ function init(){
   $('multi_a').innerHTML=portraitSVG(VIS.goku_blue,'sayen');
   $('multi_b').innerHTML=portraitSVG(VIS.vegeta,'terrien');
   updateMusicBtn();
+  rollDaily();renderTop();
+  setInterval(updateDots,60000);
   show('screen-menu');
 }
 init();
