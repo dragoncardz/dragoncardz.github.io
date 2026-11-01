@@ -222,13 +222,15 @@ main{position:relative;z-index:1;padding:16px;max-width:1000px;margin:0 auto}
 .card-art{height:58%;position:relative;flex:none;border-bottom:.22em solid rgba(0,0,0,.55);background:#000}
 .card-art svg{display:block;width:100%;height:100%}
 .art-img{display:block;width:100%;height:100%;object-fit:cover;object-position:50% 22%;-webkit-user-drag:none;user-select:none}
+.ftk-art,.card-art,.pk-art,.hav,.av,.bossav,.hero{position:relative;overflow:hidden}
+.ftk-art>.art-img,.card-art>.art-img{position:absolute;inset:0}
 .card-name{font-family:var(--font-ui);font-size:1.12em;line-height:1.08;color:#fff;padding:.38em .45em 0;text-shadow:0 .1em 0 #000,0 0 .4em rgba(0,0,0,.6);
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .card-type{font-size:.68em;font-weight:900;text-transform:uppercase;letter-spacing:.04em;color:rgba(255,240,220,.82);padding:.2em .6em 0;
   display:flex;justify-content:space-between;align-items:center;gap:.3em;white-space:nowrap}
 .rgem{display:inline-block;flex:none;width:.85em;height:.85em;transform:rotate(45deg);background:var(--rc);box-shadow:0 0 .5em var(--rc);border:.1em solid #fff;border-radius:.15em}
 .rar-x .rgem{background:conic-gradient(#ff5f5f,#ffd23f,#4ade80,#38bdf8,#a78bfa,#ff5f5f)}
-.card-stats{margin-top:auto;display:flex;justify-content:center;gap:.28em;padding:.3em .3em .55em;flex-wrap:wrap}
+.card-stats{margin-top:auto;display:flex;justify-content:center;gap:.18em;padding:.3em .2em .55em;flex-wrap:wrap;font-size:.86em;letter-spacing:-.02em}
 .st{display:inline-flex;align-items:center;gap:.18em;font-family:var(--font-ui);font-size:1.05em;color:#fff;background:rgba(0,0,0,.45);border-radius:.6em;
   padding:.1em .38em;box-shadow:inset 0 0 0 1px rgba(255,255,255,.14);white-space:nowrap}
 .st svg{width:.95em;height:.95em}
@@ -938,31 +940,51 @@ var RAR={
 var RKEYS=['c','u','r','e','l','m','x'];
 var RIDX={c:0,u:1,r:2,e:3,l:4,m:5,x:6};
 var RACES={
- sayen:{n:'Saiyan',a:'#ffb347',b:'#d9420c',ch:'S',i:'🔄',p:'Zenkai : +1 ATK au début de ton tour s’il a été blessé.'},
- terrien:{n:'Terrien',a:'#8fd0ff',b:'#2459d1',ch:'T',i:'💰',p:'Ingéniosité : tes Techniques coûtent 1 Ki de moins (minimum 1).'},
- namek:{n:'Namek',a:'#a3e36a',b:'#1d8a4a',ch:'N',i:'🌿',p:'Régénération : +3 PV au début de ton tour s’il n’a pas attaqué au tour précédent.'},
- android:{n:'Androïde',a:'#c7d2fe',b:'#4b5563',ch:'A',i:'🔋',p:'Énergie infinie : +1 Ki au début de ton tour.'},
- alien:{n:'Alien',a:'#f0abfc',b:'#7e22ce',ch:'X',i:'🛡',p:'Carapace : subit 1 dégât de moins (minimum 1).'},
- majin:{n:'Majin',a:'#ffb3d1',b:'#be185d',ch:'M',i:'🍬',p:'Gourmandise : récupère 2 PV à chaque attaque.'},
- dieu:{n:'Divinité',a:'#e9d5ff',b:'#5b21b6',ch:'D',i:'✨',p:'Aura divine : subit 2 dégâts de moins (minimum 1).'},
- dragon:{n:'Dragon',a:'#bef264',b:'#3f6212',ch:'Δ',i:'🐉',p:'Énergie négative : +2 PV au début de ton tour.'},
- autre:{n:'Autre',a:'#fde68a',b:'#92400e',ch:'?',i:'',p:''},
- kaio:{n:'',a:'#b5f0ff',b:'#1e6fd9',ch:'K',i:'',p:''}
+ sayen:{n:'Saiyan',a:'#ffb347',b:'#d9420c',ch:'S',i:'🔄'},
+ terrien:{n:'Terrien',a:'#8fd0ff',b:'#2459d1',ch:'T',i:'💰'},
+ namek:{n:'Namek',a:'#a3e36a',b:'#1d8a4a',ch:'N',i:'🌿'},
+ android:{n:'Androïde',a:'#c7d2fe',b:'#4b5563',ch:'A',i:'🔋'},
+ alien:{n:'Alien',a:'#f0abfc',b:'#7e22ce',ch:'X',i:'🛡'},
+ majin:{n:'Majin',a:'#ffb3d1',b:'#be185d',ch:'M',i:'🍬'},
+ dieu:{n:'Divinité',a:'#e9d5ff',b:'#5b21b6',ch:'D',i:'✨'},
+ dragon:{n:'Dragon',a:'#bef264',b:'#3f6212',ch:'Δ',i:'🐉'},
+ autre:{n:'Autre',a:'#fde68a',b:'#92400e',ch:'?',i:''},
+ kaio:{n:'',a:'#b5f0ff',b:'#1e6fd9',ch:'K',i:''}
 };
-var FACTION={g:{n:'Gentil',i:'💗',p:'Cœur pur : soigne 2 PV au début de ton tour s’il a moins de 50% de ses PV.'},m:{n:'Méchant',i:'⚔',p:'Cruauté : +1 dégât contre une cible déjà blessée.'}};
+var FACTION={g:{n:'Gentil',i:'💗'},m:{n:'Méchant',i:'⚔'}};
+/* Échelle des combats : K = valeur d'un « point » de dégâts/soin (PV des persos de 5 000 à 25 000) */
+var K=400;
+function fmt(v){return Math.round(v).toLocaleString('fr-FR');}
+/* Capacités de passif : 'code' ou 'code:valeur' */
 var ABS={
- explode:{n:'Kamikaze',i:'💥',d:function(v){return 'En tombant K.O., explose et inflige '+v+' dégâts au camp adverse.';}},
+ explode:{n:'Kamikaze',i:'💥',d:function(v){return 'En tombant K.O., explose et inflige '+fmt(v)+' dégâts à un ennemi.';}},
  pierce:{n:'Perforant',i:'🗡',d:function(){return 'Ses attaques ignorent la DEF adverse.';}},
- drain:{n:'Vampirisme',i:'🩸',d:function(){return 'Récupère la moitié des dégâts infligés en attaquant.';}},
- rage:{n:'Rage',i:'😤',d:function(){return '+1 ATK au début de chacun de tes tours.';}},
- absorb:{n:'Absorption',i:'🌀',d:function(){return 'Quand il met un personnage K.O. : +2 ATK et +5 PV.';}},
- evade:{n:'Esquive',i:'💨',d:function(v){return v+'% de chances d’esquiver une attaque.';}},
+ drain:{n:'Vampirisme',i:'🩸',d:function(){return 'Récupère la moitié des dégâts infligés par ses attaques.';}},
+ rage:{n:'Rage',i:'😤',d:function(v){return '+'+(v||8)+'% d’ATK au début de chacun de tes tours (cumulable).';}},
+ absorb:{n:'Absorption',i:'🌀',d:function(){return 'Quand il met un ennemi K.O. : +15% d’ATK et récupère 15% de ses PV.';}},
+ evade:{n:'Esquive',i:'💨',d:function(v){return v+'% de chances d’esquiver une attaque de base.';}},
  revive:{n:'Immortel',i:'♾',d:function(){return 'La première fois qu’il tombe K.O., il revient avec 50% de ses PV.';}},
+ survive:{n:'Volonté de fer',i:'🔥',d:function(){return 'Une fois par combat, survit à un coup fatal avec 1 PV.';}},
  double:{n:'Frappe double',i:'⚡',d:function(){return 'Attaque deux fois par tour.';}},
  scout:{n:'Éclaireur',i:'📡',d:function(){return 'À son arrivée : pioche 1 carte.';}},
- freeze:{n:'Paralysie',i:'🧊',d:function(){return 'À son arrivée : l’adversaire est étourdi (il ne pourra pas attaquer à son prochain tour).';}},
- healer:{n:'Soigneur',i:'✚',d:function(){return 'Au début de ton tour, soigne 3 PV à l’allié le plus blessé.';}},
- taunt:{n:'Provocation',i:'🛡',d:function(){return 'Les attaques de base adverses doivent le viser en priorité.';}}
+ freeze:{n:'Paralysie',i:'🧊',d:function(){return 'À son arrivée : un ennemi au hasard est étourdi.';}},
+ healer:{n:'Soigneur',i:'✚',d:function(v){return 'Au début de ton tour, soigne '+(v||10)+'% de ses PV max à l’allié le plus blessé.';}},
+ taunt:{n:'Provocation',i:'🛡',d:function(){return 'Les attaques de base adverses doivent le viser en priorité.';}},
+ atkp:{n:'Puissance',i:'💪',d:function(v){return 'ATK +'+v+'% (début du combat ou à la transformation).';}},
+ defp:{n:'Robustesse',i:'🧱',d:function(v){return 'DEF +'+v+'% (début du combat ou à la transformation).';}},
+ hpp:{n:'Endurance',i:'❤',d:function(v){return 'PV max +'+v+'% (début du combat ou à la transformation).';}},
+ dr:{n:'Réduction de dégâts',i:'🛡',d:function(v){return 'Subit '+v+'% de dégâts en moins.';}},
+ zenkai:{n:'Zenkai',i:'🔄',d:function(v){return '+'+v+'% d’ATK au début de ton tour s’il a été blessé (cumulable).';}},
+ regen:{n:'Régénération',i:'🌿',d:function(v){return 'Récupère '+v+'% de ses PV max au début de ton tour.';}},
+ stunhit:{n:'Coup étourdissant',i:'💫',d:function(v){return v+'% de chances d’étourdir la cible de ses attaques de base.';}},
+ crit:{n:'Coup critique',i:'🎯',d:function(v){return v+'% de chances de coup critique (×1,5 et ignore la DEF) en attaque de base.';}},
+ counter:{n:'Contre-attaque',i:'↩',d:function(v){return 'Quand il subit une attaque de base, riposte avec '+v+'% de son ATK.';}},
+ kiup:{n:'Énergie infinie',i:'🔋',d:function(v){return '+'+v+' Ki pour ton équipe au début de ton tour.';}},
+ spcheap:{n:'Concentration',i:'🧘',d:function(v){return 'Son Spécial coûte '+v+' Ki de moins (minimum 1).';}},
+ gaugeup:{n:'Montée en puissance',i:'⏫',d:function(v){return 'Sa jauge d’Ultime se remplit '+v+'% plus vite.';}},
+ fury:{n:'Dos au mur',i:'😡',d:function(v){return 'La première fois qu’il passe sous 50% de PV : ATK +'+v+'%.';}},
+ allyatk:{n:'Meneur',i:'📣',d:function(v){return 'Début du combat : ATK +'+v+'% à toute l’équipe.';}},
+ allydef:{n:'Protecteur',i:'🛡',d:function(v){return 'Début du combat : DEF +'+v+'% à toute l’équipe.';}}
 };
 var FAMN={goku:'Son Goku',vegeta:'Vegeta',gohan:'Son Gohan',trunks:'Trunks du futur',piccolo:'Piccolo',freezer:'Freezer',cell:'Cell',buu:'Majin Buu',
  goten:'Son Goten',trunksk:'Trunks (enfant)',black:'Goku Black',zamasu:'Zamasu',broly:'Broly',baby:'Baby'};
@@ -980,172 +1002,330 @@ function Q_(id,n,c,rar,era,fx,x){CARDS[id]=Object.assign({n:n,t:'q',c:c,rar:rar,
 function O_(id,n,c,rar,era,fx,x){CARDS[id]=Object.assign({n:n,t:'o',c:c,rar:rar,era:era,fx:fx},x||{});}
 
 /* --- Personnages : Dragon Ball --- */
-P_('goku_kid','Son Goku (enfant)','sayen','g',4,2,12,1,'c','db',{fam:'goku',fl:'Un petit garçon à queue de singe, fort comme dix.'});
-P_('krillin','Krillin','terrien','g',3,3,12,1,'c','db',{fl:'Le meilleur ami de Goku. Petit par la taille, grand par le courage.'});
-P_('yamcha','Yamcha','terrien','g',4,2,12,1,'c','db',{fl:'Le loup du désert et son Poing du loup.'});
-P_('tenshinhan','Tenshinhan','terrien','g',5,3,16,2,'u','db',{fl:'Le guerrier aux trois yeux.'});
-P_('chaozu','Chaozu','terrien','g',2,2,8,1,'c','db',{ab:['explode:3'],fl:'Prêt à tout sacrifier pour ses amis.'});
-P_('tortue','Tortue Géniale','terrien','g',4,4,18,3,'r','db',{fl:'Le vieux maître inventeur du Kaméhaméha.'});
-P_('pilaf','Pilaf','autre','m',1,1,6,1,'c','db',{ab:['scout'],fl:'Il rêve de dominer le monde… avec un seul vœu.'});
-P_('shu','Shu','autre','m',2,1,7,1,'c','db',{fl:'Le fidèle ninja-chien de Pilaf.'});
-P_('mai','Mai','terrien','m',2,2,7,1,'c','db');
-P_('soldat','Soldat du Ruban Rouge','terrien','m',2,1,6,1,'c','db');
-P_('blue','Général Blue','terrien','m',4,3,12,2,'u','db',{fl:'Un général impitoyable qui paralyse ses ennemis du regard.'});
-P_('tao','Taopaipai','terrien','m',5,2,14,2,'u','db',{ab:['pierce'],fl:'Le tueur à gages le plus célèbre du monde.'});
-P_('c8','C-8','android','g',3,5,16,2,'u','db',{ab:['taunt'],fl:'L’androïde au grand cœur du Ruban Rouge.'});
-P_('tambourine','Tambourine','namek','m',4,2,12,2,'u','db');
-P_('daimao_p','Piccolo Daimao','namek','m',6,4,26,5,'e','db',{ab:['rage'],fl:'Le Roi des Démons, plus puissant à chaque instant.'});
-P_('kami','Kami-sama','namek','g',3,5,18,3,'r','db',{ab:['healer'],fl:'Le gardien de la Terre.'});
-P_('daimao','Daimao (gentil)','autre','g',3,2,16,0,'r','db',{en:true,fl:'Un partenaire d’entraînement très, très gentil.'});
+P_('goku_kid','Son Goku (enfant)','sayen','g',2600,1800,9300,1,'c','db',{fam:'goku',fl:'Un petit garçon à queue de singe, fort comme dix.'});
+P_('krillin','Krillin','terrien','g',2200,2200,9300,1,'c','db',{fl:'Le meilleur ami de Goku. Petit par la taille, grand par le courage.'});
+P_('yamcha','Yamcha','terrien','g',2600,1800,9300,1,'c','db',{fl:'Le loup du désert et son Poing du loup.'});
+P_('tenshinhan','Tenshinhan','terrien','g',3150,2300,11700,2,'u','db',{fl:'Le guerrier aux trois yeux.'});
+P_('chaozu','Chaozu','terrien','g',1800,1800,7300,1,'c','db',{fl:'Prêt à tout sacrifier pour ses amis.'});
+P_('tortue','Tortue Géniale','terrien','g',2850,2850,13400,3,'r','db',{fl:'Le vieux maître inventeur du Kaméhaméha.'});
+P_('pilaf','Pilaf','autre','m',1400,1400,6400,1,'c','db',{fl:'Il rêve de dominer le monde… avec un seul vœu.'});
+P_('shu','Shu','autre','m',1800,1400,6900,1,'c','db',{fl:'Le fidèle ninja-chien de Pilaf.'});
+P_('mai','Mai','terrien','m',1800,1800,6900,1,'c','db');
+P_('soldat','Soldat du Ruban Rouge','terrien','m',1800,1400,6400,1,'c','db');
+P_('blue','Général Blue','terrien','m',2750,2300,9700,2,'u','db',{fl:'Un général impitoyable qui paralyse ses ennemis du regard.'});
+P_('tao','Taopaipai','terrien','m',3150,1900,10700,2,'u','db',{fl:'Le tueur à gages le plus célèbre du monde.'});
+P_('c8','C-8','android','g',2300,3150,11700,2,'u','db',{fl:'L’androïde au grand cœur du Ruban Rouge.'});
+P_('tambourine','Tambourine','namek','m',2750,1900,9700,2,'u','db');
+P_('daimao_p','Piccolo Daimao','namek','m',3900,3000,18400,5,'e','db',{fl:'Le Roi des Démons, plus puissant à chaque instant.'});
+P_('kami','Kami-sama','namek','g',2400,3300,13400,3,'r','db',{fl:'Le gardien de la Terre.'});
+P_('daimao','Daimao (gentil)','autre','g',2400,2000,12300,0,'r','db',{en:true,fl:'Un partenaire d’entraînement très, très gentil.'});
 /* --- Personnages : Dragon Ball Z --- */
-P_('goku_db','Son Goku','sayen','g',5,3,20,2,'c','z',{fam:'goku',fl:'Le Saiyan élevé sur Terre, toujours en quête d’adversaires plus forts.'});
-P_('gohan_kid','Son Gohan (enfant)','sayen','g',3,2,12,1,'u','z',{fam:'gohan',fl:'Un potentiel caché immense.'});
-P_('gohan','Son Gohan','sayen','g',5,4,20,3,'r','z',{fam:'gohan'});
-P_('piccolo','Piccolo','namek','g',4,5,20,3,'r','z',{fam:'piccolo',fl:'L’ancien ennemi devenu mentor de Gohan.'});
-P_('nail','Nail','namek','g',4,4,16,2,'c','z',{ab:['taunt'],fl:'Le guerrier protecteur des Namek.'});
-P_('dende','Dendé','namek','g',1,3,10,1,'u','z',{ab:['healer'],fl:'Le jeune Namek aux pouvoirs de guérison.'});
-P_('raditz','Raditz','sayen','m',6,3,18,3,'r','z',{fl:'Le frère aîné de Goku, venu le chercher.'});
-P_('nappa','Nappa','sayen','m',6,4,24,4,'e','z',{ab:['rage'],fl:'Une brute qui adore la destruction.'});
-P_('saibaman','Saibaman','autre','m',3,1,6,1,'c','z',{ab:['explode:4'],fl:'Il pousse dans la terre… et explose au contact.'});
-P_('vegeta','Vegeta','sayen','m',6,4,20,3,'r','z',{fam:'vegeta',fl:'Le fier prince de tous les Saiyans.'});
-P_('guldo','Guldo','alien','m',2,2,10,1,'c','z',{ab:['freeze'],fl:'Il peut arrêter le temps… en retenant son souffle.'});
-P_('recoome','Recoome','alien','m',5,5,20,3,'u','z',{ab:['taunt']});
-P_('burter','Burter','alien','m',4,3,14,2,'u','z',{ab:['evade:25'],fl:'Le plus rapide de l’univers (selon lui).'});
-P_('jeice','Jeice','alien','m',4,3,14,2,'u','z',{ab:['pierce']});
-P_('ginyu','Capitaine Ginyu','alien','m',6,5,22,4,'r','z',{fl:'Le chef du commando et ses poses légendaires.'});
-P_('dodoria','Dodoria','alien','m',4,3,16,2,'c','z');
-P_('zarbon','Zarbon','alien','m',5,4,16,3,'u','z');
-P_('soldat_f','Soldat de Freezer','alien','m',3,2,8,1,'c','z');
-P_('freezer','Freezer','alien','m',6,5,26,4,'e','z',{fam:'freezer',fl:'L’empereur de l’univers.'});
-P_('trunks','Trunks du futur','sayen','g',5,4,18,3,'r','z',{fam:'trunks',ab:['pierce'],fl:'Venu d’un futur dévasté avec son épée.'});
-P_('c20','C-20 (Dr Gero)','android','m',4,3,14,2,'u','z',{ab:['drain']});
-P_('c19','C-19','android','m',4,4,16,2,'u','z',{ab:['drain']});
-P_('c18','C-18','android','m',5,4,16,3,'r','z');
-P_('c17','C-17','android','m',5,5,18,3,'r','z');
-P_('c16','C-16','android','g',6,6,22,4,'e','z',{ab:['explode:6','taunt'],fl:'Un géant pacifique qui aime la nature.'});
-P_('cell','Cell','android','m',5,4,20,3,'r','z',{fam:'cell',ab:['absorb'],fl:'La créature parfaite du Dr Gero… pas encore achevée.'});
-P_('celljr','Cell Junior','android','m',4,2,8,1,'u','z');
-P_('babidi','Babidi','autre','m',1,2,8,1,'u','z',{ab:['scout']});
-P_('dabura','Dabura','majin','m',6,5,22,4,'e','z',{ab:['pierce'],fl:'Le roi des démons, sous l’emprise de Babidi.'});
-P_('spopovitch','Spopovitch','terrien','m',4,3,14,2,'c','z',{ab:['explode:3']});
-P_('yamu','Yamu','terrien','m',3,2,10,1,'c','z',{ab:['drain']});
-P_('buu','Majin Buu','majin','g',5,5,30,5,'e','z',{fam:'buu',ab:['revive'],fl:'Un monstre rose capricieux… qui adore les bonbons.'});
-P_('goten','Son Goten','sayen','g',3,2,10,1,'u','z',{fam:'goten'});
-P_('trunks_kid','Trunks (enfant)','sayen','g',3,2,10,1,'u','z',{fam:'trunksk'});
-P_('videl','Videl','terrien','g',3,2,10,1,'c','z');
-P_('satan','Mr. Satan','terrien','g',1,1,12,1,'u','z',{ab:['evade:40'],fl:'Le champion du monde ! (paraît-il)'});
-P_('shin','Kaïoshin','dieu','g',3,5,18,3,'r','z');
+P_('goku_db','Son Goku','sayen','g',3000,2200,13100,2,'c','z',{fam:'goku',fl:'Le Saiyan élevé sur Terre, toujours en quête d’adversaires plus forts.'});
+P_('gohan_kid','Son Gohan (enfant)','sayen','g',2300,1900,9700,1,'u','z',{fam:'gohan',fl:'Un potentiel caché immense.'});
+P_('gohan','Son Gohan','sayen','g',3300,2850,14400,3,'r','z',{fam:'gohan'});
+P_('piccolo','Piccolo','namek','g',2850,3300,14400,3,'r','z',{fam:'piccolo',fl:'L’ancien ennemi devenu mentor de Gohan.'});
+P_('nail','Nail','namek','g',2600,2600,11200,2,'c','z',{fl:'Le guerrier protecteur des Namek.'});
+P_('dende','Dendé','namek','g',1450,2300,8700,1,'u','z',{fl:'Le jeune Namek aux pouvoirs de guérison.'});
+P_('raditz','Raditz','sayen','m',3750,2400,13400,3,'r','z',{fl:'Le frère aîné de Goku, venu le chercher.'});
+P_('nappa','Nappa','sayen','m',3900,3000,17300,4,'e','z',{fl:'Une brute qui adore la destruction.'});
+P_('saibaman','Saibaman','autre','m',2200,1400,6400,1,'c','z',{fl:'Il pousse dans la terre… et explose au contact.'});
+P_('vegeta','Vegeta','sayen','m',3750,2850,14400,3,'r','z',{fam:'vegeta',fl:'Le fier prince de tous les Saiyans.'});
+P_('guldo','Guldo','alien','m',1800,1800,8300,1,'c','z',{fl:'Il peut arrêter le temps… en retenant son souffle.'});
+P_('recoome','Recoome','alien','m',3150,3150,13800,3,'u','z');
+P_('burter','Burter','alien','m',2750,2300,10700,2,'u','z',{fl:'Le plus rapide de l’univers (selon lui).'});
+P_('jeice','Jeice','alien','m',2750,2300,10700,2,'u','z');
+P_('ginyu','Capitaine Ginyu','alien','m',3750,3300,15500,4,'r','z',{fl:'Le chef du commando et ses poses légendaires.'});
+P_('dodoria','Dodoria','alien','m',2600,2200,11200,2,'c','z');
+P_('zarbon','Zarbon','alien','m',3150,2750,11700,3,'u','z');
+P_('soldat_f','Soldat de Freezer','alien','m',2200,1800,7300,1,'c','z');
+P_('freezer','Freezer','alien','m',3900,3450,18400,4,'e','z',{fam:'freezer',fl:'L’empereur de l’univers.'});
+P_('trunks','Trunks du futur','sayen','g',3300,2850,13400,3,'r','z',{fam:'trunks',fl:'Venu d’un futur dévasté avec son épée.'});
+P_('c20','C-20 (Dr Gero)','android','m',2750,2300,10700,2,'u','z');
+P_('c19','C-19','android','m',2750,2750,11700,2,'u','z');
+P_('c18','C-18','android','m',3300,2850,12300,3,'r','z');
+P_('c17','C-17','android','m',3300,3300,13400,3,'r','z');
+P_('c16','C-16','android','g',3900,3900,16200,4,'e','z',{fl:'Un géant pacifique qui aime la nature.'});
+P_('cell','Cell','android','m',3300,2850,14400,3,'r','z',{fam:'cell',fl:'La créature parfaite du Dr Gero… pas encore achevée.'});
+P_('celljr','Cell Junior','android','m',2750,1900,7700,1,'u','z');
+P_('babidi','Babidi','autre','m',1450,1900,7700,1,'u','z');
+P_('dabura','Dabura','majin','m',3900,3450,16200,4,'e','z',{fl:'Le roi des démons, sous l’emprise de Babidi.'});
+P_('spopovitch','Spopovitch','terrien','m',2600,2200,10200,2,'c','z');
+P_('yamu','Yamu','terrien','m',2200,1800,8300,1,'c','z');
+P_('buu','Majin Buu','majin','g',3450,3450,20600,5,'e','z',{fam:'buu',fl:'Un monstre rose capricieux… qui adore les bonbons.'});
+P_('goten','Son Goten','sayen','g',2300,1900,8700,1,'u','z',{fam:'goten'});
+P_('trunks_kid','Trunks (enfant)','sayen','g',2300,1900,8700,1,'u','z',{fam:'trunksk'});
+P_('videl','Videl','terrien','g',2200,1800,8300,1,'c','z');
+P_('satan','Mr. Satan','terrien','g',1450,1450,9700,1,'u','z',{fl:'Le champion du monde ! (paraît-il)'});
+P_('shin','Kaïoshin','dieu','g',2400,3300,13400,3,'r','z');
 /* --- Personnages : GT --- */
-P_('goku_gt','Son Goku (GT)','sayen','g',4,3,16,2,'u','gt',{fam:'goku',fl:'Redevenu enfant à cause d’un vœu.'});
-P_('pan','Pan','sayen','g',3,2,10,1,'c','gt');
-P_('giru','Giru','android','g',1,3,8,1,'c','gt',{ab:['scout'],fl:'Un petit robot qui détecte les Boules de Cristal.'});
-P_('uub','Oob','majin','g',5,4,18,3,'r','gt');
-P_('baby','Baby','alien','m',6,4,22,4,'e','gt',{fam:'baby',ab:['absorb'],fl:'Le dernier des Tsufurs, un parasite vengeur.'});
-P_('s17','Super C-17','android','m',7,6,28,6,'l','gt',{ab:['drain']});
-P_('haze','Haze Shenron','dragon','m',3,3,14,2,'u','gt',{ab:['pierce']});
-P_('rage_s','Rage Shenron','dragon','m',4,4,16,3,'u','gt');
-P_('eis','Eis Shenron','dragon','m',5,3,18,3,'r','gt',{ab:['freeze']});
-P_('nuova','Nuova Shenron','dragon','g',6,5,22,4,'e','gt',{fl:'Le seul dragon maléfique doté d’honneur.'});
-P_('omega','Omega Shenron','dragon','m',8,7,40,8,'m','gt',{ab:['drain'],fl:'Le dragon ultime, né des sept boules.'});
+P_('goku_gt','Son Goku (GT)','sayen','g',2750,2300,11700,2,'u','gt',{fam:'goku',fl:'Redevenu enfant à cause d’un vœu.'});
+P_('pan','Pan','sayen','g',2200,1800,8300,1,'c','gt');
+P_('giru','Giru','android','g',1400,2200,7300,1,'c','gt',{fl:'Un petit robot qui détecte les Boules de Cristal.'});
+P_('uub','Oob','majin','g',3300,2850,13400,3,'r','gt');
+P_('baby','Baby','alien','m',3900,3000,16200,4,'e','gt',{fam:'baby',fl:'Le dernier des Tsufurs, un parasite vengeur.'});
+P_('s17','Super C-17','android','m',4550,4100,20300,6,'l','gt');
+P_('haze','Haze Shenron','dragon','m',2300,2300,10700,2,'u','gt');
+P_('rage_s','Rage Shenron','dragon','m',2750,2750,11700,3,'u','gt');
+P_('eis','Eis Shenron','dragon','m',3300,2400,13400,3,'r','gt');
+P_('nuova','Nuova Shenron','dragon','g',3900,3450,16200,4,'e','gt',{fl:'Le seul dragon maléfique doté d’honneur.'});
+P_('omega','Omega Shenron','dragon','m',5250,4750,25000,8,'m','gt',{fl:'Le dragon ultime, né des sept boules.'});
 /* --- Personnages : Super --- */
-P_('beerus','Beerus','dieu','m',8,7,34,8,'m','s',{ab:['pierce'],fl:'Le Dieu de la Destruction. Ne réveillez pas le chat.'});
-P_('whis','Whis','dieu','g',5,9,32,7,'l','s',{ab:['evade:40'],fl:'L’ange accompagnateur de Beerus.'});
-P_('hit','Hit','alien','m',6,4,22,4,'e','s',{ab:['evade:30'],fl:'L’assassin légendaire de l’Univers 6.'});
-P_('cabba','Cabba','sayen','g',4,3,16,2,'u','s');
-P_('caulifla','Caulifla','sayen','m',5,3,16,2,'u','s');
-P_('kale','Kale','sayen','m',4,4,18,3,'r','s',{ab:['rage']});
-P_('goku_black','Goku Black','dieu','m',6,5,24,5,'e','s',{fam:'black',fl:'Un dieu dans le corps de Goku.'});
-P_('zamasu','Zamasu','dieu','m',5,5,22,4,'e','s',{fam:'zamasu',ab:['revive'],fl:'Un Kaïoshin devenu immortel.'});
-P_('jiren','Jiren','alien','m',9,8,40,9,'m','s',{ab:['rage'],fl:'Le plus fort de l’Univers 11.'});
-P_('toppo','Toppo','dieu','m',6,6,26,5,'e','s',{ab:['taunt']});
-P_('broly','Broly','sayen','m',7,5,30,6,'l','s',{fam:'broly',ab:['rage'],fl:'Une puissance sans limite, grandie dans l’exil.'});
-P_('gamma1','Gamma 1','android','g',5,5,20,3,'r','s',{ab:['pierce']});
-P_('cellmax','Cell Max','android','m',10,6,45,9,'m','s',{en:true,ab:['rage']});
+P_('beerus','Beerus','dieu','m',5250,4750,24800,8,'m','s',{fl:'Le Dieu de la Destruction. Ne réveillez pas le chat.'});
+P_('whis','Whis','dieu','g',3600,5500,22600,7,'l','s',{fl:'L’ange accompagnateur de Beerus.'});
+P_('hit','Hit','alien','m',3900,3000,16200,4,'e','s',{fl:'L’assassin légendaire de l’Univers 6.'});
+P_('cabba','Cabba','sayen','g',2750,2300,11700,2,'u','s');
+P_('caulifla','Caulifla','sayen','m',3150,2300,11700,2,'u','s');
+P_('kale','Kale','sayen','m',2850,2850,13400,3,'r','s');
+P_('goku_black','Goku Black','dieu','m',3900,3450,17300,5,'e','s',{fam:'black',fl:'Un dieu dans le corps de Goku.'});
+P_('zamasu','Zamasu','dieu','m',3450,3450,16200,4,'e','s',{fam:'zamasu',fl:'Un Kaïoshin devenu immortel.'});
+P_('jiren','Jiren','alien','m',5750,5250,25000,9,'m','s',{fl:'Le plus fort de l’Univers 11.'});
+P_('toppo','Toppo','dieu','m',3900,3900,18400,5,'e','s');
+P_('broly','Broly','sayen','m',4550,3600,21500,6,'l','s',{fam:'broly',fl:'Une puissance sans limite, grandie dans l’exil.'});
+P_('gamma1','Gamma 1','android','g',3300,3300,14400,3,'r','s');
+P_('cellmax','Cell Max','android','m',6250,4250,25000,9,'m','s',{en:true});
 
 /* --- Transformations --- */
-T_('oozaru','Oozaru','sayen','m',null,1,6,1,3,'r','db',{rr:'sayen',ab:['rage'],art:'moon',fl:'Un Saiyan qui voit la pleine lune devient un singe géant.'});
-T_('goku_ssj1','Son Goku SSJ','sayen','g','goku',1,3,2,2,'r','z',{fl:'La légende du Super Saiyan s’éveille.'});
-T_('goku_ssj2','Son Goku SSJ2','sayen','g','goku',2,4,2,3,'r','z');
-T_('goku_ssj3','Son Goku SSJ3','sayen','g','goku',3,5,3,4,'e','z');
-T_('goku_god','Son Goku SSJ Divin','sayen','g','goku',4,5,4,5,'e','s');
-T_('goku_blue','Son Goku SSJ Blue','sayen','g','goku',5,6,5,6,'l','s');
-T_('goku_ssj4','Son Goku SSJ4','sayen','g','goku',5,7,4,6,'l','gt');
-T_('goku_mui','Goku Ultra Instinct','sayen','g','goku',6,8,6,7,'l','s',{mui:true,ab:['evade:30'],fl:'50% de chances de le maîtriser… sinon l’effet est minime.'});
-T_('u_mui','Ultra Instinct Maîtrisé','sayen','g','goku',7,10,8,9,'x','s',{ab:['evade:50'],fl:'Le corps bouge seul. La forme ultime.'});
-T_('golden_oozaru','Oozaru doré','sayen','m',null,4,8,3,5,'e','gt',{rr:'sayen',ab:['rage'],art:'moon_gold'});
-T_('vegeta_ssj','Vegeta SSJ','sayen','m','vegeta',1,3,2,2,'r','z');
-T_('vegeta_majin','Majin Vegeta','sayen','m','vegeta',2,5,2,4,'e','z',{ab:['rage'],fl:'Il a laissé Babidi le contrôler pour retrouver sa fierté.'});
-T_('vegeta_ssj4','Vegeta SSJ4','sayen','m','vegeta',5,7,4,6,'l','gt');
-T_('vegeta_blue','Vegeta SSJ Blue','sayen','m','vegeta',5,6,5,6,'e','s');
-T_('vegeta_ue','Vegeta Ultra Ego','sayen','m','vegeta',6,8,4,7,'l','s',{ab:['rage']});
-T_('gohan_ssj','Son Gohan SSJ','sayen','g','gohan',1,3,2,2,'u','z');
-T_('gohan_ssj2','Son Gohan SSJ2','sayen','g','gohan',2,5,3,4,'e','z',{fl:'La colère qui a vaincu Cell.'});
-T_('gohan_ult','Gohan Ultime','sayen','g','gohan',4,6,5,5,'l','z');
-T_('gohan_beast','Gohan Beast','sayen','g','gohan',6,9,6,8,'m','s',{ab:['pierce']});
-T_('trunks_ssj','Trunks SSJ','sayen','g','trunks',1,3,2,2,'r','z');
-T_('piccolo_orange','Piccolo Orange','namek','g','piccolo',3,6,5,5,'e','s');
-T_('freezer_final','Freezer (forme finale)','alien','m','freezer',2,4,3,4,'r','z');
-T_('freezer_100','Freezer 100%','alien','m','freezer',3,4,2,4,'e','z');
-T_('freezer_gold','Golden Freezer','alien','m','freezer',5,6,4,6,'l','s');
-T_('freezer_black','Black Freezer','alien','m','freezer',6,9,5,8,'m','s');
-T_('cell_semi','Cell (semi-parfait)','android','m','cell',1,3,3,3,'r','z');
-T_('cell_perfect','Cell Parfait','android','m','cell',2,5,4,5,'l','z',{ab:['revive'],fl:'La perfection incarnée… et il régénère tout.'});
-T_('buu_super','Super Buu','majin','m','buu',1,5,2,5,'e','z',{ab:['absorb']});
-T_('buu_kid','Kid Buu','majin','m','buu',2,6,1,6,'l','z',{ab:['rage']});
-T_('black_rose','Goku Black Rosé','dieu','m','black',4,5,4,5,'l','s');
-T_('broly_lss','Broly Légendaire','sayen','m','broly',3,8,4,7,'m','s');
-T_('baby_vegeta','Baby Vegeta','alien','m','baby',1,5,3,4,'e','gt');
-T_('baby_oozaru','Baby Oozaru doré','alien','m','baby',2,7,3,6,'l','gt',{art:'moon_gold'});
-T_('gotenks','Gotenks','sayen','g',null,9,7,4,4,'e','z',{fus:['goten','trunksk'],fl:'La fusion de deux enfants turbulents.'});
-T_('vegetto','Vegetto','sayen','g',null,9,10,6,8,'m','z',{fus:['goku','vegeta'],fl:'La fusion par les boucles Potara.'});
-T_('fused_zamasu','Zamasu fusionné','dieu','m',null,9,9,6,8,'m','s',{fus:['black','zamasu'],ab:['revive']});
-T_('u_gogeta4','Gogeta SSJ4','sayen','g',null,9,12,6,9,'x','gt',{fus:['goku','vegeta'],fl:'La puissance ultime de l’ère GT.'});
-T_('u_gogeta','Gogeta SSJ Blue','sayen','g',null,9,11,8,9,'x','s',{fus:['goku','vegeta'],fl:'La danse de la fusion, version divine.'});
+T_('oozaru','Oozaru','sayen','m',null,1,2400,400,3,'r','db',{rr:'sayen',art:'moon',fl:'Un Saiyan qui voit la pleine lune devient un singe géant.'});
+T_('goku_ssj1','Son Goku SSJ','sayen','g','goku',1,1200,800,2,'r','z',{fl:'La légende du Super Saiyan s’éveille.'});
+T_('goku_ssj2','Son Goku SSJ2','sayen','g','goku',2,1600,800,3,'r','z');
+T_('goku_ssj3','Son Goku SSJ3','sayen','g','goku',3,2000,1200,4,'e','z');
+T_('goku_god','Son Goku SSJ Divin','sayen','g','goku',4,2000,1600,5,'e','s');
+T_('goku_blue','Son Goku SSJ Blue','sayen','g','goku',5,2400,2000,6,'l','s');
+T_('goku_ssj4','Son Goku SSJ4','sayen','g','goku',5,2800,1600,6,'l','gt');
+T_('goku_mui','Goku Ultra Instinct','sayen','g','goku',6,3200,2400,7,'l','s',{mui:true,fl:'50% de chances de le maîtriser… sinon l’effet est minime.'});
+T_('u_mui','Ultra Instinct Maîtrisé','sayen','g','goku',7,4000,3200,9,'x','s',{fl:'Le corps bouge seul. La forme ultime.'});
+T_('golden_oozaru','Oozaru doré','sayen','m',null,4,3200,1200,5,'e','gt',{rr:'sayen',art:'moon_gold'});
+T_('vegeta_ssj','Vegeta SSJ','sayen','m','vegeta',1,1200,800,2,'r','z');
+T_('vegeta_majin','Majin Vegeta','sayen','m','vegeta',2,2000,800,4,'e','z',{fl:'Il a laissé Babidi le contrôler pour retrouver sa fierté.'});
+T_('vegeta_ssj4','Vegeta SSJ4','sayen','m','vegeta',5,2800,1600,6,'l','gt');
+T_('vegeta_blue','Vegeta SSJ Blue','sayen','m','vegeta',5,2400,2000,6,'e','s');
+T_('vegeta_ue','Vegeta Ultra Ego','sayen','m','vegeta',6,3200,1600,7,'l','s');
+T_('gohan_ssj','Son Gohan SSJ','sayen','g','gohan',1,1200,800,2,'u','z');
+T_('gohan_ssj2','Son Gohan SSJ2','sayen','g','gohan',2,2000,1200,4,'e','z',{fl:'La colère qui a vaincu Cell.'});
+T_('gohan_ult','Gohan Ultime','sayen','g','gohan',4,2400,2000,5,'l','z');
+T_('gohan_beast','Gohan Beast','sayen','g','gohan',6,3600,2400,8,'m','s');
+T_('trunks_ssj','Trunks SSJ','sayen','g','trunks',1,1200,800,2,'r','z');
+T_('piccolo_orange','Piccolo Orange','namek','g','piccolo',3,2400,2000,5,'e','s');
+T_('freezer_final','Freezer (forme finale)','alien','m','freezer',2,1600,1200,4,'r','z');
+T_('freezer_100','Freezer 100%','alien','m','freezer',3,1600,800,4,'e','z');
+T_('freezer_gold','Golden Freezer','alien','m','freezer',5,2400,1600,6,'l','s');
+T_('freezer_black','Black Freezer','alien','m','freezer',6,3600,2000,8,'m','s');
+T_('cell_semi','Cell (semi-parfait)','android','m','cell',1,1200,1200,3,'r','z');
+T_('cell_perfect','Cell Parfait','android','m','cell',2,2000,1600,5,'l','z',{fl:'La perfection incarnée… et il régénère tout.'});
+T_('buu_super','Super Buu','majin','m','buu',1,2000,800,5,'e','z');
+T_('buu_kid','Kid Buu','majin','m','buu',2,2400,400,6,'l','z');
+T_('black_rose','Goku Black Rosé','dieu','m','black',4,2000,1600,5,'l','s');
+T_('broly_lss','Broly Légendaire','sayen','m','broly',3,3200,1600,7,'m','s');
+T_('baby_vegeta','Baby Vegeta','alien','m','baby',1,2000,1200,4,'e','gt');
+T_('baby_oozaru','Baby Oozaru doré','alien','m','baby',2,2800,1200,6,'l','gt',{art:'moon_gold'});
+T_('gotenks','Gotenks','sayen','g',null,9,2800,1600,4,'e','z',{fus:['goten','trunksk'],fl:'La fusion de deux enfants turbulents.'});
+T_('vegetto','Vegetto','sayen','g',null,9,4000,2400,8,'m','z',{fus:['goku','vegeta'],fl:'La fusion par les boucles Potara.'});
+T_('fused_zamasu','Zamasu fusionné','dieu','m',null,9,3600,2400,8,'m','s',{fus:['black','zamasu']});
+T_('u_gogeta4','Gogeta SSJ4','sayen','g',null,9,4800,2400,9,'x','gt',{fus:['goku','vegeta'],fl:'La puissance ultime de l’ère GT.'});
+T_('u_gogeta','Gogeta SSJ Blue','sayen','g',null,9,4400,3200,9,'x','s',{fus:['goku','vegeta'],fl:'La danse de la fusion, version divine.'});
 
 /* --- Techniques --- */
-Q_('kamehameha','Kaméhaméha',2,'c','db',[['dmg',5]],{art:'beam',c1:'#5fd4ff',c2:'#1d6bff',r:'terrien'});
-Q_('janken','Janken',1,'c','db',[['dmg',3]],{art:'fist',c1:'#ffb347',r:'sayen'});
-Q_('dodonpa','Dodonpa',1,'c','db',[['dmg',4]],{art:'beam',c1:'#fff3a0',c2:'#eab308',r:'terrien'});
-Q_('kikoho','Kikoho',4,'u','db',[['dmg',8]],{art:'beam',c1:'#fff3a0',c2:'#f59e0b',r:'terrien'});
+Q_('kamehameha','Kaméhaméha',2,'c','db',[['dmg',2000]],{art:'beam',c1:'#5fd4ff',c2:'#1d6bff',r:'terrien'});
+Q_('janken','Janken',1,'c','db',[['dmg',1200]],{art:'fist',c1:'#ffb347',r:'sayen'});
+Q_('dodonpa','Dodonpa',1,'c','db',[['dmg',1600]],{art:'beam',c1:'#fff3a0',c2:'#eab308',r:'terrien'});
+Q_('kikoho','Kikoho',4,'u','db',[['dmg',3200]],{art:'beam',c1:'#fff3a0',c2:'#f59e0b',r:'terrien'});
 Q_('taiyoken','Taiyoken',2,'u','db',[['stun',1]],{art:'flash',c1:'#fffbe0',r:'terrien'});
-Q_('mafuba','Mafuba',6,'e','db',[['kill',18]],{art:'seal',r:'terrien'});
+Q_('mafuba','Mafuba',6,'e','db',[['kill',7200]],{art:'seal',r:'terrien'});
 Q_('kaioken','Kaïoken',2,'r','z',[['kaioken',1]],{art:'flame',r:'sayen'});
-Q_('makankosappo','Makankosappo',3,'r','z',[['dmg',7]],{art:'spiral',r:'namek'});
-Q_('masenko','Masenko',2,'c','z',[['dmg',5]],{art:'beam',c1:'#fff3a0',c2:'#f59e0b',r:'sayen'});
-Q_('galickgun','Garlic Ho',3,'u','z',[['dmg',6]],{art:'beam',c1:'#e9a6ff',c2:'#7c3aed',r:'sayen'});
-Q_('finalflash','Final Flash',5,'e','z',[['dmg',9]],{art:'beam',c1:'#fffbe0',c2:'#eab308',r:'sayen'});
-Q_('kienzan','Kienzan',3,'r','z',[['dmg',7]],{art:'disc',r:'terrien'});
-Q_('burning','Burning Attack',3,'u','z',[['dmg',6]],{art:'orb',c1:'#ffb347',c2:'#c2410c',r:'sayen'});
-Q_('bigbang','Big Bang Attack',4,'r','z',[['dmg',8]],{art:'orb',c1:'#9be7ff',c2:'#2563eb',r:'sayen'});
-Q_('genkidama','Genkidama',7,'l','z',[['dmg',12]],{art:'bomb',c1:'#7dd3fc',c2:'#2563eb',r:'sayen'});
-Q_('kame_pf','Kaméhaméha Père-Fils',8,'l','z',[['dmg',14]],{art:'beam',c1:'#cfefff',c2:'#1d4ed8',r:'sayen'});
-Q_('finalexplosion','Final Explosion',5,'e','z',[['boom',12]],{art:'boom',c1:'#fde047',c2:'#f97316',r:'sayen'});
-Q_('heal_dende','Soin de Dendé',2,'u','z',[['heal',10]],{art:'heal',r:'namek'});
-Q_('explosive_wave','Vague explosive',3,'u','z',[['aoe',3]],{art:'wave',c1:'#ffd23f',c2:'#f97316'});
-Q_('hellzone','Hellzone Grenade',5,'e','z',[['dmg',9]],{art:'orbs',c1:'#fde047',c2:'#65a30d',r:'namek'});
-Q_('death_beam','Death Beam',2,'u','z',[['dmg',5]],{art:'beam',c1:'#f5d0fe',c2:'#a21caf',r:'alien'});
-Q_('fist_dragon','Poing du Dragon',6,'e','gt',[['dmg',11]],{art:'fist',c1:'#ffd23f',r:'sayen'});
-Q_('kame_x10','Kaméhaméha x10',8,'l','gt',[['dmg',14],['stun',1]],{art:'beam',c1:'#ffb3b3',c2:'#dc2626',r:'sayen'});
-Q_('hakai','Hakai',7,'l','s',[['kill',25]],{art:'hakai',c1:'#c084fc',c2:'#4c1d95',r:'dieu'});
-Q_('kame_divin','Kaméhaméha Divin',5,'e','s',[['dmg',10]],{art:'beam',c1:'#e9d5ff',c2:'#2563eb',r:'sayen'});
-Q_('time_skip','Saut temporel',3,'r','s',[['dmg',2],['stun',1]],{art:'clock',c1:'#c4b5fd',r:'alien'});
-Q_('eraser','Eraser Cannon',4,'r','s',[['dmg',8]],{art:'orb',c1:'#bbf7d0',c2:'#16a34a',r:'sayen'});
-Q_('u_genki','Genkidama de l’Univers',9,'x','z',[['dmg',20]],{art:'bomb',c1:'#e0f2fe',c2:'#38bdf8',r:'sayen',fl:'Toute l’énergie de la Terre, réunie dans tes mains.'});
+Q_('makankosappo','Makankosappo',3,'r','z',[['dmg',2800]],{art:'spiral',r:'namek'});
+Q_('masenko','Masenko',2,'c','z',[['dmg',2000]],{art:'beam',c1:'#fff3a0',c2:'#f59e0b',r:'sayen'});
+Q_('galickgun','Garlic Ho',3,'u','z',[['dmg',2400]],{art:'beam',c1:'#e9a6ff',c2:'#7c3aed',r:'sayen'});
+Q_('finalflash','Final Flash',5,'e','z',[['dmg',3600]],{art:'beam',c1:'#fffbe0',c2:'#eab308',r:'sayen'});
+Q_('kienzan','Kienzan',3,'r','z',[['dmg',2800]],{art:'disc',r:'terrien'});
+Q_('burning','Burning Attack',3,'u','z',[['dmg',2400]],{art:'orb',c1:'#ffb347',c2:'#c2410c',r:'sayen'});
+Q_('bigbang','Big Bang Attack',4,'r','z',[['dmg',3200]],{art:'orb',c1:'#9be7ff',c2:'#2563eb',r:'sayen'});
+Q_('genkidama','Genkidama',7,'l','z',[['dmg',4800]],{art:'bomb',c1:'#7dd3fc',c2:'#2563eb',r:'sayen'});
+Q_('kame_pf','Kaméhaméha Père-Fils',8,'l','z',[['dmg',5600]],{art:'beam',c1:'#cfefff',c2:'#1d4ed8',r:'sayen'});
+Q_('finalexplosion','Final Explosion',5,'e','z',[['boom',4800]],{art:'boom',c1:'#fde047',c2:'#f97316',r:'sayen'});
+Q_('heal_dende','Soin de Dendé',2,'u','z',[['heal',4000]],{art:'heal',r:'namek'});
+Q_('explosive_wave','Vague explosive',3,'u','z',[['aoe',1200]],{art:'wave',c1:'#ffd23f',c2:'#f97316'});
+Q_('hellzone','Hellzone Grenade',5,'e','z',[['dmg',3600]],{art:'orbs',c1:'#fde047',c2:'#65a30d',r:'namek'});
+Q_('death_beam','Death Beam',2,'u','z',[['dmg',2000]],{art:'beam',c1:'#f5d0fe',c2:'#a21caf',r:'alien'});
+Q_('fist_dragon','Poing du Dragon',6,'e','gt',[['dmg',4400]],{art:'fist',c1:'#ffd23f',r:'sayen'});
+Q_('kame_x10','Kaméhaméha x10',8,'l','gt',[['dmg',5600],['stun',1]],{art:'beam',c1:'#ffb3b3',c2:'#dc2626',r:'sayen'});
+Q_('hakai','Hakai',7,'l','s',[['kill',10000]],{art:'hakai',c1:'#c084fc',c2:'#4c1d95',r:'dieu'});
+Q_('kame_divin','Kaméhaméha Divin',5,'e','s',[['dmg',4000]],{art:'beam',c1:'#e9d5ff',c2:'#2563eb',r:'sayen'});
+Q_('time_skip','Saut temporel',3,'r','s',[['dmg',800],['stun',1]],{art:'clock',c1:'#c4b5fd',r:'alien'});
+Q_('eraser','Eraser Cannon',4,'r','s',[['dmg',3200]],{art:'orb',c1:'#bbf7d0',c2:'#16a34a',r:'sayen'});
+Q_('u_genki','Genkidama de l’Univers',9,'x','z',[['dmg',8000]],{art:'bomb',c1:'#e0f2fe',c2:'#38bdf8',r:'sayen',fl:'Toute l’énergie de la Terre, réunie dans tes mains.'});
 /* --- Objets --- */
 O_('senzu','Haricot magique',2,'r','db',[['full',1]],{art:'bean',fl:'Un seul haricot rassasie et soigne pour dix jours.'});
 O_('radar','Radar du Dragon',2,'u','db',[['draw',2]],{art:'radar'});
 O_('capsule','Capsule',1,'c','db',[['ki',3]],{art:'capsule'});
 O_('nuage','Nuage Kinto',1,'c','db',[['draw',1],['ki',1]],{art:'cloud',fl:'Seuls les cœurs purs peuvent monter dessus.'});
-O_('nyoibo','Bâton magique',1,'c','db',[['atk',2]],{art:'stick'});
+O_('nyoibo','Bâton magique',1,'c','db',[['atk',800]],{art:'stick'});
 O_('scouter','Scouter',0,'c','z',[['draw',1]],{art:'scouter'});
-O_('armure','Armure Saiyan',1,'c','z',[['def',2]],{art:'armor'});
-O_('gravite','Salle de gravité',2,'u','z',[['atk',2],['def',1]],{art:'weight'});
-O_('salle','Salle de l’Esprit et du Temps',4,'r','z',[['atk',3],['def',3]],{art:'hourglass',fl:'Un an d’entraînement en une seule journée.'});
+O_('armure','Armure Saiyan',1,'c','z',[['def',800]],{art:'armor'});
+O_('gravite','Salle de gravité',2,'u','z',[['atk',800],['def',400]],{art:'weight'});
+O_('salle','Salle de l’Esprit et du Temps',4,'r','z',[['atk',1200],['def',1200]],{art:'hourglass',fl:'Un an d’entraînement en une seule journée.'});
 O_('machine','Machine temporelle',3,'r','z',[['draw',3]],{art:'clock',c1:'#fde68a'});
-O_('eau_divine','Eau ultra-divine',3,'e','z',[['atk',5],['hurt',5]],{art:'water'});
-O_('u_shenron','Shenron',5,'x','db',[['full',1],['draw',3],['atk',2],['def',2]],{art:'dragon',fl:'Le dragon sacré exauce ton vœu.'});
+O_('eau_divine','Eau ultra-divine',3,'e','z',[['atk',2000],['hurt',2000]],{art:'water'});
+O_('u_shenron','Shenron',5,'x','db',[['full',1],['draw',3],['atk',800],['def',800]],{art:'dragon',fl:'Le dragon sacré exauce ton vœu.'});
 /* --- Boules de cristal --- */
 for(var _b=1;_b<=7;_b++){CARDS['db'+_b]={n:'Boule à '+_b+' étoile'+(_b>1?'s':''),t:'b',c:1,rar:'u',era:'db',art:'ball'};}
+
+/* --- Passifs uniques [nom, capacités] (voir ABS). Une transformation garde le passif de base et ajoute le sien. --- */
+var PS={
+ goku_kid:['Queue de singe',['zenkai:15','evade:10']],
+ krillin:['Le plus fort des Terriens',['evade:25','survive']],
+ yamcha:['Crocs du loup',['crit:25','counter:25']],
+ tenshinhan:['Troisième œil',['stunhit:20','defp:15']],
+ chaozu:['Sacrifice pour un ami',['explode:1200','spcheap:1','evade:15']],
+ tortue:['Maître des arts martiaux',['allyatk:10','gaugeup:30']],
+ pilaf:['Empereur en carton',['scout','dr:20']],
+ shu:['Ninja-chien',['evade:20','crit:15']],
+ mai:['Tireuse d’élite',['pierce','crit:10']],
+ soldat:['Discipline militaire',['defp:15']],
+ blue:['Regard paralysant',['stunhit:25','defp:10']],
+ tao:['Tueur à gages',['pierce','crit:20']],
+ c8:['Cœur de géant',['taunt','dr:20','regen:5']],
+ tambourine:['Griffes du démon',['crit:20','fury:20']],
+ daimao_p:['Roi des Démons',['rage:10','regen:5']],
+ kami:['Gardien de la Terre',['healer:10','dr:10']],
+ daimao:['Gentil géant',['hpp:20','regen:5']],
+ goku_db:['Combattant né',['zenkai:15','gaugeup:20']],
+ gohan_kid:['Potentiel caché',['fury:50','evade:10']],
+ gohan:['Colère enfouie',['fury:30','zenkai:10']],
+ piccolo:['Régénération namek',['regen:8','defp:15']],
+ nail:['Protecteur de Namek',['taunt','regen:5']],
+ dende:['Guérisseur de Namek',['healer:15','evade:10']],
+ raditz:['Fierté saiyenne',['zenkai:20','crit:10']],
+ nappa:['Brute du Raid',['rage:8','hpp:15']],
+ saibaman:['Étreinte explosive',['explode:1600']],
+ vegeta:['Prince des Saiyans',['zenkai:20','atkp:10']],
+ guldo:['Arrêt du temps',['freeze','evade:10']],
+ recoome:['Corps d’acier',['taunt','hpp:20']],
+ burter:['Le plus rapide de l’univers',['evade:30']],
+ jeice:['Tir d’élite',['pierce','crit:15']],
+ ginyu:['Changement de corps',['counter:40','allyatk:10']],
+ dodoria:['Brutalité',['fury:25','dr:10']],
+ zarbon:['Forme monstrueuse',['fury:40']],
+ soldat_f:['Chair à canon',['dr:10']],
+ freezer:['Empereur de l’univers',['dr:20','atkp:15']],
+ trunks:['Lame du futur',['pierce','crit:20']],
+ c20:['Vol d’énergie',['drain','kiup:1']],
+ c19:['Absorption d’énergie',['drain','hpp:15']],
+ c18:['Énergie infinie',['kiup:1','evade:15']],
+ c17:['Barrière d’énergie',['dr:20','counter:25']],
+ c16:['Gardien de la nature',['explode:2400','taunt','hpp:20']],
+ cell:['Bio-androïde',['absorb','regen:6']],
+ celljr:['Rejeton de Cell',['crit:20','evade:10']],
+ babidi:['Marque Majin',['scout','allyatk:15']],
+ dabura:['Roi des Démons',['pierce','stunhit:20']],
+ spopovitch:['Pantin de Babidi',['explode:1200','survive']],
+ yamu:['Aspirateur d’énergie',['drain','evade:10']],
+ buu:['Corps élastique',['revive','regen:5','dr:15']],
+ goten:['Énergie débordante',['gaugeup:30','evade:10']],
+ trunks_kid:['Fils du prince',['crit:15','gaugeup:20']],
+ videl:['Justicière',['counter:30','evade:10']],
+ satan:['Champion du monde',['evade:40','survive']],
+ shin:['Pouvoirs divins',['dr:20','healer:10']],
+ goku_gt:['Petit mais costaud',['evade:20','zenkai:15']],
+ pan:['Petite-fille de Goku',['fury:30','evade:10']],
+ giru:['Radar à Boules',['scout','evade:15']],
+ uub:['Réincarnation de Buu',['regen:6','atkp:10']],
+ baby:['Parasite tsufur',['absorb','drain']],
+ s17:['Fusion infernale',['drain','dr:25','kiup:1']],
+ haze:['Pollution',['pierce','regen:5']],
+ rage_s:['Décharge électrique',['stunhit:25','regen:5']],
+ eis:['Froid traître',['freeze','evade:15']],
+ nuova:['Honneur du dragon',['regen:6','counter:30','atkp:10']],
+ omega:['Énergie négative',['drain','regen:5','dr:25']],
+ beerus:['Dieu de la Destruction',['pierce','crit:25','dr:20']],
+ whis:['Ange accompagnateur',['evade:40','healer:10']],
+ hit:['Saut temporel',['evade:30','counter:40']],
+ cabba:['Fierté de l’Univers 6',['zenkai:20','defp:10']],
+ caulifla:['Talent brut',['crit:20','zenkai:15']],
+ kale:['Berserker',['rage:10','fury:30']],
+ goku_black:['Corps volé',['zenkai:20','crit:15']],
+ zamasu:['Corps immortel',['revive','regen:5']],
+ jiren:['Force absolue',['rage:10','dr:30','counter:30']],
+ toppo:['Candidat Dieu de la Destruction',['taunt','dr:20']],
+ broly:['Puissance sans limite',['rage:12','hpp:20']],
+ gamma1:['Super-héros',['pierce','counter:20']],
+ cellmax:['Monstre géant',['rage:10','hpp:20']],
+ oozaru:['Singe géant',['rage:10','hpp:30']],
+ goku_ssj1:['Légende du Super Saiyan',['atkp:15','zenkai:10']],
+ goku_ssj2:['Éclairs dorés',['crit:20','atkp:10']],
+ goku_ssj3:['Puissance démesurée',['atkp:25','gaugeup:30']],
+ goku_god:['Ki divin',['dr:20','regen:5']],
+ goku_blue:['Divinité maîtrisée',['atkp:20','dr:15']],
+ goku_ssj4:['Puissance primale',['rage:10','hpp:20']],
+ goku_mui:['Signe de l’instinct',['evade:30','counter:30']],
+ u_mui:['Le corps bouge seul',['evade:50','counter:50','crit:20']],
+ golden_oozaru:['Singe doré',['rage:12','hpp:40']],
+ vegeta_ssj:['Fierté dorée',['atkp:15','zenkai:10']],
+ vegeta_majin:['Marque de Babidi',['rage:10','fury:30']],
+ vegeta_ssj4:['Prince primal',['crit:25','hpp:20']],
+ vegeta_blue:['Ki divin du prince',['atkp:20','dr:15']],
+ vegeta_ue:['Ultra Ego',['rage:12','zenkai:30']],
+ gohan_ssj:['Colère dorée',['fury:20','atkp:10']],
+ gohan_ssj2:['Colère libérée',['atkp:25','crit:15']],
+ gohan_ult:['Potentiel libéré',['atkp:20','dr:20']],
+ gohan_beast:['Bête intérieure',['pierce','fury:50','atkp:20']],
+ trunks_ssj:['Rage du futur',['crit:25','atkp:10']],
+ piccolo_orange:['Géant orange',['hpp:30','regen:8','taunt']],
+ freezer_final:['Forme finale',['atkp:15','dr:10']],
+ freezer_100:['Pleine puissance',['atkp:30']],
+ freezer_gold:['Éclat doré',['atkp:20','dr:20']],
+ freezer_black:['Aura noire',['atkp:25','dr:25','crit:15']],
+ cell_semi:['Semi-parfait',['absorb','hpp:20']],
+ cell_perfect:['Perfection',['revive','regen:8']],
+ buu_super:['Absorption des guerriers',['absorb','atkp:15']],
+ buu_kid:['Chaos originel',['rage:10','regen:8']],
+ black_rose:['Rosé divin',['crit:20','atkp:20']],
+ broly_lss:['Super Saiyan Légendaire',['rage:15','hpp:30']],
+ baby_vegeta:['Contrôle mental',['drain','atkp:15']],
+ baby_oozaru:['Oozaru doré parasite',['rage:10','hpp:40']],
+ gotenks:['Super Ghost Kamikaze',['crit:25','evade:20']],
+ vegetto:['Fusion Potara',['atkp:30','crit:20']],
+ fused_zamasu:['Dieu immortel',['revive','regen:10','dr:20']],
+ u_gogeta4:['Puissance ultime de GT',['atkp:30','crit:30','dr:20']],
+ u_gogeta:['Danse de la fusion',['atkp:30','evade:25','counter:30']]
+};
+Object.keys(PS).forEach(function(id){if(CARDS[id]){CARDS[id].pn=PS[id][0];CARDS[id].ab=PS[id][1];}});
+
+/* --- Compétences de leader (1er emplacement de l'équipe) [nom, condition] : ATK, DEF et PV +X% selon la rareté.
+   Conditions : 'r:race', 'f:g|m' (faction), 'e:ère', 's:synergie'. Une transformation garde la condition et prend son % si meilleur. --- */
+var LDPCT={c:20,u:30,r:50,e:70,l:100,m:150,x:200};
+var LD={
+ goku_kid:['Petit aventurier','e:db'],krillin:['Courage terrien','r:terrien'],yamcha:['Guerrier Z','s:z'],tenshinhan:['École de la Grue','s:grue'],chaozu:['École de la Grue','s:grue'],
+ tortue:['École de la Tortue','s:tortue'],pilaf:['Bande à Pilaf','s:pilaf'],shu:['Bande à Pilaf','s:pilaf'],mai:['Bande à Pilaf','s:pilaf'],soldat:['Ruban Rouge','s:ruban'],
+ blue:['Ruban Rouge','s:ruban'],tao:['Âme de méchant','f:m'],c8:['Androïdes','r:android'],tambourine:['Démons namek','r:namek'],daimao_p:['Armée du mal','f:m'],
+ kami:['Peuple Namek','r:namek'],daimao:['Cœurs purs','f:g'],
+ goku_db:['Sang saiyan','r:sayen'],gohan_kid:['Famille Son','s:son'],gohan:['Famille Son','s:son'],piccolo:['Guerriers Z','s:z'],nail:['Peuple Namek','r:namek'],
+ dende:['Peuple Namek','r:namek'],raditz:['Sang saiyan','r:sayen'],nappa:['Fierté Saiyan','s:saiyan'],saibaman:['Armée du mal','f:m'],vegeta:['Sang saiyan','r:sayen'],
+ guldo:['Commando Ginyu','s:ginyu'],recoome:['Commando Ginyu','s:ginyu'],burter:['Commando Ginyu','s:ginyu'],jeice:['Commando Ginyu','s:ginyu'],ginyu:['Commando Ginyu','s:ginyu'],
+ dodoria:['Armée de Freezer','s:freezer'],zarbon:['Armée de Freezer','s:freezer'],soldat_f:['Armée de Freezer','s:freezer'],freezer:['Armée de Freezer','s:freezer'],
+ trunks:['Guerriers Z','s:z'],c20:['Ruban Rouge','s:ruban'],c19:['Androïdes','r:android'],c18:['Androïdes','r:android'],c17:['Androïdes','r:android'],c16:['Androïdes','r:android'],
+ cell:['Ruban Rouge','s:ruban'],celljr:['Ruban Rouge','s:ruban'],babidi:['Clan Majin','s:majin'],dabura:['Clan Majin','s:majin'],spopovitch:['Clan Majin','s:majin'],yamu:['Clan Majin','s:majin'],
+ buu:['Peuple Majin','r:majin'],goten:['Famille Son','s:son'],trunks_kid:['Fierté Saiyan','s:saiyan'],videl:['Courage terrien','r:terrien'],satan:['Champion du monde','r:terrien'],shin:['Divinités','r:dieu'],
+ goku_gt:['Ère GT','e:gt'],pan:['Famille Son','s:son'],giru:['Ère GT','e:gt'],uub:['Peuple Majin','r:majin'],baby:['Armée du mal','f:m'],s17:['Androïdes','r:android'],
+ haze:['Dragons maléfiques','s:dragons'],rage_s:['Dragons maléfiques','s:dragons'],eis:['Dragons maléfiques','s:dragons'],nuova:['Dragons','r:dragon'],omega:['Dragons','r:dragon'],
+ beerus:['Divinités','r:dieu'],whis:['Ère Super','e:s'],hit:['Armée du mal','f:m'],cabba:['Univers 6','s:u6'],caulifla:['Univers 6','s:u6'],kale:['Univers 6','s:u6'],
+ goku_black:['Divinités','r:dieu'],zamasu:['Divinités','r:dieu'],jiren:['Aliens','r:alien'],toppo:['Pride Troopers','s:u11'],broly:['Sang saiyan','r:sayen'],gamma1:['Ruban Rouge','s:ruban'],cellmax:['Ruban Rouge','s:ruban']
+};
+function ldCondTxt(cd){var p=cd.split(':'),k=p[0],v=p[1];
+  if(k==='r')return 'les '+(RACES[v]?RACES[v].n:v)+'s';if(k==='f')return 'les '+(FACTION[v]?FACTION[v].n:v)+'s';
+  if(k==='e')return 'les personnages de l’ère '+(ERAS[v]?ERAS[v].n:v);if(k==='s'){var S=SYN.filter(function(x){return x.id===v;})[0];return 'les membres « '+(S?S.n:v)+' »';}return 'toute l’équipe';}
+function ldText(id){var d=LD[id];if(!d)return '';return 'ATK, DEF et PV +'+LDPCT[CARDS[id].rar]+'% pour '+ldCondTxt(d[1])+'.';}
+
+/* --- Passifs des Boules de cristal, inspirés des 7 Dragons maléfiques de GT (en plus de piocher 1 carte) --- */
+var BALLS={
+ 1:['Syn Shenron','Énergie négative','Toute ton équipe gagne +25% d’ATK… mais chaque allié perd 10% de ses PV max.'],
+ 2:['Haze Shenron','Brume toxique','Les ennemis perdent 8% de leurs PV max ; la pollution coûte aussi 3% à tes alliés.'],
+ 3:['Eis Shenron','Gel absolu','Étourdit l’ennemi le plus fort… mais Eis triche : ton allié le plus faible est gelé aussi.'],
+ 4:['Nuova Shenron','Soleil de Nuova','Soigne 10% des PV max de toute l’équipe et donne +15% de DEF.'],
+ 5:['Rage Shenron','Orage','Foudroie les ennemis (10% de leurs PV max) et +1 Ki, mais tes alliés prennent 5%.'],
+ 6:['Oceanus Shenron','Typhon','+15% d’esquive à toute ton équipe pour le reste du combat.'],
+ 7:['Naturon Shenron','Absorption tellurique','Vole 10% des PV max de l’ennemi le plus en forme pour soigner ton allié le plus blessé.']
+};
+for(_b=1;_b<=7;_b++){CARDS['db'+_b].bp=_b;}
 
 /* Apparence des portraits (dessins originaux en SVG) */
 var SK='#f7c99b', HB='#1c1c24';
@@ -1269,89 +1449,89 @@ var DEFAULT_VIS={skin:'#e0c0a0',hs:'bald',outfit:'#888888'};
 
 /* --- Spéciaux [nom, type, valeur, coût Ki] et Ultimes [nom, type, valeur] --- */
 var SP={
- goku_kid:['Janken','dmg',6,1],goku_db:['Kaméhaméha','dmg',9,2],goku_gt:['Kaméhaméha','dmg',9,2],goku_ssj1:['Kaméhaméha','dmg',12,2],goku_ssj3:['Poing du Dragon','dmg',15,3],
- krillin:['Kienzan','dmg',9,2],yamcha:['Poing du loup','dmg',7,1],tenshinhan:['Taiyoken','stun',2,2],chaozu:['Télékinésie','stun',1,2],tortue:['Mafuba','stun',3,3],
- pilaf:['Appel des soldats','summon','soldat',2],shu:['Shuriken','dmg',4,1],mai:['Rafale','multi',6,2],soldat:['Tir groupé','dmg',4,1],blue:['Regard paralysant','stun',2,2],
- tao:['Dodonpa','dmg',9,2],c8:['Protection','guard',3,1],tambourine:['Griffes','dmg',7,2],daimao_p:['Engendrer un démon','summon','tambourine',4],kami:['Prière','heal',10,2],daimao:['Gentillesse','heal',6,1],
- gohan_kid:['Masenko','dmg',8,2],gohan:['Masenko','dmg',10,2],piccolo:['Makankosappo','dmg',12,3],nail:['Rayon des yeux','dmg',7,2],dende:['Soin','heal',14,2],
- raditz:['Double Sunday','dmg',10,2],nappa:['Plantez les Saibamen','summon','saibaman',2],saibaman:['Acide','dmg',5,1],vegeta:['Garlic Ho','dmg',12,3],
- guldo:['Arrêt du temps','stun',1,2],recoome:['Recoome Kick','dmg',10,2],burter:['Space Mach Attack','dmg',9,2],jeice:['Crusher Ball','dmg',10,2],ginyu:['Pose Ginyu','buff',2,2],
- dodoria:['Rayon buccal','dmg',8,2],zarbon:['Elegant Blaster','dmg',9,2],soldat_f:['Tir de blaster','dmg',5,1],freezer:['Death Beam','dmg',12,3],trunks:['Coup d’épée','dmg',12,2],
- c20:['Absorption','drain',8,2],c19:['Absorption','drain',8,2],c18:['Kienzan','dmg',10,2],c17:['Barrière','guard',4,2],c16:['Bras canon','dmg',11,3],
- cell:['Absorption','drain',10,3],celljr:['Rafale','dmg',6,1],babidi:['Marque Majin','buff',2,2],dabura:['Crachat pétrifiant','stun',4,3],spopovitch:['Pression','dmg',7,2],
- yamu:['Aspirateur d’énergie','drain',6,1],buu:['Rayon chocolat','stun',3,3],goten:['Kaméhaméha','dmg',8,2],trunks_kid:['Buster Cannon','dmg',8,2],videl:['Coup de pied sauté','dmg',6,1],
- satan:['Provocation','guard',3,1],shin:['Paralysie divine','stun',2,2],pan:['Maiden Blast','dmg',7,2],giru:['Radar','draw',1,1],uub:['Rafale de Ki','dmg',10,2],
- baby:['Infection','drain',9,2],s17:['Absorption','drain',12,3],haze:['Brume toxique','aoe',4,3],rage_s:['Choc électrique','stun',3,2],eis:['Blizzard','stun',4,2],
- nuova:['Nova Strike','dmg',12,3],omega:['Minus Energy','aoe',8,4],beerus:['Hakai','kill',20,5],whis:['Retour temporel','healall',12,4],hit:['Saut temporel','stun',6,3],
- cabba:['Galick Gun','dmg',9,2],caulifla:['Crush Cannon','dmg',10,2],kale:['Berserk','buffself',3,2],goku_black:['Lame de Ki','dmg',13,3],zamasu:['Lumière divine','dmg',10,3],
- jiren:['Coup de poing','dmg',16,3],toppo:['Hakai','kill',16,4],broly:['Eraser Cannon','dmg',14,3],gamma1:['Gamma Blaster','dmg',11,2],cellmax:['Rugissement','aoe',10,4]
+ goku_kid:['Janken','dmg',2400,1],goku_db:['Kaméhaméha','dmg',3600,2],goku_gt:['Kaméhaméha','dmg',3600,2],goku_ssj1:['Kaméhaméha','dmg',4800,2],goku_ssj3:['Poing du Dragon','dmg',6000,3],
+ krillin:['Kienzan','dmg',3600,2],yamcha:['Poing du loup','dmg',2800,1],tenshinhan:['Taiyoken','stun',800,2],chaozu:['Télékinésie','stun',400,2],tortue:['Mafuba','stun',1200,3],
+ pilaf:['Appel des soldats','summon','soldat',2],shu:['Shuriken','dmg',1600,1],mai:['Rafale','multi',2400,2],soldat:['Tir groupé','dmg',1600,1],blue:['Regard paralysant','stun',800,2],
+ tao:['Dodonpa','dmg',3600,2],c8:['Protection','guard',1200,1],tambourine:['Griffes','dmg',2800,2],daimao_p:['Engendrer un démon','summon','tambourine',4],kami:['Prière','heal',4000,2],daimao:['Gentillesse','heal',2400,1],
+ gohan_kid:['Masenko','dmg',3200,2],gohan:['Masenko','dmg',4000,2],piccolo:['Makankosappo','dmg',4800,3],nail:['Rayon des yeux','dmg',2800,2],dende:['Soin','heal',5600,2],
+ raditz:['Double Sunday','dmg',4000,2],nappa:['Plantez les Saibamen','summon','saibaman',2],saibaman:['Acide','dmg',2000,1],vegeta:['Garlic Ho','dmg',4800,3],
+ guldo:['Arrêt du temps','stun',400,2],recoome:['Recoome Kick','dmg',4000,2],burter:['Space Mach Attack','dmg',3600,2],jeice:['Crusher Ball','dmg',4000,2],ginyu:['Pose Ginyu','buff',800,2],
+ dodoria:['Rayon buccal','dmg',3200,2],zarbon:['Elegant Blaster','dmg',3600,2],soldat_f:['Tir de blaster','dmg',2000,1],freezer:['Death Beam','dmg',4800,3],trunks:['Coup d’épée','dmg',4800,2],
+ c20:['Absorption','drain',3200,2],c19:['Absorption','drain',3200,2],c18:['Kienzan','dmg',4000,2],c17:['Barrière','guard',1600,2],c16:['Bras canon','dmg',4400,3],
+ cell:['Absorption','drain',4000,3],celljr:['Rafale','dmg',2400,1],babidi:['Marque Majin','buff',800,2],dabura:['Crachat pétrifiant','stun',1600,3],spopovitch:['Pression','dmg',2800,2],
+ yamu:['Aspirateur d’énergie','drain',2400,1],buu:['Rayon chocolat','stun',1200,3],goten:['Kaméhaméha','dmg',3200,2],trunks_kid:['Buster Cannon','dmg',3200,2],videl:['Coup de pied sauté','dmg',2400,1],
+ satan:['Provocation','guard',1200,1],shin:['Paralysie divine','stun',800,2],pan:['Maiden Blast','dmg',2800,2],giru:['Radar','draw',1,1],uub:['Rafale de Ki','dmg',4000,2],
+ baby:['Infection','drain',3600,2],s17:['Absorption','drain',4800,3],haze:['Brume toxique','aoe',1600,3],rage_s:['Choc électrique','stun',1200,2],eis:['Blizzard','stun',1600,2],
+ nuova:['Nova Strike','dmg',4800,3],omega:['Minus Energy','aoe',3200,4],beerus:['Hakai','kill',8000,5],whis:['Retour temporel','healall',4800,4],hit:['Saut temporel','stun',2400,3],
+ cabba:['Galick Gun','dmg',3600,2],caulifla:['Crush Cannon','dmg',4000,2],kale:['Berserk','buffself',1200,2],goku_black:['Lame de Ki','dmg',5200,3],zamasu:['Lumière divine','dmg',4000,3],
+ jiren:['Coup de poing','dmg',6400,3],toppo:['Hakai','kill',6400,4],broly:['Eraser Cannon','dmg',5600,3],gamma1:['Gamma Blaster','dmg',4400,2],cellmax:['Rugissement','aoe',4000,4]
 };
 var UL={
- goku_kid:['Kaméhaméha','dmg',14],goku_db:['Genkidama','dmg',22],goku_gt:['Kaméhaméha x10','dmg',24],krillin:['Kienzan multiple','multi',18],yamcha:['Soukidan','dmg',16],
- tenshinhan:['Kikoho','dmg',20],chaozu:['Auto-destruction','kamikaze',16],tortue:['Kaméhaméha MAX','aoe',10],pilaf:['Pilaf Machine','aoe',6],shu:['Pluie de kunaïs','multi',9],
- mai:['Bazooka','dmg',12],soldat:['Grenade','aoe',4],blue:['Lame cachée','dmg',14],tao:['Super Dodonpa','dmg',20],c8:['Colère de C-8','dmg',14],tambourine:['Vol en piqué','dmg',14],
- daimao_p:['Explosion démoniaque','aoe',12],kami:['Mafuba','stunall',4],daimao:['Gros câlin','dmg',10],gohan_kid:['Colère de Gohan','dmg',22],gohan:['Kaméhaméha','dmg',26],
- piccolo:['Hellzone Grenade','aoe',12],nail:['Régénération','healall',10],dende:['Grand soin','healall',14],raditz:['Saturday Crash','dmg',20],nappa:['Bomber DX','aoe',12],
- saibaman:['Étreinte explosive','kamikaze',10],vegeta:['Final Flash','dmg',28],guldo:['Lien psychique','stunall',2],recoome:['Ultra Fighting Bomber','aoe',12],
- burter:['Tornade bleue','multi',21],jeice:['Purple Combination','multi',18],ginyu:['Milky Cannon','dmg',24],dodoria:['Charge brutale','dmg',16],zarbon:['Forme monstrueuse','buffself',4],
- soldat_f:['Assaut groupé','aoe',4],freezer:['Supernova','aoe',14],trunks:['Burning Attack','dmg',26],c20:['Rayon oculaire','dmg',18],c19:['Rayon','dmg',16],c18:['Tir de barrage','multi',18],
- c17:['Power Blitz','aoe',12],c16:['Hell Flash','dmg',26],cell:['Kaméhaméha','dmg',24],celljr:['Assaut des Junior','multi',12],babidi:['Sortilège','stunall',2],
- dabura:['Darkness Sword','dmg',24],spopovitch:['Gonflement','kamikaze',14],yamu:['Pillage d’énergie','drain',14],buu:['Planet Burst','aoe',14],goten:['Coup de pied volant','dmg',18],
- trunks_kid:['Burning Attack','dmg',18],videl:['Justice !','dmg',14],satan:['Dynamite Kick','dmg',8],shin:['Téléportation sacrée','healall',8],pan:['Masenko','dmg',16],
- giru:['Giru Beam','dmg',12],uub:['Kaméhaméha','dmg',24],baby:['Revenge Death Ball','aoe',14],s17:['Flash Bomber','aoe',16],haze:['Poison mortel','multi',21],
- rage_s:['Tempête','aoe',10],eis:['Gel absolu','stunall',4],nuova:['Soleil de Nuova','aoe',14],omega:['Minus Energy Power Ball','aoe',24],beerus:['Sphère de destruction','aoe',26],
- whis:['Coup de bâton','dmg',30],hit:['Coup mortel','dmg',32],cabba:['Super Saiyan','buffself',5],caulifla:['Rafale de Ki','multi',18],kale:['Gigantic Meteor','aoe',14],
- goku_black:['Kaméhaméha noir','dmg',28],zamasu:['Jugement divin','aoe',14],jiren:['Power Impact','aoe',24],toppo:['Énergie de destruction','aoe',18],broly:['Gigantic Roar','aoe',20],
- gamma1:['Gamma Burst Flash','dmg',26],cellmax:['Pied géant','aoe',28],
- goku_ssj1:['Kaméhaméha Super Saiyan','dmg',26],goku_ssj2:['Kaméhaméha','dmg',28],goku_ssj3:['Poing du Dragon','dmg',34],goku_god:['Kaméhaméha Divin','dmg',34],goku_blue:['Kaméhaméha Blue','dmg',38],
- goku_ssj4:['Kaméhaméha x10','dmg',38],goku_mui:['Instinct ultime','dmg',42],u_mui:['Kaméhaméha Ultra Instinct','aoe',30],vegeta_ssj:['Final Flash','dmg',30],vegeta_majin:['Final Explosion','aoe',18],
- vegeta_ssj4:['Final Shine','dmg',38],vegeta_blue:['Final Flash Blue','dmg',38],vegeta_ue:['Hakai d’Ultra Ego','dmg',44],gohan_ssj:['Masenko','dmg',26],gohan_ssj2:['Kaméhaméha','dmg',34],
- gohan_ult:['Kaméhaméha ultime','dmg',38],gohan_beast:['Makankosappo Beast','dmg',48],trunks_ssj:['Shining Sword Attack','dmg',32],piccolo_orange:['Hellzone Grenade','aoe',18],
- freezer_final:['Death Ball','aoe',16],freezer_100:['Death Ball','aoe',20],freezer_gold:['Golden Death Ball','aoe',24],freezer_black:['Supernova noire','aoe',30],
- cell_semi:['Kaméhaméha','dmg',28],cell_perfect:['Kaméhaméha solaire','aoe',22],buu_super:['Absorption','dmg',30],buu_kid:['Planet Burst','aoe',24],black_rose:['Faux divine','aoe',20],
- broly_lss:['Gigantic Meteor','aoe',30],baby_vegeta:['Revenge Death Ball','aoe',20],baby_oozaru:['Revenge Death Ball','aoe',26],oozaru:['Rayon buccal','aoe',16],golden_oozaru:['Rayon buccal doré','aoe',24],
- gotenks:['Super Ghost Kamikaze','multi',30],vegetto:['Final Kaméhaméha','dmg',48],u_gogeta:['Stardust Breaker','aoe',34],u_gogeta4:['Big Bang Kaméhaméha','dmg',60],fused_zamasu:['Lame divine','aoe',30]
+ goku_kid:['Kaméhaméha','dmg',5600],goku_db:['Genkidama','dmg',8800],goku_gt:['Kaméhaméha x10','dmg',9600],krillin:['Kienzan multiple','multi',7200],yamcha:['Soukidan','dmg',6400],
+ tenshinhan:['Kikoho','dmg',8000],chaozu:['Auto-destruction','kamikaze',6400],tortue:['Kaméhaméha MAX','aoe',4000],pilaf:['Pilaf Machine','aoe',2400],shu:['Pluie de kunaïs','multi',3600],
+ mai:['Bazooka','dmg',4800],soldat:['Grenade','aoe',1600],blue:['Lame cachée','dmg',5600],tao:['Super Dodonpa','dmg',8000],c8:['Colère de C-8','dmg',5600],tambourine:['Vol en piqué','dmg',5600],
+ daimao_p:['Explosion démoniaque','aoe',4800],kami:['Mafuba','stunall',1600],daimao:['Gros câlin','dmg',4000],gohan_kid:['Colère de Gohan','dmg',8800],gohan:['Kaméhaméha','dmg',10400],
+ piccolo:['Hellzone Grenade','aoe',4800],nail:['Régénération','healall',4000],dende:['Grand soin','healall',5600],raditz:['Saturday Crash','dmg',8000],nappa:['Bomber DX','aoe',4800],
+ saibaman:['Étreinte explosive','kamikaze',4000],vegeta:['Final Flash','dmg',11200],guldo:['Lien psychique','stunall',800],recoome:['Ultra Fighting Bomber','aoe',4800],
+ burter:['Tornade bleue','multi',8400],jeice:['Purple Combination','multi',7200],ginyu:['Milky Cannon','dmg',9600],dodoria:['Charge brutale','dmg',6400],zarbon:['Forme monstrueuse','buffself',1600],
+ soldat_f:['Assaut groupé','aoe',1600],freezer:['Supernova','aoe',5600],trunks:['Burning Attack','dmg',10400],c20:['Rayon oculaire','dmg',7200],c19:['Rayon','dmg',6400],c18:['Tir de barrage','multi',7200],
+ c17:['Power Blitz','aoe',4800],c16:['Hell Flash','dmg',10400],cell:['Kaméhaméha','dmg',9600],celljr:['Assaut des Junior','multi',4800],babidi:['Sortilège','stunall',800],
+ dabura:['Darkness Sword','dmg',9600],spopovitch:['Gonflement','kamikaze',5600],yamu:['Pillage d’énergie','drain',5600],buu:['Planet Burst','aoe',5600],goten:['Coup de pied volant','dmg',7200],
+ trunks_kid:['Burning Attack','dmg',7200],videl:['Justice !','dmg',5600],satan:['Dynamite Kick','dmg',3200],shin:['Téléportation sacrée','healall',3200],pan:['Masenko','dmg',6400],
+ giru:['Giru Beam','dmg',4800],uub:['Kaméhaméha','dmg',9600],baby:['Revenge Death Ball','aoe',5600],s17:['Flash Bomber','aoe',6400],haze:['Poison mortel','multi',8400],
+ rage_s:['Tempête','aoe',4000],eis:['Gel absolu','stunall',1600],nuova:['Soleil de Nuova','aoe',5600],omega:['Minus Energy Power Ball','aoe',9600],beerus:['Sphère de destruction','aoe',10400],
+ whis:['Coup de bâton','dmg',12000],hit:['Coup mortel','dmg',12800],cabba:['Super Saiyan','buffself',2000],caulifla:['Rafale de Ki','multi',7200],kale:['Gigantic Meteor','aoe',5600],
+ goku_black:['Kaméhaméha noir','dmg',11200],zamasu:['Jugement divin','aoe',5600],jiren:['Power Impact','aoe',9600],toppo:['Énergie de destruction','aoe',7200],broly:['Gigantic Roar','aoe',8000],
+ gamma1:['Gamma Burst Flash','dmg',10400],cellmax:['Pied géant','aoe',11200],
+ goku_ssj1:['Kaméhaméha Super Saiyan','dmg',10400],goku_ssj2:['Kaméhaméha','dmg',11200],goku_ssj3:['Poing du Dragon','dmg',13600],goku_god:['Kaméhaméha Divin','dmg',13600],goku_blue:['Kaméhaméha Blue','dmg',15200],
+ goku_ssj4:['Kaméhaméha x10','dmg',15200],goku_mui:['Instinct ultime','dmg',16800],u_mui:['Kaméhaméha Ultra Instinct','aoe',12000],vegeta_ssj:['Final Flash','dmg',12000],vegeta_majin:['Final Explosion','aoe',7200],
+ vegeta_ssj4:['Final Shine','dmg',15200],vegeta_blue:['Final Flash Blue','dmg',15200],vegeta_ue:['Hakai d’Ultra Ego','dmg',17600],gohan_ssj:['Masenko','dmg',10400],gohan_ssj2:['Kaméhaméha','dmg',13600],
+ gohan_ult:['Kaméhaméha ultime','dmg',15200],gohan_beast:['Makankosappo Beast','dmg',19200],trunks_ssj:['Shining Sword Attack','dmg',12800],piccolo_orange:['Hellzone Grenade','aoe',7200],
+ freezer_final:['Death Ball','aoe',6400],freezer_100:['Death Ball','aoe',8000],freezer_gold:['Golden Death Ball','aoe',9600],freezer_black:['Supernova noire','aoe',12000],
+ cell_semi:['Kaméhaméha','dmg',11200],cell_perfect:['Kaméhaméha solaire','aoe',8800],buu_super:['Absorption','dmg',12000],buu_kid:['Planet Burst','aoe',9600],black_rose:['Faux divine','aoe',8000],
+ broly_lss:['Gigantic Meteor','aoe',12000],baby_vegeta:['Revenge Death Ball','aoe',8000],baby_oozaru:['Revenge Death Ball','aoe',10400],oozaru:['Rayon buccal','aoe',6400],golden_oozaru:['Rayon buccal doré','aoe',9600],
+ gotenks:['Super Ghost Kamikaze','multi',12000],vegetto:['Final Kaméhaméha','dmg',19200],u_gogeta:['Stardust Breaker','aoe',13600],u_gogeta4:['Big Bang Kaméhaméha','dmg',24000],fused_zamasu:['Lame divine','aoe',12000]
 };
 var NEEDT={dmg:'enemy',drain:'enemy',stun:'enemy',kill:'enemy',kamikaze:'enemy',heal:'ally'};
 /* --- Attaques d'équipe (familles requises sur le terrain) --- */
 var TEAMATK=[
- {id:'tortue',n:'Kaméhaméha de l’École',m:['goku','krillin','yamcha'],c:5,k:'aoe',v:12},
- {id:'pf',n:'Kaméhaméha Père-Fils',m:['goku','gohan'],c:5,k:'dmg',v:32},
- {id:'grue',n:'Duo de la Grue',m:['tenshinhan','chaozu'],c:4,k:'stunall',v:5},
- {id:'mm',n:'Masenko-Makanko',m:['piccolo','gohan'],c:5,k:'dmg',v:30},
- {id:'impact',n:'Double Impact Saiyan',m:['goku','vegeta'],c:6,k:'dmg',v:40},
- {id:'ginyu',n:'Pose du Commando Ginyu',m:['ginyu','recoome','burter','jeice','guldo'],c:3,k:'ginyu',v:4},
- {id:'andro',n:'Trio Androïde',m:['c16','c17','c18'],c:5,k:'aoe',v:14},
- {id:'k18',n:'Amour de Krillin et C-18',m:['krillin','c18'],c:3,k:'healall',v:12},
- {id:'namek',n:'Bénédiction de Namek',m:['piccolo','dende'],c:4,k:'healall',v:15},
- {id:'pilaf',n:'Robot de la Bande à Pilaf',m:['pilaf','shu','mai'],c:3,k:'stunall',v:3},
- {id:'pride',n:'Pride Troopers',m:['jiren','toppo'],c:6,k:'aoe',v:20},
- {id:'u6',n:'Saiyans de l’Univers 6',m:['cabba','caulifla','kale'],c:5,k:'aoe',v:14},
- {id:'zero',n:'Plan Zéro Mortel',m:['black','zamasu'],c:6,k:'aoe',v:18},
- {id:'hakai',n:'Duo destructeur',m:['beerus','whis'],c:6,k:'kill',v:40},
- {id:'sons',n:'Fils de Goku',m:['gohan','goten'],c:4,k:'dmg',v:26},
- {id:'gt',n:'Goten & Trunks',m:['goten','trunksk'],c:4,k:'multi',v:24},
- {id:'army',n:'Armée de Freezer',m:['freezer','dodoria','zarbon'],c:5,k:'aoe',v:12},
- {id:'saiyans',n:'Raid Saiyan',m:['vegeta','nappa'],c:5,k:'aoe',v:14},
- {id:'dragons',n:'Ombres des Dragons',m:['haze','eis','nuova'],c:5,k:'aoe',v:14},
- {id:'ruban',n:'Escouade du Ruban Rouge',m:['soldat','blue','tao'],c:4,k:'multi',v:18}
+ {id:'tortue',n:'Kaméhaméha de l’École',m:['goku','krillin','yamcha'],c:5,k:'aoe',v:4800},
+ {id:'pf',n:'Kaméhaméha Père-Fils',m:['goku','gohan'],c:5,k:'dmg',v:12800},
+ {id:'grue',n:'Duo de la Grue',m:['tenshinhan','chaozu'],c:4,k:'stunall',v:2000},
+ {id:'mm',n:'Masenko-Makanko',m:['piccolo','gohan'],c:5,k:'dmg',v:12000},
+ {id:'impact',n:'Double Impact Saiyan',m:['goku','vegeta'],c:6,k:'dmg',v:16000},
+ {id:'ginyu',n:'Pose du Commando Ginyu',m:['ginyu','recoome','burter','jeice','guldo'],c:3,k:'ginyu',v:1600},
+ {id:'andro',n:'Trio Androïde',m:['c16','c17','c18'],c:5,k:'aoe',v:5600},
+ {id:'k18',n:'Amour de Krillin et C-18',m:['krillin','c18'],c:3,k:'healall',v:4800},
+ {id:'namek',n:'Bénédiction de Namek',m:['piccolo','dende'],c:4,k:'healall',v:6000},
+ {id:'pilaf',n:'Robot de la Bande à Pilaf',m:['pilaf','shu','mai'],c:3,k:'stunall',v:1200},
+ {id:'pride',n:'Pride Troopers',m:['jiren','toppo'],c:6,k:'aoe',v:8000},
+ {id:'u6',n:'Saiyans de l’Univers 6',m:['cabba','caulifla','kale'],c:5,k:'aoe',v:5600},
+ {id:'zero',n:'Plan Zéro Mortel',m:['black','zamasu'],c:6,k:'aoe',v:7200},
+ {id:'hakai',n:'Duo destructeur',m:['beerus','whis'],c:6,k:'kill',v:16000},
+ {id:'sons',n:'Fils de Goku',m:['gohan','goten'],c:4,k:'dmg',v:10400},
+ {id:'gt',n:'Goten & Trunks',m:['goten','trunksk'],c:4,k:'multi',v:9600},
+ {id:'army',n:'Armée de Freezer',m:['freezer','dodoria','zarbon'],c:5,k:'aoe',v:4800},
+ {id:'saiyans',n:'Raid Saiyan',m:['vegeta','nappa'],c:5,k:'aoe',v:5600},
+ {id:'dragons',n:'Ombres des Dragons',m:['haze','eis','nuova'],c:5,k:'aoe',v:5600},
+ {id:'ruban',n:'Escouade du Ruban Rouge',m:['soldat','blue','tao'],c:4,k:'multi',v:7200}
 ];
 /* --- Synergies d'équipe [seuil, effet, valeur, texte] --- */
 var SYN=[
- {id:'tortue',n:'École de la Tortue',i:'🐢',m:['goku','krillin','yamcha','tortue'],t:[[2,'atk',1,'+1 ATK aux membres'],[3,'spcost',1,'Spéciaux des membres : -1 Ki']]},
- {id:'grue',n:'École de la Grue',i:'🕊',m:['tenshinhan','chaozu','tao'],t:[[2,'def',2,'+2 DEF aux membres']]},
- {id:'z',n:'Guerriers Z',i:'⚡',m:['goku','gohan','piccolo','krillin','yamcha','tenshinhan','chaozu','vegeta','trunks','goten','trunksk','c18','videl','pan','uub'],t:[[3,'atkall',1,'+1 ATK à toute l’équipe'],[5,'regen',2,'Toute l’équipe récupère 2 PV par tour']]},
- {id:'saiyan',n:'Fierté Saiyan',i:'🔥',race:'sayen',t:[[3,'atk',1,'+1 ATK aux Saiyans'],[5,'gauge',50,'Jauges d’Ultime à 50% au départ']]},
- {id:'son',n:'Famille Son',i:'🏠',m:['goku','gohan','goten','pan'],t:[[2,'blood',2,'Si un membre tombe K.O., les autres gagnent +2 ATK']]},
- {id:'namek',n:'Peuple Namek',i:'🌿',race:'namek',t:[[2,'regen',2,'Toute l’équipe récupère 2 PV par tour']]},
- {id:'ginyu',n:'Commando Ginyu',i:'💪',m:['ginyu','recoome','burter','jeice','guldo'],t:[[3,'atk',2,'+2 ATK aux membres'],[5,'gauge',100,'Jauges d’Ultime pleines au départ']]},
+ {id:'tortue',n:'École de la Tortue',i:'🐢',m:['goku','krillin','yamcha','tortue'],t:[[2,'atk',400,'+400 ATK aux membres'],[3,'spcost',1,'Spéciaux des membres : -1 Ki']]},
+ {id:'grue',n:'École de la Grue',i:'🕊',m:['tenshinhan','chaozu','tao'],t:[[2,'def',800,'+800 DEF aux membres']]},
+ {id:'z',n:'Guerriers Z',i:'⚡',m:['goku','gohan','piccolo','krillin','yamcha','tenshinhan','chaozu','vegeta','trunks','goten','trunksk','c18','videl','pan','uub'],t:[[3,'atkall',400,'+400 ATK à toute l’équipe'],[5,'regen',800,'Toute l’équipe récupère 800 PV par tour']]},
+ {id:'saiyan',n:'Fierté Saiyan',i:'🔥',race:'sayen',t:[[3,'atk',400,'+400 ATK aux Saiyans'],[5,'gauge',50,'Jauges d’Ultime à 50% au départ']]},
+ {id:'son',n:'Famille Son',i:'🏠',m:['goku','gohan','goten','pan'],t:[[2,'blood',800,'Si un membre tombe K.O., les autres gagnent +800 ATK']]},
+ {id:'namek',n:'Peuple Namek',i:'🌿',race:'namek',t:[[2,'regen',800,'Toute l’équipe récupère 800 PV par tour']]},
+ {id:'ginyu',n:'Commando Ginyu',i:'💪',m:['ginyu','recoome','burter','jeice','guldo'],t:[[3,'atk',800,'+800 ATK aux membres'],[5,'gauge',100,'Jauges d’Ultime pleines au départ']]},
  {id:'freezer',n:'Armée de Freezer',i:'👑',m:['freezer','dodoria','zarbon','soldat_f','ginyu','recoome','burter','jeice','guldo','raditz','nappa'],t:[[3,'ki',1,'+1 Ki par tour']]},
  {id:'ruban',n:'Ruban Rouge',i:'🎗',m:['soldat','blue','tao','c8','c16','c17','c18','c19','c20','cell','celljr','gamma1'],t:[[3,'draw',1,'+1 carte piochée par tour']]},
- {id:'android',n:'Androïdes',i:'🤖',race:'android',t:[[3,'ki',1,'+1 Ki par tour'],[5,'defall',2,'+2 DEF à toute l’équipe']]},
- {id:'majin',n:'Clan Majin',i:'Ⓜ',m:['babidi','dabura','spopovitch','yamu','buu'],t:[[3,'atk',3,'+3 ATK aux membres']]},
- {id:'dieux',n:'Divinités',i:'✨',race:'dieu',t:[[2,'defall',1,'+1 DEF à toute l’équipe'],[3,'spcostall',1,'Tous les Spéciaux : -1 Ki']]},
- {id:'u6',n:'Univers 6',i:'6️⃣',m:['hit','cabba','caulifla','kale'],t:[[3,'atk',2,'+2 ATK aux membres']]},
- {id:'u11',n:'Pride Troopers',i:'🛡',m:['jiren','toppo'],t:[[2,'def',2,'+2 DEF aux membres']]},
+ {id:'android',n:'Androïdes',i:'🤖',race:'android',t:[[3,'ki',1,'+1 Ki par tour'],[5,'defall',800,'+800 DEF à toute l’équipe']]},
+ {id:'majin',n:'Clan Majin',i:'Ⓜ',m:['babidi','dabura','spopovitch','yamu','buu'],t:[[3,'atk',1200,'+1 200 ATK aux membres']]},
+ {id:'dieux',n:'Divinités',i:'✨',race:'dieu',t:[[2,'defall',400,'+400 DEF à toute l’équipe'],[3,'spcostall',1,'Tous les Spéciaux : -1 Ki']]},
+ {id:'u6',n:'Univers 6',i:'6️⃣',m:['hit','cabba','caulifla','kale'],t:[[3,'atk',800,'+800 ATK aux membres']]},
+ {id:'u11',n:'Pride Troopers',i:'🛡',m:['jiren','toppo'],t:[[2,'def',800,'+800 DEF aux membres']]},
  {id:'dragons',n:'Dragons maléfiques',i:'🐉',race:'dragon',t:[[3,'stunimm',1,'Immunisés contre l’étourdissement']]},
  {id:'pilaf',n:'Bande à Pilaf',i:'🐷',m:['pilaf','shu','mai'],t:[[3,'draw',1,'+1 carte piochée par tour']]}
 ];
@@ -1381,7 +1561,7 @@ var LEVELS=[
  {id:'vegeta',saga:'z',arc:'Arc Saiyan',name:'Vegeta',boss:'vegeta',sub:'Le prince des Saiyans',team:'vegeta,nappa,saibaman*2',bx:2,deck:'oozaru*2,galickgun*3,scouter*2,armure*2,capsule*2,senzu',zeni:360,rew:['vegeta','galickgun','kaioken'],
   quote:'Je suis le prince de tous les Saiyans ! Contemple ma transformation en Oozaru !',desc:'Le Raid Saiyan et la transformation en Oozaru.'},
  {id:'zarbon',saga:'z',arc:'Arc Namek',name:'Dodoria & Zarbon',boss:'zarbon',sub:'Les lieutenants de Freezer',team:'zarbon,dodoria,soldat_f*3',reserve:'soldat_f*3',bx:1.5,deck:'scouter*2,armure*2,explosive_wave*2,senzu,death_beam*2,capsule*2',zeni:380,rew:['zarbon','dende','nail'],
-  quote:'Laisse-moi faire, Dodoria. La beauté triomphe toujours.',desc:'L’Armée de Freezer gagne du Ki supplémentaire. Carapace : les Aliens subissent moins de dégâts.'},
+  quote:'Laisse-moi faire, Dodoria. La beauté triomphe toujours.',desc:'L’Armée de Freezer gagne du Ki supplémentaire, et Freezer réduit les dégâts qu’il subit.'},
  {id:'ginyu',saga:'z',arc:'Arc Namek',name:'Commando Ginyu',boss:'ginyu',sub:'Les forces spéciales prennent la pose',team:'ginyu,recoome,burter,jeice,guldo',bx:1.4,deck:'scouter*2,armure*2,capsule*3,explosive_wave*2,gravite*2',zeni:400,rew:['ginyu','burter','heal_dende'],
   quote:'Recoome ! Burter ! Jeice ! Guldo ! Ginyu ! Nous sommes… le Commando Ginyu !',desc:'Les 5 membres réunis : leurs jauges d’Ultime commencent pleines et leur Pose renforce tout le commando. Recoome provoque.'},
  {id:'freezer',saga:'z',arc:'Arc Namek',name:'Freezer',boss:'freezer',sub:'L’empereur de l’univers',team:'freezer,zarbon,dodoria,soldat_f*2',reserve:'soldat_f*2',bx:2.6,deck:'freezer_final*2,freezer_100,death_beam*3,armure*2,capsule*3',zeni:480,rew:['goku_ssj1','freezer','kienzan'],
@@ -1395,7 +1575,7 @@ var LEVELS=[
  {id:'cellgame',saga:'z',arc:'Arc Cell',name:'Les Jeux de Cell',boss:'cell_perfect',sub:'Le tournoi de la fin du monde',team:'cell>cell_perfect,celljr*4',reserve:'celljr*3',bx:2.6,deck:'kamehameha*3,salle,senzu*2,capsule*3,explosive_wave*2',zeni:620,rew:['gohan','gohan_ssj','gohan_ssj2'],
   quote:'Les jeux de Cell commencent ! Et voici mes enfants, les Cell Junior !',desc:'Cell Parfait est immortel une fois et ses Cell Junior déferlent en renfort.'},
  {id:'dabura',saga:'z',arc:'Arc Buu',name:'Babidi & Dabura',boss:'dabura',sub:'Le sorcier et ses sbires',team:'dabura,babidi,spopovitch,yamu,vegeta>vegeta_majin',bx:1.5,deck:'explosive_wave*2,capsule*3,armure*2,senzu,galickgun*2',zeni:640,rew:['dabura','goten','trunks_kid'],
-  quote:'Pa-pa-ra-pa ! Dabura, Vegeta, montrez-leur la puissance de la magie !',desc:'Le Clan Majin gagne +3 ATK. Majin Vegeta est de la partie !'},
+  quote:'Pa-pa-ra-pa ! Dabura, Vegeta, montrez-leur la puissance de la magie !',desc:'Le Clan Majin gagne +1 200 ATK. Majin Vegeta est de la partie !'},
  {id:'buu',saga:'z',arc:'Arc Buu',name:'Majin Buu',boss:'buu',sub:'Le monstre rose se réveille',team:'buu,babidi,dabura',bx:2.4,deck:'buu_super*2,kamehameha*2,senzu*2,capsule*3,explosive_wave*2',zeni:700,rew:['buu','gotenks','vegeta_majin'],
   quote:'Buu va te transformer en chocolat !',desc:'Majin Buu revient d’entre les morts une fois et change de forme.'},
  {id:'kidbuu',saga:'z',arc:'Arc Buu',name:'Kid Buu',boss:'buu_kid',sub:'La forme originelle du chaos',team:'buu>buu_kid',bx:4.5,deck:'kamehameha*3,explosive_wave*3,capsule*3,senzu*2',zeni:800,rew:['u_genki','goku_ssj3','vegetto'],
@@ -1413,7 +1593,7 @@ var LEVELS=[
  {id:'freezer_r',saga:'s',arc:'La Résurrection de F',name:'Golden Freezer',boss:'freezer_gold',sub:'Freezer revient… en or',team:'freezer>freezer_gold,soldat_f*4',reserve:'soldat_f*3',bx:2.2,deck:'death_beam*3,capsule*2,armure*2,senzu',zeni:1200,rew:['goku_blue','freezer_gold','vegeta_blue'],
   quote:'Quatre mois d’entraînement… Admire ma forme dorée !',desc:'Une armée de soldats puis l’éclat doré de Freezer.'},
  {id:'hit',saga:'s',arc:'Tournoi Univers 6 vs 7',name:'Hit',boss:'hit',sub:'L’assassin qui maîtrise le temps',team:'hit,cabba,caulifla,kale',bx:1.6,deck:'time_skip*3,capsule*2,senzu*2,gravite*2',zeni:1250,rew:['hit','cabba','time_skip'],
-  quote:'Je suis un tueur. Le temps lui-même m’obéit.',desc:'L’Univers 6 réuni : +2 ATK, et leurs trois Saiyans ont une attaque d’équipe.'},
+  quote:'Je suis un tueur. Le temps lui-même m’obéit.',desc:'L’Univers 6 réuni : +800 ATK, et leurs trois Saiyans ont une attaque d’équipe.'},
  {id:'black',saga:'s',arc:'Arc Goku Black',name:'Goku Black & Zamasu',boss:'goku_black',sub:'Le plan Zéro Mortel',team:'goku_black,zamasu',bx:2.6,deck:'black_rose*2,fused_zamasu,kame_divin*2,death_beam*2,capsule*2,senzu*2',zeni:1300,rew:['goku_black','black_rose','zamasu'],
   quote:'Le plan Zéro Mortel commence. Les humains sont une erreur.',desc:'Zamasu est immortel, Goku Black se pare de rose… et ils fusionnent.'},
  {id:'jiren',saga:'s',arc:'Tournoi du Pouvoir',name:'Jiren',boss:'jiren',sub:'Le plus fort de l’Univers 11',team:'jiren,toppo',bx:3,deck:'explosive_wave*2,hakai,capsule*3,salle,senzu*2,gravite*2',zeni:1500,rew:['u_mui','jiren'],
@@ -1428,7 +1608,7 @@ var TUTO_TEAM=['goku_db','krillin','yamcha','tenshinhan','chaozu'];
 var TUTO_DECK=['db1','kamehameha','nuage','goku_ssj1','senzu','kaioken','db2','janken','capsule','dodonpa','db3','nyoibo','kamehameha','radar','janken','db4','taiyoken','nuage','capsule','dodonpa'];
 var STARTER_COL={goku_db:1,goku_kid:1,krillin:1,yamcha:1,tenshinhan:1,chaozu:1,goku_ssj1:1,kaioken:1,kamehameha:2,dodonpa:2,janken:2,senzu:1,nuage:2,capsule:2,nyoibo:2,taiyoken:1,db1:1,db2:1,db3:1,radar:1};
 var STARTER_TEAM=['goku_db','krillin','yamcha','tenshinhan','chaozu'];
-var DECK_MIN=20,DECK_MAX=40,TEAM_SIZE=5,TEAM_MAX=22,HPX=1.5,TENSION_T=12;
+var DECK_MIN=20,DECK_MAX=40,TEAM_SIZE=5,TEAM_MAX=22,HPX=1,TENSION_T=12;
 
 /* =====================================================================
    SAUVEGARDE
@@ -1793,27 +1973,27 @@ function cardRace(c){return c.r||(c.t==='b'?'autre':'autre');}
 function fxShort(c){
   if(c.t==='b')return '<span class="st fx">'+IC.ki+'Pioche · ⭐</span>';
   var f=c.fx[0],k=f[0],v=f[1];
-  if(k==='dmg')return '<span class="st fx">'+IC.atk+v+' dégâts'+(c.fx.length>1?' +':'')+'</span>';
-  if(k==='kill')return '<span class="st fx">K.O. ≤'+v+' PV</span>';
-  if(k==='heal')return '<span class="st fx">'+IC.hp+'+'+v+' PV</span>';
+  if(k==='dmg')return '<span class="st fx">'+IC.atk+fmt(v)+(c.fx.length>1?' +':'')+'</span>';
+  if(k==='kill')return '<span class="st fx">K.O. ≤'+fmt(v)+' PV</span>';
+  if(k==='heal')return '<span class="st fx">'+IC.hp+'+'+fmt(v)+' PV</span>';
   if(k==='full')return '<span class="st fx">'+IC.hp+'Soin total'+(c.fx.length>1?' +':'')+'</span>';
-  if(k==='atk')return '<span class="st atk">'+IC.atk+'+'+v+'</span>'+(c.fx[1]&&c.fx[1][0]==='def'?'<span class="st def">'+IC.def+'+'+c.fx[1][1]+'</span>':'');
-  if(k==='def')return '<span class="st def">'+IC.def+'+'+v+'</span>';
+  if(k==='atk')return '<span class="st atk">'+IC.atk+'+'+fmt(v)+'</span>'+(c.fx[1]&&c.fx[1][0]==='def'?'<span class="st def">'+IC.def+'+'+fmt(c.fx[1][1])+'</span>':'');
+  if(k==='def')return '<span class="st def">'+IC.def+'+'+fmt(v)+'</span>';
   if(k==='draw')return '<span class="st fx">Pioche '+v+(c.fx.length>1?' +':'')+'</span>';
   if(k==='ki')return '<span class="st fx">'+IC.ki+'+'+v+' Ki</span>';
   if(k==='stun')return '<span class="st fx">Étourdit</span>';
   if(k==='kaioken')return '<span class="st fx">×2 ATK/DEF</span>';
-  if(k==='boom')return '<span class="st fx">'+v+' 💥 à tous</span>';
-  if(k==='aoe')return '<span class="st fx">'+IC.atk+v+' à tous</span>';
+  if(k==='boom')return '<span class="st fx">'+fmt(v)+' 💥 à tous</span>';
+  if(k==='aoe')return '<span class="st fx">'+IC.atk+fmt(v)+' à tous</span>';
   return '';
 }
-function stat(k,v,base){var cl=(base!=null&&v>base)?' up':((base!=null&&v<base)?' down':'');return '<span class="st '+k+cl+'">'+IC[k]+v+'</span>';}
+function stat(k,v,base){var cl=(base!=null&&v>base)?' up':((base!=null&&v<base)?' down':'');return '<span class="st '+k+cl+'">'+IC[k]+fmt(v)+'</span>';}
 function cardHTML(id,o){
   o=o||{}; var c=CARDS[id]; if(!c)return '';
   var R=RACES[cardRace(c)]||RACES.autre, rr=RAR[c.rar]||RAR.c, stats;
   if(o.atk!=null) stats=stat('atk',o.atk,o.ba)+stat('def',o.def,o.bd)+stat('hp',Math.max(0,o.hp),o.bh);
   else if(c.t==='p') stats=stat('atk',c.a)+stat('def',c.d)+stat('hp',c.h);
-  else if(c.t==='t') stats='<span class="st atk">'+IC.atk+'+'+c.a+'</span><span class="st def">'+IC.def+'+'+c.d+'</span>';
+  else if(c.t==='t') stats='<span class="st atk">'+IC.atk+'+'+fmt(c.a)+'</span><span class="st def">'+IC.def+'+'+fmt(c.d)+'</span>';
   else stats=fxShort(c);
   var tl=TYPES[c.t]+(c.t==='p'&&c.f?(c.f==='g'?' · Gentil':' · Méchant'):'')+(c.t==='t'&&!c.fus?' · Nv '+c.lv:'')+(c.fus?' · Fusion':'');
   var cls='card tilt rar-'+c.rar+(o.dim?' dim':'')+(o.cls?' '+o.cls:'');
@@ -1839,11 +2019,12 @@ function kiHTML(cur,max,pop){
 }
 function boulesHTML(n,pop){var h='';for(var i=1;i<=7;i++){h+='<span class="db'+(i<=n?' on':'')+(pop&&i===n?' pop':'')+'"></span>';}return h;}
 function pct(a,b){return Math.max(0,Math.min(100,a/b*100))+'%';}
-function abName(s){var p=s.split(':'),A=ABS[p[0]];return A?A.i+' '+A.n+(p[1]?' '+p[1]+(p[0]==='evade'?'%':''):''):s;}
+function abName(s){var p=s.split(':'),A=ABS[p[0]];return A?A.i+' '+A.n+(p[1]?' '+(['explode','kiup','spcheap'].indexOf(p[0])>=0?(p[0]==='explode'?fmt(+p[1]):p[1]):p[1]+'%'):''):s;}
 function abDesc(s){var p=s.split(':'),A=ABS[p[0]];return A?A.d(p[1]):'';}
 function fxText(k,v){
+  if(typeof v==='number')v=fmt(v);
   return {dmg:'Inflige '+v+' dégâts au personnage adverse (ou à ses PV s’il n’en a pas). Ignore la DEF.',
-    kill:'Met K.O. le personnage adverse s’il a '+v+' PV ou moins. Sinon, inflige 4 dégâts.',
+    kill:'Met K.O. le personnage adverse s’il a '+v+' PV ou moins. Sinon, inflige 1 600 dégâts.',
     heal:'Soigne '+v+' PV à ton personnage.',full:'Soigne entièrement ton personnage.',atk:'+'+v+' ATK à ton personnage.',def:'+'+v+' DEF à ton personnage.',
     hurt:'Ton personnage perd '+v+' PV (il ne peut pas tomber en dessous de 1).',kaioken:'Double l’ATK et la DEF de ton personnage ce tour… mais elles sont divisées par 2 au tour suivant.',
     stun:'Étourdit l’adversaire : il ne pourra pas attaquer à son prochain tour.',draw:'Pioche '+v+' carte'+(v>1?'s':'')+'.',ki:'+'+v+' Ki ce tour.',
@@ -1857,18 +2038,20 @@ function needsActive(c){if(c.t==='q')return true;if(c.t!=='o')return false;retur
 function openModal(html){var m=$('modal');m.innerHTML='<div class="mbox"><button class="mclose" onclick="closeModal()">✕</button>'+html+'</div>';m.classList.remove('hidden');}
 function closeModal(){var m=$('modal');m.classList.add('hidden');m.innerHTML='';}
 function kindText(k,v){
+  if(typeof v==='number')v=fmt(v);
   return {dmg:'Inflige '+v+' dégâts à un ennemi (ignore la DEF).',drain:'Inflige '+v+' dégâts à un ennemi et récupère la moitié en PV.',
-    stun:'Inflige '+v+' dégâts à un ennemi et l’étourdit (il passe son prochain tour).',kill:'Élimine un ennemi ayant '+v+' PV ou moins (sinon 6 dégâts).',
+    stun:'Inflige '+v+' dégâts à un ennemi et l’étourdit (il passe son prochain tour).',kill:'Élimine un ennemi ayant '+v+' PV ou moins (sinon 2 400 dégâts).',
     kamikaze:'Inflige '+v+' dégâts à un ennemi… puis tombe K.O.',aoe:'Inflige '+v+' dégâts à tous les ennemis.',stunall:'Inflige '+v+' dégâts à tous les ennemis et les étourdit.',
     multi:'3 frappes sur des ennemis au hasard, '+v+' dégâts au total.',heal:'Soigne '+v+' PV à un allié.',healall:'Soigne '+v+' PV à toute l’équipe.',
     buff:'+'+v+' ATK à toute l’équipe (permanent).',buffself:'+'+v+' ATK et +'+v+' DEF à lui-même.',guard:'Provocation jusqu’à ton prochain tour et +'+v+' DEF.',
     summon:'Invoque jusqu’à 2 « '+(CARDS[v]?CARDS[v].n:v)+' » dans les emplacements libres.',draw:'Pioche '+v+' carte(s).',gauge:'+'+v+'% de jauge d’Ultime à toute l’équipe.',
-    ginyu:'+'+v+' ATK et +10 PV à toute l’équipe.'}[k]||'';
+    ginyu:'+'+v+' ATK et +4 000 PV à toute l’équipe.'}[k]||'';
 }
 function kindShort(k,v){
+  if(typeof v==='number')v=fmt(v);
   return {dmg:v+' dégâts',drain:v+' dégâts + vol de vie',stun:v+' dégâts + étourdit',kill:'K.O. si ≤ '+v+' PV',kamikaze:v+' dégâts puis K.O.',aoe:v+' à tous',
     stunall:v+' à tous + étourdit',multi:v+' en 3 coups',heal:'+'+v+' PV (allié)',healall:'+'+v+' PV (équipe)',buff:'+'+v+' ATK (équipe)',buffself:'+'+v+' ATK/DEF',
-    guard:'Provocation +'+v+' DEF',summon:'Invoque '+(CARDS[v]?CARDS[v].n:v),draw:'Pioche '+v,gauge:'+'+v+'% jauge',ginyu:'+'+v+' ATK & +10 PV (équipe)'}[k]||'';
+    guard:'Provocation +'+v+' DEF',summon:'Invoque '+(CARDS[v]?CARDS[v].n:v),draw:'Pioche '+v,gauge:'+'+v+'% jauge',ginyu:'+'+v+' ATK & +4 000 PV (équipe)'}[k]||'';
 }
 function famOf(id){var c=CARDS[id];return c.fam||id;}
 function synOfCard(id){var c=CARDS[id],f=famOf(id);return SYN.filter(function(S){return S.race?S.race===c.r:S.m.indexOf(f)>=0;});}
@@ -1881,26 +2064,27 @@ function showDetails(id){
     '<span class="chip">'+TYPEN[c.t]+'</span>'+(c.era?'<span class="chip">'+ERAS[c.era].n+'</span>':'')+
     (c.t==='p'?'<span class="chip">🔶 Puissance : '+c.c+'</span>':(c.c!==undefined?'<span class="chip">⚡ Coût : '+c.c+' Ki</span>':''))+'</div>';
   if(c.t==='p'||c.t==='t'){
-    if(c.t==='p')h+='<div class="abl"><b>Stats en combat</b><br>ATK '+c.a+' · DEF '+c.d+' · PV '+Math.round(c.h*HPX)+'</div>';
+    if(c.t==='p')h+='<div class="abl"><b>Stats en combat</b><br>ATK '+fmt(c.a)+' · DEF '+fmt(c.d)+' · PV '+fmt(c.h)+'</div>';
+    if(c.t==='p'&&LD[id])h+='<div class="abl"><b>👑 Leader : '+LD[id][0]+'</b><br>'+ldText(id)+'<br><span class="hint">Actif s’il est placé en 1er dans l’équipe.</span></div>';
     var sp=SP[id],ul=UL[id];
-    if(c.t==='p'){sp=sp||['Vague d’énergie','dmg',c.a+3,2];ul=ul||['Assaut final','dmg',c.a*2+8];}
+    if(c.t==='p'){sp=sp||defSP(c);ul=ul||defUL(c);}
     if(sp)h+='<div class="abl"><b>🔵 Spécial : '+sp[0]+'</b> ('+sp[3]+' Ki)<br>'+kindText(sp[1],sp[2])+'</div>';
     if(ul)h+='<div class="abl"><b>🟡 Ultime : '+ul[0]+'</b> (jauge pleine)<br>'+kindText(ul[1],ul[2])+'</div>';
   }
   if(c.t==='p'){
-    if(R.p)h+='<div class="abl"><b>'+R.i+' Race '+R.n+'</b><br>'+R.p+'</div>';
-    if(c.f)h+='<div class="abl"><b>'+FACTION[c.f].i+' '+FACTION[c.f].n+'</b><br>'+FACTION[c.f].p+'</div>';
-    (c.ab||[]).forEach(function(s){h+='<div class="abl"><b>'+abName(s)+'</b><br>'+abDesc(s)+'</div>';});
+    if(c.ab&&c.ab.length)h+='<div class="abl"><b>✦ Passif : '+(c.pn||'Talent')+'</b><br>'+c.ab.map(function(s){return '<b>'+abName(s)+'</b> — '+abDesc(s);}).join('<br>')+'</div>';
     synOfCard(id).forEach(function(S){h+='<div class="abl"><b>'+S.i+' Synergie : '+S.n+'</b><br>'+S.t.map(function(t){return t[0]+' membres : '+t[3];}).join('<br>')+'</div>';});
     teamAtkOfCard(id).forEach(function(T){h+='<div class="abl"><b>🟣 Attaque d’équipe : '+T.n+'</b> ('+T.c+' Ki)<br>Avec '+T.m.map(famName).join(', ')+' : '+kindText(T.k,T.v)+'</div>';});
   } else if(c.t==='t'){
     var req=c.fus?'Fusion : '+famName(c.fus[0])+' et '+famName(c.fus[1])+' doivent être tous les deux sur le terrain. Ils fusionnent et additionnent leurs PV.':
       (c.rr?'Se joue sur n’importe quel '+RACES[c.rr].n+' de ton équipe.':'Se joue sur '+famName(c.rq)+' (n’importe quelle forme).');
-    h+='<div class="abl"><b>Condition</b><br>'+req+(c.fus?'':' Niveau de puissance '+c.lv+' : le personnage doit être à un niveau inférieur.')+' La transformation utilise l’action du combattant ce tour-ci.</div>';
-    h+='<div class="abl"><b>Bonus</b><br>+'+c.a+' ATK et +'+c.d+' DEF (permanents).'+(c.mui?' Maîtrise : 50% de chances, sinon seulement +1/+1.':'')+'</div>';
-    (c.ab||[]).forEach(function(s){h+='<div class="abl"><b>Gagne '+abName(s)+'</b><br>'+abDesc(s)+'</div>';});
+    h+='<div class="abl"><b>Condition</b><br>'+req+(c.fus?'':' Niveau de puissance '+c.lv+' : le personnage doit être à un niveau inférieur. Sauter des niveaux coûte +2 Ki par niveau sauté.')+' La transformation utilise l’action du combattant ce tour-ci.</div>';
+    h+='<div class="abl"><b>Bonus</b><br>+'+fmt(c.a)+' ATK et +'+fmt(c.d)+' DEF (permanents).'+(c.mui?' Maîtrise : 50% de chances, sinon seulement +400/+400 et pas de passif.':'')+'</div>';
+    if(c.ab&&c.ab.length)h+='<div class="abl"><b>✦ Passif ajouté : '+(c.pn||'Talent')+'</b><br>'+c.ab.map(function(s){return '<b>'+abName(s)+'</b> — '+abDesc(s);}).join('<br>')+'</div>';
+    if(!c.rr&&RIDX[c.rar]>=4)h+='<div class="abl"><b>👑 Leader</b><br>Si le leader prend cette forme, son bonus de leader passe à +'+LDPCT[c.rar]+'%.</div>';
   } else if(c.t==='b'){
-    h+='<div class="abl"><b>Effet</b><br>Pioche 1 carte.</div><div class="abl"><b>⭐ Shenron</b><br>Joue 7 Boules de Cristal (n’importe lesquelles) dans un même combat pour invoquer Shenron : toute ton équipe est soignée et le premier combattant tombé revient avec 50% de ses PV.</div>';
+    var BB=BALLS[c.bp];
+    h+='<div class="abl"><b>Effet</b><br>Pioche 1 carte.</div>'+(BB?'<div class="abl"><b>🐉 '+BB[0]+' — '+BB[1]+'</b><br>'+BB[2]+'</div>':'')+'<div class="abl"><b>⭐ Shenron</b><br>Joue 7 Boules de Cristal (n’importe lesquelles) dans un même combat pour invoquer Shenron : toute ton équipe est soignée et le premier combattant tombé revient avec 50% de ses PV.</div>';
   } else {
     var tw=cardTarget(c);
     h+='<div class="abl"><b>Effet</b><br>'+c.fx.map(function(f){return fxText(f[0],f[1]);}).join('<br>')+'</div>';
@@ -2200,7 +2384,7 @@ var TIPS={
  b_start:{t:'Combat en équipe ! Chaque camp aligne jusqu’à 5 combattants. Tu gagnes quand toute l’équipe adverse (et ses renforts) est K.O. Ton Ki ⚡ sert à payer les Spéciaux, les attaques d’équipe et les cartes de soutien.',f:'hud_me'},
  b_select:{t:'Clique sur un de tes combattants pour choisir son action. Chacun agit une fois par tour (les combattants prêts sont entourés de blanc).',f:'row_me'},
  b_actions:{t:'Attaque : gratuite, dégâts = ATK − DEF, charge la jauge jaune. Spécial : coûte du Ki. Ultime : quand la jauge jaune est pleine. Équipe : attaque combinée quand les bons membres sont réunis !',f:'actbar'},
- b_combo:{t:'COMBO ! Plusieurs attaques de base sur la même cible dans le même tour font +1 dégât à chaque coup supplémentaire. Concentrez vos coups !'},
+ b_combo:{t:'COMBO ! Plusieurs attaques de base sur la même cible dans le même tour font +400 dégâts à chaque coup supplémentaire. Concentrez vos coups !'},
  b_hand:{t:'En bas, tes cartes de soutien : techniques, objets, transformations, boules. Clique pour jouer, puis choisis la cible si besoin. « i » ou clic droit pour les détails.',f:'p_hand'},
  b_gauge:{t:'Une jauge d’Ultime est pleine ! Sélectionne ce combattant pour déclencher son attaque ultime.'},
  b_team:{t:'Une attaque d’équipe est disponible ! Elle utilise l’action de tous les membres concernés, mais elle est dévastatrice.'},
@@ -2213,7 +2397,7 @@ var TIPS={
  b_end:{t:'Tous tes combattants ont agi. Clique sur « Fin du tour » : l’adversaire joue alors à son tour.',f:'btn_end'},
  b_enemy:{t:'C’est le tour de l’adversaire : il pioche, gagne du Ki, joue ses cartes, puis chacun de ses combattants agit.'},
  b_draw:{t:'Au début de chaque tour, tu pioches 1 carte de soutien et ton Ki maximum augmente de 1 (jusqu’à 10).',f:'p_pile'},
- b_passive:{t:'Les passifs se déclenchent au début de ton tour selon la race et le camp de chaque combattant (Zenkai, Régénération, Cœur pur…).'},
+ b_passive:{t:'Chaque personnage a son propre passif (Zenkai, Régénération, Rage, Soigneur…) et le 1er de ton équipe est ton leader 👑. Touche « i » pour les lire.'},
  b_ability:{t:'Attention aux capacités spéciales ! Certains combattants explosent en tombant, esquivent, ressuscitent… Lis les cartes adverses.'},
  b_ko:{t:'Un combattant est K.O. ! Son emplacement est libre : certaines capacités peuvent y invoquer des renforts.'},
  b_summon:{t:'Invocation ! Certains personnages appellent des renforts dans les emplacements libres. Élimine l’invocateur en priorité !'},
@@ -2350,7 +2534,8 @@ function rollRarity(minIdx){
 function pullCard(era,minIdx){
   var r=rollRarity(minIdx),i=RIDX[r];
   while(i>=0&&!POOLS[era][RKEYS[i]].length)i--;
-  if(i<0)return POOLS[era].c[0];
+  /* Aucune carte de cette rareté ou en dessous dans ce booster : on prend la rareté supérieure la plus proche */
+  if(i<0){i=RIDX[r];while(i<RKEYS.length&&!POOLS[era][RKEYS[i]].length)i++;}
   var pool=POOLS[era][RKEYS[i]];return pool[Math.floor(Math.random()*pool.length)];
 }
 function packInner(era){
@@ -2625,11 +2810,11 @@ function starChests(){
 }
 
 /* --- Éveil des personnages (doublons) --- */
-var AW=[[0,0,0,0],[3,0,0,0],[3,1,0,0],[6,1,0,0],[6,1,1,0],[9,2,1,30]];
+var AW=[[0,0,0,0],[1200,0,0,0],[1200,400,0,0],[2400,400,0,0],[2400,400,400,0],[3600,800,400,30]];
 function awakeOf(id){var c=CARDS[id];if(!c||c.t!=='p')return 0;return Math.max(0,Math.min(5,(col[id]||0)-1));}
-function awakeTxt(st){var w=AW[st];return st?'★'+st+' : +'+w[0]+' PV'+(w[1]?', +'+w[1]+' ATK':'')+(w[2]?', +'+w[2]+' DEF':'')+(w[3]?', jauge d’Ultime à '+w[3]+'%':''):'Pas encore éveillé';}
+function awakeTxt(st){var w=AW[st];return st?'★'+st+' : +'+fmt(w[0])+' PV'+(w[1]?', +'+fmt(w[1])+' ATK':'')+(w[2]?', +'+fmt(w[2])+' DEF':'')+(w[3]?', jauge d’Ultime à '+w[3]+'%':''):'Pas encore éveillé';}
 function recalcTot(s){s.maxTot=0;s.units.forEach(function(u){if(u)s.maxTot+=u.maxHp;});s.reserve.forEach(function(r){s.maxTot+=Math.round(CARDS[r.id].h*HPX);});}
-function applyAwaken(s){s.units.forEach(function(u){if(!u)return;var w=AW[awakeOf(u.baseId)];u.hp+=w[0];u.maxHp+=w[0];u.atk+=w[1];u.def+=w[2];u.gauge=Math.max(u.gauge,w[3]);});recalcTot(s);}
+function applyAwaken(s){s.units.forEach(function(u){if(!u)return;var w=AW[awakeOf(u.baseId)];u.hp+=w[0];u.maxHp+=w[0];u.nH+=w[0];u.atk+=w[1];u.nA+=w[1];u.def+=w[2];u.nD+=w[2];u.gauge=Math.max(u.gauge,w[3]);});recalcTot(s);}
 
 /* --- Recyclage des doublons en trop --- */
 var RECY={c:5,u:10,r:25,e:60,l:150,m:400,x:0};
@@ -2672,10 +2857,10 @@ function towerLevel(n){
   var deck=[];for(var k=0;k<16;k++)deck.push(dpool[Math.floor(r()*dpool.length)]);
   var lead=specs[0].split('>'),bn=CARDS[lead[1]||lead[0]].n;
   return {tower:true,id:'tower',floor:n,name:boss?bn:'Étage '+n,boss:lead[1]||lead[0],team:specs.join(','),deck:deck.join(','),bx:boss?1.3+Math.min(1.2,n/50):1,
-    theme:theme,scale:{h:1+Math.max(0,n-6)*.035,a:Math.floor(n/12),d:Math.floor(n/20)},
+    theme:theme,scale:{h:1+Math.max(0,n-6)*.035,a:Math.floor(n/12)*400,d:Math.floor(n/20)*400},
     quote:boss?'Tu es arrivé jusqu’ici ? Voyons si tu mérites l’étage suivant !':'Personne ne monte plus haut sans me vaincre !'};
 }
-function applyScale(s,sc){s.units.forEach(function(u){if(!u)return;u.maxHp=Math.round(u.maxHp*sc.h);u.hp=u.maxHp;u.atk+=sc.a;u.def+=sc.d;});recalcTot(s);}
+function applyScale(s,sc){s.units.forEach(function(u){if(!u)return;u.maxHp=Math.round(u.maxHp*sc.h);u.nH=Math.round(u.nH*sc.h);u.hp=u.maxHp;u.atk+=sc.a;u.nA+=sc.a;u.def+=sc.d;u.nD+=sc.d;});recalcTot(s);}
 function renderTower(){
   var n=meta.tower.floor,L=towerLevel(n),R=towerRew(n),team=parseTeam(L.team);
   var h='<div class="panel"><div class="tower-hero"><div class="tower-floor"><small>ÉTAGE</small>'+n+'</div><div style="flex:1;min-width:200px">'+
@@ -2861,12 +3046,46 @@ function cardTarget(c){
 }
 function makeUnit(sp,bx,token){
   var c=CARDS[sp.id],h=Math.round(c.h*HPX*(bx||1));
-  var u={id:sp.id,baseId:sp.id,fam:c.fam||sp.id,race:c.r,f:c.f,lv:0,atk:c.a,def:c.d,hp:h,maxHp:h,gauge:0,acted:false,abs:(c.ab||[]).slice(),
+  var u={id:sp.id,baseId:sp.id,fam:c.fam||sp.id,race:c.r,f:c.f,lv:0,atk:c.a,def:c.d,hp:h,maxHp:h,gauge:0,acted:false,abs:[],
+    nA:c.a,nD:c.d,nH:h,ldA:0,ldD:0,ldH:0,evB:0,
     stun:false,stunNow:false,taunt:0,gdef:0,spDisc:0,stunImm:false,token:!!token,uid:++UID,attackedLast:true,hurt:false};
+  addPassive(u,c.ab);
   if(sp.tf)applyTf(u,sp.tf);
   return u;
 }
-function applyTf(u,tid){var c=CARDS[tid];u.atk+=c.a;u.def+=c.d;u.id=tid;u.lv=c.lv;(c.ab||[]).forEach(function(s){if(u.abs.indexOf(s)<0)u.abs.push(s);});}
+/* Ajoute des capacités de passif ; les bonus en % s'appliquent tout de suite sur les stats nominales */
+function addPassive(u,abs){
+  (abs||[]).forEach(function(s){
+    var p=s.split(':'),v=parseInt(p[1],10)||0;
+    if(p[0]==='atkp')u.atk+=Math.round(u.nA*v/100);
+    else if(p[0]==='defp')u.def+=Math.round(u.nD*v/100);
+    else if(p[0]==='hpp'){var g=Math.round(u.nH*v/100);u.maxHp+=g;u.hp+=g;}
+    if(u.abs.indexOf(s)<0)u.abs.push(s);
+  });
+}
+function applyTf(u,tid){var c=CARDS[tid];u.atk+=c.a;u.def+=c.d;u.nA+=c.a;u.nD+=c.d;u.id=tid;u.lv=c.lv;addPassive(u,c.ab);}
+/* Leader : le combattant du 1er emplacement donne ATK/DEF/PV +X% aux alliés qui remplissent sa condition */
+function leaderInfo(s){
+  if(s.ldUid==null&&s.units[0])s.ldUid=s.units[0].uid;
+  var u=s.units.filter(function(x){return x&&x.uid===s.ldUid;})[0];if(!u)return s.ld||null;
+  var d=LD[u.id]||LD[u.baseId];if(!d)return null;
+  var pct=Math.max(LDPCT[CARDS[u.baseId].rar]||0,LDPCT[CARDS[u.id].rar]||0);
+  return {n:d[0],cd:d[1],pct:pct,id:u.id};
+}
+function ldMatch(cd,u){
+  var p=cd.split(':'),k=p[0],v=p[1];
+  if(k==='r')return u.race===v;if(k==='f')return u.f===v;if(k==='e')return CARDS[u.baseId].era===v;
+  if(k==='s'){var S=SYN.filter(function(x){return x.id===v;})[0];return !!S&&synMember(u,S);}
+  return true;
+}
+function ldApplyUnit(s,u){
+  if(!u)return;
+  u.atk-=u.ldA;u.def-=u.ldD;u.maxHp-=u.ldH;u.hp=Math.max(1,u.hp-u.ldH);u.ldA=u.ldD=u.ldH=0;
+  var L=s.ld;if(!L||!ldMatch(L.cd,u))return;
+  u.ldA=Math.round(u.nA*L.pct/100);u.ldD=Math.round(u.nD*L.pct/100);u.ldH=Math.round(u.nH*L.pct/100);
+  u.atk+=u.ldA;u.def+=u.ldD;u.maxHp+=u.ldH;u.hp+=u.ldH;
+}
+function refreshLeader(s){var L=leaderInfo(s);if(L)s.ld=L;s.units.forEach(function(u){ldApplyUnit(s,u);});recalcTot(s);}
 function newSide(key,name,specs,deck,reserve,bx){
   var s={key:key,name:name,units:[null,null,null,null,null],deck:deck,hand:[],reserve:reserve.slice(),ki:0,kiMax:0,turn:0,boules:0,fallen:[],combo:null,
     synKi:0,synDraw:0,regen:0,blood:0,bloodSyn:null,syn:[],maxTot:0,_fresh:0};
@@ -2894,10 +3113,21 @@ function applySynergies(s){
     });
   });
 }
-function spOf(u){var d=SP[u.id]||SP[u.baseId];if(d)return d;var c=CARDS[u.baseId];return ['Vague d’énergie','dmg',c.a+3,2];}
-function ulOf(u){var d=UL[u.id]||UL[u.baseId];if(d)return d;var c=CARDS[u.baseId];return ['Assaut final','dmg',c.a*2+8];}
-function spCost(u,sp){return Math.max(1,sp[3]-(u.spDisc||0)-(u.race==='terrien'?1:0));}
-function gainG(u,n){if(u)u.gauge=Math.min(100,u.gauge+Math.round(n*(u.race==='android'?1.5:1)));}
+function defSP(c){return ['Vague d’énergie','dmg',Math.round(c.a*1.1/100)*100,2];}
+function defUL(c){return ['Assaut final','dmg',Math.round(c.a*2.4/100)*100];}
+function spOf(u){var d=SP[u.id]||SP[u.baseId];if(d)return d;return defSP(CARDS[u.baseId]);}
+function ulOf(u){var d=UL[u.id]||UL[u.baseId];if(d)return d;return defUL(CARDS[u.baseId]);}
+function spCost(u,sp){return Math.max(1,sp[3]-(u.spDisc||0)-abVal(u,'spcheap'));}
+function gainG(u,n){if(u)u.gauge=Math.min(100,u.gauge+Math.round(n*(1+abVal(u,'gaugeup')/100)));}
+/* Puissance des Spéciaux/Ultimes : suivent les bonus d'ATK (leader, passifs, objets…) par rapport à l'ATK nominale */
+function powR(u){return u&&u.nA?Math.max(.5,u.atk/u.nA):1;}
+var POWK=['dmg','drain','stun','kamikaze','aoe','stunall','multi'];
+function skillVal(u,kind,v){return POWK.indexOf(kind)>=0?Math.round(v*powR(u)/50)*50:v;}
+function pctOf(u,k,v){return Math.round((k==='a'?u.nA:(k==='d'?u.nD:u.maxHp))*v/100);}
+/* Dégâts d'une attaque de base (sans esquive ni critique) */
+function basicDmg(u,tg,n){return Math.max(Math.round(u.atk*.2),u.atk-(hasAb(u,'pierce')?0:tg.def))+((n||1)-1)*K;}
+/* Coût d'une transformation : +2 Ki par niveau sauté */
+function tfCost(u,c){if(!u||c.fus)return c.c;return c.c+2*Math.max(0,c.lv-(u.lv||0)-1);}
 function tensionBonus(){var t=P?P.turn:0;return t>=TENSION_T?t-TENSION_T+1:0;}
 function teamMembers(s,T){
   var out=[];
@@ -2920,11 +3150,19 @@ function startBattle(li,Lobj){
   E=newSide('foe',L.name,parseTeam(L.team),ed,parseTeam(L.reserve),L.bx||1);
   if(L.scale)applyScale(E,L.scale);
   applySynergies(P);applySynergies(E);
+  [P,E].forEach(function(s){
+    if(s===P)refreshLeader(s);
+    s.units.forEach(function(u){
+      if(!u)return;var aa=abVal(u,'allyatk'),ad=abVal(u,'allydef');
+      if(aa||ad)s.units.forEach(function(x){if(x){x.atk+=pctOf(x,'a',aa);x.def+=pctOf(x,'d',ad);}});
+    });
+  });
   P.hand=P.deck.splice(0,5);E.hand=E.deck.splice(0,5);P._fresh=5;
   gameOver=false;busy=true;slotCache={};SEL=null;TGT=null;LOG=[];
   $('foe_name').textContent=L.name;$('foe_av').innerHTML=bossPortrait(L);$('me_av').innerHTML=artSVG(pteam[0].id);
   show('screen-battle');$('battle_log').innerHTML='';
   logMsg('Le combat commence contre '+L.name+' !');
+  if(P.ld)logMsg('Ton leader 👑 '+CARDS[P.ld.id].n+' — '+P.ld.n+' : ATK, DEF et PV +'+P.ld.pct+'% pour '+ldCondTxt(P.ld.cd)+'.');
   [P,E].forEach(function(s){s.syn.forEach(function(a){logMsg((s===P?'Ta synergie':'Synergie adverse')+' : '+a.S.i+' '+a.S.n+' — '+a.tiers.map(function(t){return t[3];}).join(', '));});});
   [P,E].forEach(function(s){
     s.units.forEach(function(u){
@@ -2965,18 +3203,17 @@ async function startTurn(s){
     u.stunNow=u.stun;u.stun=false;u.acted=u.stunNow;
     if(u.stunNow)pp.push(['ÉTOURDI','down']);
     if(!first){
-      var g;
-      if(u.f==='g'&&u.hp<u.maxHp/2){g=healU(u,2);if(g)pp.push(['+'+g,'heal']);}
-      if(u.race==='sayen'&&u.hurt){u.atk++;pp.push(['+1 ATK','buff']);}
-      if(u.race==='namek'&&!u.attackedLast){g=healU(u,3);if(g)pp.push(['+'+g,'heal']);}
-      if(u.race==='dragon'){g=healU(u,2);if(g)pp.push(['+'+g,'heal']);}
-      if(hasAb(u,'rage')){u.atk++;pp.push(['+1 ATK','buff']);}
-      if(s.regen){g=healU(u,s.regen);if(g)pp.push(['+'+g,'heal']);}
+      var g,x;
+      if(hasAb(u,'zenkai')&&u.hurt){x=pctOf(u,'a',abVal(u,'zenkai'));u.atk+=x;pp.push(['+'+fmt(x)+' ATK','buff']);}
+      if(hasAb(u,'rage')){x=pctOf(u,'a',abVal(u,'rage')||8);u.atk+=x;pp.push(['+'+fmt(x)+' ATK','buff']);}
+      if(hasAb(u,'regen')){g=healU(u,pctOf(u,'h',abVal(u,'regen')));if(g)pp.push(['+'+fmt(g),'heal']);}
+      if(s.regen){g=healU(u,s.regen);if(g)pp.push(['+'+fmt(g),'heal']);}
     }
     u.hurt=false;u.attackedLast=false;
     if(pp.length)pops.push([i,pp]);
   });
-  if(!first)s.units.forEach(function(u){if(u&&hasAb(u,'healer')){var t=mostHurt(s);if(t){var g=healU(t,3);if(g)logMsg(nm(u)+' soigne '+nm(t)+' (+'+g+' PV).');}}});
+  if(!first)s.units.forEach(function(u){if(u&&hasAb(u,'healer')){var t=mostHurt(s);if(t){var g=healU(t,pctOf(t,'h',abVal(u,'healer')||10));if(g)logMsg(nm(u)+' soigne '+nm(t)+' (+'+fmt(g)+' PV).');}}});
+  var kb=0;s.units.forEach(function(u){if(u)kb+=abVal(u,'kiup');});if(kb){s.ki+=kb;if(s===P)logMsg('Énergie infinie : +'+kb+' Ki.');}
   if(!(s===P&&first))await drawCards(s,1+(first?0:s.synDraw));
   renderBattle();
   if(pops.length){
@@ -2998,12 +3235,13 @@ function tokenHTML(u,s){
   if(isTaunt(u))bd+='<span title="Provocation">🛡</span>';
   if(u.kaiokenPending)bd+='<span title="Kaïoken">🔥</span>';
   if(u.token)bd+='<span title="Invocation">✦</span>';
+  if(s&&s.ld&&s.ldUid===u.uid)bd+='<span title="Leader">👑</span>';
   return '<div class="ftk rar-'+c.rar+(u.acted&&s===P?' acted':'')+(u.gauge>=100?' ultready':'')+(u._new?' summon':'')+(u._tf?' tfin':'')+(u.kaiokenPending?' kaio':'')+'" style="--ra:'+R.a+';--rb:'+R.b+'">'+
     (bd?'<div class="ftk-bd">'+bd+'</div>':'')+
     '<div class="ftk-in"><div class="ftk-art">'+artSVG(u.id)+'</div><div class="ftk-name">'+c.n+'</div>'+
-    '<div class="ftk-hp"><i style="width:'+pct(u.hp,u.maxHp)+'"></i><span>'+Math.max(0,u.hp)+'/'+u.maxHp+'</span></div>'+
+    '<div class="ftk-hp"><i style="width:'+pct(u.hp,u.maxHp)+'"></i><span>'+fmt(Math.max(0,u.hp))+'</span></div>'+
     '<div class="ftk-g'+(u.gauge>=100?' full':'')+'"><i style="width:'+u.gauge+'%"></i></div>'+
-    '<div class="ftk-st"><b class="a'+(u.atk>b.a?' up':'')+'">'+IC.atk+u.atk+'</b><b class="d'+(u.def>b.d?' up':'')+'">'+IC.def+u.def+'</b></div></div>'+
+    '<div class="ftk-st"><b class="a'+(u.atk>u.nA?' up':'')+'">'+IC.atk+fmt(u.atk)+'</b><b class="d'+(u.def>u.nD?' up':'')+'">'+IC.def+fmt(u.def)+'</b></div></div>'+
     '<div class="tki" onclick="event.stopPropagation();showDetails(\''+u.id+'\')">i</div></div>';
 }
 function renderSlot(s,i){
@@ -3027,9 +3265,9 @@ function applySelClasses(){
 function renderBattle(){
   if(!P)return;
   var ph=teamHp(P),eh=teamHp(E);
-  $('p_life').textContent=ph[0]+' / '+ph[1];$('p_hpfill').style.width=pct(ph[0],ph[1]);
-  $('e_life').textContent=eh[0]+' / '+eh[1];$('e_hpfill').style.width=pct(eh[0],eh[1]);
-  $('p_turn').textContent=P.turn;var tb=tensionBonus();$('tension').textContent=tb?'TENSION +'+tb:'';
+  $('p_life').textContent=fmt(ph[0])+' / '+fmt(ph[1]);$('p_hpfill').style.width=pct(ph[0],ph[1]);
+  $('e_life').textContent=fmt(eh[0])+' / '+fmt(eh[1]);$('e_hpfill').style.width=pct(eh[0],eh[1]);
+  $('p_turn').textContent=P.turn;var tb=tensionBonus();$('tension').textContent=tb?'TENSION +'+fmt(tb*K):'';
   $('p_ki').innerHTML=kiHTML(P.ki,P.kiMax,P._kipop);P._kipop=false;
   $('p_boules').innerHTML=boulesHTML(P.boules,P._bpop);P._bpop=false;
   $('p_deckn').textContent=P.deck.length;
@@ -3063,9 +3301,9 @@ function unitActions(i){
   var can=!u.acted&&!busy&&!gameOver,why=u.stunNow?'Étourdi ce tour':(u.acted?'A déjà agi':'');
   var sp=spOf(u),cost=spCost(u,sp),ul=ulOf(u);
   var cb=P.combo&&P.combo.n?P.combo:null;
-  L.push({key:'atk',cls:'atk',lbl:'⚔ Attaque',sub:'ATK '+u.atk+' − DEF cible'+(hasAb(u,'pierce')?' (perforant)':'')+' · +25% jauge',ok:can,why:why});
-  L.push({key:'sp',cls:'sp',lbl:'🔵 '+sp[0],sub:kindShort(sp[1],sp[2]),cost:cost+' Ki',ok:can&&P.ki>=cost&&skillPossible(P,u,sp[1],sp[2]),why:why||(P.ki<cost?'Pas assez de Ki':'')});
-  L.push({key:'ul',cls:'ul',lbl:'🟡 ULTIME : '+ul[0],sub:kindShort(ul[1],ul[2]),cost:'Jauge '+u.gauge+'%',ok:can&&u.gauge>=100&&skillPossible(P,u,ul[1],ul[2]),why:why||(u.gauge<100?'Jauge pas encore pleine':'')});
+  L.push({key:'atk',cls:'atk',lbl:'⚔ Attaque',sub:'ATK '+fmt(u.atk)+' − DEF cible'+(hasAb(u,'pierce')?' (perforant)':'')+' · +25% jauge',ok:can,why:why});
+  L.push({key:'sp',cls:'sp',lbl:'🔵 '+sp[0],sub:kindShort(sp[1],skillVal(u,sp[1],sp[2])),cost:cost+' Ki',ok:can&&P.ki>=cost&&skillPossible(P,u,sp[1],sp[2]),why:why||(P.ki<cost?'Pas assez de Ki':'')});
+  L.push({key:'ul',cls:'ul',lbl:'🟡 ULTIME : '+ul[0],sub:kindShort(ul[1],skillVal(u,ul[1],ul[2])),cost:'Jauge '+u.gauge+'%',ok:can&&u.gauge>=100&&skillPossible(P,u,ul[1],ul[2]),why:why||(u.gauge<100?'Jauge pas encore pleine':'')});
   TEAMATK.forEach(function(T){
     if(T.m.indexOf(u.fam)<0)return;var mem=teamMembers(P,T);if(!mem)return;
     var free=mem.every(function(j){return !P.units[j].acted;});
@@ -3140,14 +3378,16 @@ function transformError(s,u,c){
 }
 function validCardTarget(s,c,who,j){
   var u=(who==='enemy'?opp(s):s).units[j];if(!u)return false;
-  if(c.t==='t')return !transformError(s,u,c);
+  if(c.t==='t')return !transformError(s,u,c)&&s.ki>=tfCost(u,c);
   if(c.fx&&c.fx.some(function(f){return f[0]==='kaioken';}))return !u.kaiokenPending;
   return true;
 }
 function cardError(s,id){
   var c=CARDS[id],tw=cardTarget(c);
   if(s.ki<(c.c||0))return 'Pas assez de Ki ⚡ (il en faut '+c.c+').';
-  if(tw){var side=tw==='enemy'?opp(s):s,ok=false;for(var j=0;j<TEAM_SIZE;j++)if(validCardTarget(s,c,tw,j))ok=true;if(!ok)return c.t==='t'?'Aucun combattant ne peut utiliser cette transformation maintenant.':'Aucune cible valide.';}
+  if(tw){var side=tw==='enemy'?opp(s):s,ok=false;for(var j=0;j<TEAM_SIZE;j++)if(validCardTarget(s,c,tw,j))ok=true;
+    if(!ok&&c.t==='t'){for(j=0;j<TEAM_SIZE;j++)if(s.units[j]&&!transformError(s,s.units[j],c))return 'Pas assez de Ki ⚡ : sauter une transformation coûte +2 Ki par niveau sauté (il en faut '+tfCost(s.units[j],c)+').';}
+    if(!ok)return c.t==='t'?'Aucun combattant ne peut utiliser cette transformation maintenant.':'Aucune cible valide.';}
   return null;
 }
 function playCard(hi){
@@ -3230,14 +3470,15 @@ function ringAt(s,i,col){var p=posOf(s,i);ring($('fx'),p.x,p.y,col,3);burst($('f
 function originEl(s){var a=alive(s);return a.length?slotEl(s,a[Math.floor(a.length/2)]):$(s===P?'row_me':'row_foe');}
 
 /* --- Résolution des dégâts --- */
-function mBonus(u,tg){return u&&tg&&u.f==='m'&&tg.hp<tg.maxHp?1:0;}
 async function dealDmg(o,t,dmg,s,si){
   var u=o.units[t];if(!u||gameOver)return 0;
-  var red=u.race==='alien'?1:(u.race==='dieu'?2:0);
-  dmg=Math.max(1,dmg-red)+tensionBonus();
-  u.hp-=dmg;u.hurt=true;gainG(u,Math.max(3,10-Math.floor(u.maxHp/30)));
-  if(o===E)track('dmg',dmg);
-  var p=posOf(o,t);floatText(p.x,p.y-20,'-'+dmg);renderBattle();
+  dmg=Math.max(1,Math.round(dmg*(1-Math.min(80,abVal(u,'dr'))/100)))+tensionBonus()*K;
+  u.hp-=dmg;u.hurt=true;gainG(u,Math.max(3,10-Math.floor(u.maxHp/12000)));
+  if(o===E)track('dmg',Math.ceil(dmg/K));
+  var p=posOf(o,t);floatText(p.x,p.y-20,'-'+fmt(dmg));
+  if(u.hp<=0&&hasAb(u,'survive')&&!u.survived){u.survived=true;u.hp=1;floatText(p.x,p.y-44,'TIENT BON !','buff small');logMsg(nm(u)+' tient bon avec 1 PV !');tip('b_ability');}
+  if(u.hp>0&&u.hp<u.maxHp/2&&hasAb(u,'fury')&&!u.furyOn){u.furyOn=true;var fa=pctOf(u,'a',abVal(u,'fury'));u.atk+=fa;floatText(p.x,p.y-44,'+'+fmt(fa)+' ATK','buff small');logMsg(nm(u)+' est dos au mur : +'+fmt(fa)+' ATK !');}
+  renderBattle();
   if(u.hp<=0)await koUnit(o,t,s,si);
   return dmg;
 }
@@ -3255,13 +3496,13 @@ async function koUnit(s,t,k,ki){
   if(s===E&&!u.token)track('ko');
   logMsg(nm(u)+' est K.O. !');await koFX(el);s.units[t]=null;if(!u.token)s.fallen.push(u);renderBattle();
   if(s===P)tip('b_ko');
-  if(s.blood&&s.bloodSyn&&synMember(u,s.bloodSyn)){var any=false;s.units.forEach(function(x){if(x&&synMember(x,s.bloodSyn)){x.atk+=s.blood;any=true;}});if(any)logMsg('Famille Son : la colère monte, +'+s.blood+' ATK !');}
-  if(k&&ki>=0&&k.units[ki]&&hasAb(k.units[ki],'absorb')){var a=k.units[ki];a.atk+=2;a.maxHp+=5;a.hp+=5;k.maxTot+=5;logMsg(nm(a)+' absorbe l’énergie : +2 ATK, +5 PV !');ringAt(k,ki,'#c084fc');tip('b_ability');}
-  if(s.reserve.length&&!gameOver){var nu=makeUnit(s.reserve.shift(),1);nu._new=true;s.units[t]=nu;logMsg('Renfort : '+nm(nu)+' entre en jeu !');sfxSummon();renderBattle();await wait(350);}
+  if(s.blood&&s.bloodSyn&&synMember(u,s.bloodSyn)){var any=false;s.units.forEach(function(x){if(x&&synMember(x,s.bloodSyn)){x.atk+=s.blood;any=true;}});if(any)logMsg('Famille Son : la colère monte, +'+fmt(s.blood)+' ATK !');}
+  if(k&&ki>=0&&k.units[ki]&&hasAb(k.units[ki],'absorb')){var a=k.units[ki],aa=pctOf(a,'a',15),ah=healU(a,pctOf(a,'h',15));a.atk+=aa;logMsg(nm(a)+' absorbe l’énergie : +'+fmt(aa)+' ATK, +'+fmt(ah)+' PV !');ringAt(k,ki,'#c084fc');tip('b_ability');}
+  if(s.reserve.length&&!gameOver){var nu=makeUnit(s.reserve.shift(),1);ldApplyUnit(s,nu);nu._new=true;s.units[t]=nu;logMsg('Renfort : '+nm(nu)+' entre en jeu !');sfxSummon();renderBattle();await wait(350);}
   var ex=abVal(u,'explode');
   if(ex&&!gameOver){
     var o=opp(s),tg=(k===o&&ki>=0&&o.units[ki])?ki:randAlive(o);
-    if(tg>=0){var p2=relC(el,$('arena'));logMsg(nm(u)+' explose ! ('+ex+' dégâts à '+nm(o.units[tg])+')');impact($('fx'),p2.x,p2.y,'#ff7a00');ring($('fx'),p2.x,p2.y,'#ffd23f',5);flashScreen('rgba(255,170,60,.5)');sfxBoom();tip('b_ability');await wait(300);await dealDmg(o,tg,ex,s,-1);}
+    if(tg>=0){var p2=relC(el,$('arena'));logMsg(nm(u)+' explose ! ('+fmt(ex)+' dégâts à '+nm(o.units[tg])+')');impact($('fx'),p2.x,p2.y,'#ff7a00');ring($('fx'),p2.x,p2.y,'#ffd23f',5);flashScreen('rgba(255,170,60,.5)');sfxBoom();tip('b_ability');await wait(300);await dealDmg(o,tg,ex,s,-1);}
   }
   checkEnd();
 }
@@ -3273,13 +3514,19 @@ async function actBasic(s,i,t){
   if(s.combo&&s.combo.uid===tg.uid)s.combo.n++;else s.combo={uid:tg.uid,n:1};
   var n=s.combo.n,hits=hasAb(u,'double')?2:1;
   for(var h=0;h<hits&&s.units[i]===u&&o.units[t]===tg&&!gameOver;h++){
-    var dmg=Math.max(1,u.atk-(hasAb(u,'pierce')?0:tg.def))+(n-1)+mBonus(u,tg);
-    var ev=abVal(tg,'evade');
+    var dmg=basicDmg(u,tg,n),crit=abVal(u,'crit');
+    var ev=Math.min(75,abVal(tg,'evade')+(tg.evB||0));
     if(ev&&Math.random()*100<ev){await lunge(s,i,o,t,true);var q=posOf(o,t);floatText(q.x,q.y-30,'ESQUIVE !','buff small');logMsg(nm(tg)+' esquive l’attaque de '+nm(u)+' !');tip('b_ability');continue;}
-    if(n>=2&&h===0){unitCut(s,u,'combo','COMBO ×'+n,'+'+(n-1)+' dégâts');if(s===P){tip('b_combo');if(n===3)track('combo3');}}
+    if(crit&&Math.random()*100<crit){dmg=Math.round(u.atk*1.5)+(n-1)*K;var qc=posOf(o,t);floatText(qc.x,qc.y-44,'CRITIQUE !','down small');}
+    if(n>=2&&h===0){unitCut(s,u,'combo','COMBO ×'+n,'+'+fmt((n-1)*K)+' dégâts');if(s===P){tip('b_combo');if(n===3)track('combo3');}}
     await lunge(s,i,o,t,false);
     var d=await dealDmg(o,t,dmg,s,i);
-    if(s.units[i]===u){var hh=0;if(hasAb(u,'drain'))hh+=Math.floor(d/2);if(u.race==='majin')hh+=2;if(hh){var g=healU(u,hh);if(g){var p=posOf(s,i);floatText(p.x,p.y-30,'+'+g,'heal small');}}}
+    if(s.units[i]===u&&hasAb(u,'drain')){var g=healU(u,Math.floor(d/2));if(g){var p=posOf(s,i);floatText(p.x,p.y-30,'+'+fmt(g),'heal small');}}
+    if(o.units[t]===tg&&!gameOver){
+      var sh=abVal(u,'stunhit');if(sh&&Math.random()*100<sh)stunUnit(o,t);
+      var ct=abVal(tg,'counter');
+      if(ct&&s.units[i]===u){var qt=posOf(o,t);floatText(qt.x,qt.y-44,'CONTRE !','buff small');logMsg(nm(tg)+' contre-attaque !');await lunge(o,t,s,i,false);await dealDmg(s,i,Math.round(tg.atk*ct/100),o,t);}
+    }
   }
   if(s.units[i]===u)gainG(u,25);
   logMsg(nm(u)+' attaque'+(n>=2?' (combo ×'+n+')':'')+'.');
@@ -3307,13 +3554,14 @@ async function actTeam(s,T,t){
   renderBattle();
 }
 async function runEffect(s,i,kind,v,t,lvl){
-  var u=s.units[i],o=opp(s),from=slotEl(s,i),cc=u?colsOf(u):{c1:'#ffd23f',c2:'#c2410c'},big=lvl!=='sp'||v>=10,j,k;
+  var u=s.units[i],o=opp(s),from=slotEl(s,i),cc=u?colsOf(u):{c1:'#ffd23f',c2:'#c2410c'},big=lvl!=='sp'||v>=10*K,j,k;
+  if(u)v=skillVal(u,kind,v);
   switch(kind){
-    case 'dmg':if(!o.units[t])break;await shotFX(from,slotEl(o,t),cc.c1,cc.c2,big);await dealDmg(o,t,v+mBonus(u,o.units[t]),s,i);break;
-    case 'drain':if(!o.units[t])break;await shotFX(from,slotEl(o,t),'#f87171','#7f1d1d',false);var dd=await dealDmg(o,t,v,s,i);if(s.units[i]){var g=healU(s.units[i],Math.ceil(dd/2));if(g){var p=posOf(s,i);floatText(p.x,p.y-30,'+'+g,'heal small');}}break;
+    case 'dmg':if(!o.units[t])break;await shotFX(from,slotEl(o,t),cc.c1,cc.c2,big);await dealDmg(o,t,v,s,i);break;
+    case 'drain':if(!o.units[t])break;await shotFX(from,slotEl(o,t),'#f87171','#7f1d1d',false);var dd=await dealDmg(o,t,v,s,i);if(s.units[i]){var g=healU(s.units[i],Math.ceil(dd/2));if(g){var p=posOf(s,i);floatText(p.x,p.y-30,'+'+fmt(g),'heal small');}}break;
     case 'stun':if(!o.units[t])break;await shotFX(from,slotEl(o,t),'#fde68a','#a16207',false);flashScreen('rgba(255,255,230,.6)');await dealDmg(o,t,v,s,i);if(o.units[t])stunUnit(o,t);break;
     case 'kill':if(!o.units[t])break;await shotFX(from,slotEl(o,t),'#c084fc','#4c1d95',false);
-      if(o.units[t].hp<=v){logMsg(nm(o.units[t])+' est effacé !');await koUnit(o,t,s,i);}else{logMsg(nm(o.units[t])+' résiste !');await dealDmg(o,t,6,s,i);}break;
+      if(o.units[t].hp<=v){logMsg(nm(o.units[t])+' est effacé !');await koUnit(o,t,s,i);}else{logMsg(nm(o.units[t])+' résiste !');await dealDmg(o,t,6*K,s,i);}break;
     case 'kamikaze':if(!o.units[t])break;await shotFX(from,slotEl(o,t),'#fb923c','#c2410c',false);await dealDmg(o,t,v,s,i);if(s.units[i]&&!gameOver){logMsg(nm(s.units[i])+' se sacrifie !');await koUnit(s,i,null,-1);}break;
     case 'aoe':case 'stunall':
       await aoeFX(from,o,cc.c1);
@@ -3324,14 +3572,14 @@ async function runEffect(s,i,kind,v,t,lvl){
       var per=Math.ceil(v/3);
       for(k=0;k<3&&!gameOver;k++){j=randAlive(o);if(j<0)break;await shotFX(s.units[i]?from:originEl(s),slotEl(o,j),cc.c1,cc.c2,false);await dealDmg(o,j,per,s,i);}
       break;
-    case 'heal':var tu=s.units[t]||mostHurt(s);if(tu){var ti=s.units.indexOf(tu),gh=healU(tu,v);ringAt(s,ti,'#4ade80');sfxHeal();var pp=posOf(s,ti);floatText(pp.x,pp.y-30,'+'+gh+' PV','heal');await wait(400);}break;
-    case 'healall':alive(s).forEach(function(x){var gx=healU(s.units[x],v);ringAt(s,x,'#4ade80');var px=posOf(s,x);floatText(px.x,px.y-30,'+'+gx,'heal small');});sfxHeal();await wait(500);break;
-    case 'buff':alive(s).forEach(function(x){s.units[x].atk+=v;ringAt(s,x,'#ff8a3d');var px=posOf(s,x);floatText(px.x,px.y-30,'+'+v+' ATK','buff small');});sfxPower();await wait(500);break;
-    case 'ginyu':alive(s).forEach(function(x){s.units[x].atk+=v;healU(s.units[x],10);ringAt(s,x,'#c084fc');var px=posOf(s,x);floatText(px.x,px.y-30,'+'+v+' ATK','buff small');});sfxPower();await wait(500);break;
-    case 'buffself':if(u){u.atk+=v;u.def+=v;ringAt(s,i,'#ffd23f');var pb=posOf(s,i);floatText(pb.x,pb.y-30,'+'+v+'/+'+v,'buff');sfxPower();await wait(450);}break;
+    case 'heal':var tu=s.units[t]||mostHurt(s);if(tu){var ti=s.units.indexOf(tu),gh=healU(tu,v);ringAt(s,ti,'#4ade80');sfxHeal();var pp=posOf(s,ti);floatText(pp.x,pp.y-30,'+'+fmt(gh)+' PV','heal');await wait(400);}break;
+    case 'healall':alive(s).forEach(function(x){var gx=healU(s.units[x],v);ringAt(s,x,'#4ade80');var px=posOf(s,x);floatText(px.x,px.y-30,'+'+fmt(gx),'heal small');});sfxHeal();await wait(500);break;
+    case 'buff':alive(s).forEach(function(x){s.units[x].atk+=v;ringAt(s,x,'#ff8a3d');var px=posOf(s,x);floatText(px.x,px.y-30,'+'+fmt(v)+' ATK','buff small');});sfxPower();await wait(500);break;
+    case 'ginyu':alive(s).forEach(function(x){s.units[x].atk+=v;healU(s.units[x],10*K);ringAt(s,x,'#c084fc');var px=posOf(s,x);floatText(px.x,px.y-30,'+'+fmt(v)+' ATK','buff small');});sfxPower();await wait(500);break;
+    case 'buffself':if(u){u.atk+=v;u.def+=v;ringAt(s,i,'#ffd23f');var pb=posOf(s,i);floatText(pb.x,pb.y-30,'+'+fmt(v)+'/+'+fmt(v),'buff');sfxPower();await wait(450);}break;
     case 'guard':if(u){u.taunt=1;u.gdef+=v;u.def+=v;ringAt(s,i,'#7cc4ff');var pg=posOf(s,i);floatText(pg.x,pg.y-30,'PROVOCATION','buff small');await wait(450);}break;
     case 'summon':
-      var cnt=0;for(j=0;j<TEAM_SIZE&&cnt<2;j++){if(!s.units[j]){var nu=makeUnit({id:v},1,true);nu._new=true;s.units[j]=nu;s.maxTot+=nu.maxHp;cnt++;renderBattle();ringAt(s,j,'#a3e36a');sfxSummon();await wait(250);}}
+      var cnt=0;for(j=0;j<TEAM_SIZE&&cnt<2;j++){if(!s.units[j]){var nu=makeUnit({id:v},1,true);ldApplyUnit(s,nu);nu._new=true;s.units[j]=nu;s.maxTot+=nu.maxHp;cnt++;renderBattle();ringAt(s,j,'#a3e36a');sfxSummon();await wait(250);}}
       logMsg(cnt+' '+CARDS[v].n+' invoqué'+(cnt>1?'s':'')+' !');tip('b_summon');break;
     case 'draw':await drawCards(s,v);break;
     case 'gauge':alive(s).forEach(function(x){gainG(s.units[x],v);});renderBattle();break;
@@ -3342,7 +3590,9 @@ async function runEffect(s,i,kind,v,t,lvl){
 /* --- Cartes de soutien --- */
 async function playSupport(s,hi,t){
   var id=s.hand[hi],c=CARDS[id];if(!id)return;
-  s.ki-=c.c||0;
+  var cost=c.t==='t'?tfCost(s.units[t],c):(c.c||0);
+  s.ki-=cost;
+  if(c.t==='t'&&cost>c.c)logMsg('Transformation sautée : +'+(cost-c.c)+' Ki ('+cost+' Ki au total).');
   if(s===P){
     var el=document.querySelectorAll('#p_hand .card')[hi],tw=cardTarget(c);
     s.hand.splice(hi,1);$('p_ki').innerHTML=kiHTML(P.ki,P.kiMax);sfxPlay();
@@ -3351,7 +3601,9 @@ async function playSupport(s,hi,t){
   if(c.t==='t')await transformUnit(s,t,id);
   else if(c.t==='b'){
     s.boules++;if(s===P)P._bpop=true;sfxCoin();logMsg('Boule de cristal ('+s.boules+'/7) : pioche 1 carte.');
-    await drawCards(s,1);if(s.boules===7)await shenron(s);
+    await drawCards(s,1);
+    if(c.bp)await ballEffect(s,c.bp);
+    if(s.boules===7)await shenron(s);
   } else {
     if(c.t==='q'){var cu=alive(s)[0];await cutin({kind:'special',side:sk(s),ids:[id],title:c.n,sub:'TECHNIQUE',c1:c.c1||'#ffd23f',c2:c.c2||'#c2410c'});}
     await applyCardFx(s,c,t);
@@ -3368,11 +3620,13 @@ async function transformUnit(s,t,id){
     if(j>=0){var pu=s.units[j];u.maxHp+=pu.maxHp;u.hp+=pu.hp;s.units[j]=null;logMsg(nm(u)+' fusionne avec '+nm(pu)+' !');tip('b_fusion');}
     u.fam='fusion';
   }
-  var ga=c.a,gd=c.d,title=c.n;
-  if(c.mui&&Math.random()>=.5){ga=1;gd=1;title='Pas encore maîtrisé…';logMsg('Ultra Instinct pas encore maîtrisé : effet minime.');}
-  u.atk+=ga;u.def+=gd;u.id=id;u.lv=c.lv;(c.ab||[]).forEach(function(x){if(u.abs.indexOf(x)<0)u.abs.push(x);});
-  u.acted=true;u._tf=true;logMsg(c.n+' ! (+'+ga+' ATK, +'+gd+' DEF)');renderBattle();
-  var p=posOf(s,t);floatText(p.x,p.y-30,'+'+ga+' ATK','buff');
+  var ga=c.a,gd=c.d,title=c.n,mui=c.mui&&Math.random()>=.5;
+  if(mui){ga=K;gd=K;title='Pas encore maîtrisé…';logMsg('Ultra Instinct pas encore maîtrisé : effet minime.');}
+  u.atk+=ga;u.def+=gd;u.nA+=ga;u.nD+=gd;u.id=id;u.lv=c.lv;if(!mui)addPassive(u,c.ab);
+  if(c.pn&&!mui)logMsg('Passif : '+c.pn+' !');
+  if(s===P)refreshLeader(s);
+  u.acted=true;u._tf=true;logMsg(c.n+' ! (+'+fmt(ga)+' ATK, +'+fmt(gd)+' DEF)');renderBattle();
+  var p=posOf(s,t);floatText(p.x,p.y-30,'+'+fmt(ga)+' ATK','buff');
   await unitCut(s,u,RIDX[c.rar]>=4?'ult':'special',title,c.fus?'FUSION':'TRANSFORMATION');
 }
 async function transformFX(slot,color){
@@ -3389,12 +3643,12 @@ async function applyCardFx(s,c,t){
   for(var n=0;n<c.fx.length&&!gameOver;n++){
     var k=c.fx[n][0],v=c.fx[n][1],a=s.units[t],p;
     if(k==='dmg'){if(!o.units[t])continue;await shotFX(originEl(s),slotEl(o,t),c1,c2,beam);await dealDmg(o,t,v,s,-1);}
-    else if(k==='kill'){if(!o.units[t])continue;await shotFX(originEl(s),slotEl(o,t),'#c084fc','#4c1d95',false);if(o.units[t].hp<=v){logMsg(c.n+' : '+nm(o.units[t])+' est éliminé !');await koUnit(o,t,s,-1);}else{logMsg(nm(o.units[t])+' résiste !');await dealDmg(o,t,4,s,-1);}}
+    else if(k==='kill'){if(!o.units[t])continue;await shotFX(originEl(s),slotEl(o,t),'#c084fc','#4c1d95',false);if(o.units[t].hp<=v){logMsg(c.n+' : '+nm(o.units[t])+' est éliminé !');await koUnit(o,t,s,-1);}else{logMsg(nm(o.units[t])+' résiste !');await dealDmg(o,t,4*K,s,-1);}}
     else if(k==='stun'){if(o.units[t]){flashScreen('rgba(255,255,230,.7)');stunUnit(o,t);await wait(300);}}
     else if(k==='aoe'){await aoeFX(originEl(s),o,c1);var ids=alive(o).map(function(x){return o.units[x].uid;});for(var q=0;q<ids.length&&!gameOver;q++){var jj=-1;o.units.forEach(function(x,y){if(x&&x.uid===ids[q])jj=y;});if(jj>=0)await dealDmg(o,jj,v,s,-1);}}
-    else if(k==='heal'||k==='full'){if(a){var g=healU(a,k==='full'?9999:v);ringAt(s,t,'#4ade80');sfxHeal();p=posOf(s,t);floatText(p.x,p.y-30,'+'+g+' PV','heal');await wait(400);}}
-    else if(k==='atk'||k==='def'){if(a){a[k]+=v;ringAt(s,t,k==='atk'?'#ff8a3d':'#7cc4ff');sfxPower();p=posOf(s,t);floatText(p.x,p.y-30,'+'+v+' '+k.toUpperCase(),'buff');renderBattle();await wait(380);}}
-    else if(k==='hurt'){if(a){a.hp=Math.max(1,a.hp-v);p=posOf(s,t);floatText(p.x,p.y-10,'-'+v,'small');renderBattle();await wait(300);}}
+    else if(k==='heal'||k==='full'){if(a){var g=healU(a,k==='full'?9999:v);ringAt(s,t,'#4ade80');sfxHeal();p=posOf(s,t);floatText(p.x,p.y-30,'+'+fmt(g)+' PV','heal');await wait(400);}}
+    else if(k==='atk'||k==='def'){if(a){a[k]+=v;ringAt(s,t,k==='atk'?'#ff8a3d':'#7cc4ff');sfxPower();p=posOf(s,t);floatText(p.x,p.y-30,'+'+fmt(v)+' '+k.toUpperCase(),'buff');renderBattle();await wait(380);}}
+    else if(k==='hurt'){if(a){a.hp=Math.max(1,a.hp-v);p=posOf(s,t);floatText(p.x,p.y-10,'-'+fmt(v),'small');renderBattle();await wait(300);}}
     else if(k==='kaioken'){if(a){sfxPower();flashScreen('rgba(255,40,40,.45)');ringAt(s,t,'#ff3030');a.kbA=a.atk;a.kbD=a.def;a.atk*=2;a.def*=2;a.kaiokenPending=true;logMsg('Kaïoken ! '+nm(a)+' double ses stats ce tour.');renderBattle();p=posOf(s,t);floatText(p.x,p.y-30,'×2','buff');await wait(450);}}
     else if(k==='boom'){if(a){logMsg(nm(a)+' se sacrifie dans une explosion !');var from=slotEl(s,t);await aoeFX(from,o,'#fde047');var ids2=alive(o).map(function(x){return o.units[x].uid;});await koUnit(s,t,null,-1);for(var r=0;r<ids2.length&&!gameOver;r++){var j2=-1;o.units.forEach(function(x,y){if(x&&x.uid===ids2[r])j2=y;});if(j2>=0)await dealDmg(o,j2,v,s,-1);}}}
     else if(k==='draw'){logMsg(c.n+' : pioche '+v+' carte'+(v>1?'s':'')+'.');await drawCards(s,v);}
@@ -3408,6 +3662,29 @@ async function shenron(s){
   var f=s.fallen.shift();
   if(f){for(var j=0;j<TEAM_SIZE;j++){if(!s.units[j]){f.hp=Math.ceil(f.maxHp/2);f.stun=false;f.stunNow=false;f.acted=true;f._new=true;s.units[j]=f;logMsg('Shenron ressuscite '+nm(f)+' !');break;}}}
   logMsg('🐉 Shenron soigne toute l’équipe de '+(s===P?'ton camp':s.name)+' !');renderBattle();
+}
+/* Passif d'une Boule de cristal (voir BALLS) */
+async function ballEffect(s,n){
+  var B=BALLS[n],o=opp(s),mine=alive(s),theirs=alive(o);if(!B)return;
+  logMsg('⭐ '+B[0]+' — '+B[1]+' : '+B[2]);
+  function pop(side,j,txt,cl){var q=posOf(side,j);floatText(q.x,q.y-30,txt,cl+' small');}
+  function hurtPct(side,j,pc){var u=side.units[j];if(!u)return;var d=Math.max(1,pctOf(u,'h',pc));u.hp=Math.max(1,u.hp-d);pop(side,j,'-'+fmt(d),'down');}
+  switch(n){
+    case 1:mine.forEach(function(j){var u=s.units[j],x=pctOf(u,'a',25);u.atk+=x;pop(s,j,'+'+fmt(x)+' ATK','buff');hurtPct(s,j,10);});flashScreen('rgba(120,0,40,.45)');break;
+    case 2:theirs.forEach(function(j){hurtPct(o,j,8);});mine.forEach(function(j){hurtPct(s,j,3);});flashScreen('rgba(120,160,60,.4)');break;
+    case 3:
+      var bj=-1;theirs.forEach(function(j){if(bj<0||o.units[j].atk>o.units[bj].atk)bj=j;});if(bj>=0)stunUnit(o,bj);
+      var wj=-1;mine.forEach(function(j){if(wj<0||s.units[j].hp<s.units[wj].hp)wj=j;});if(wj>=0)stunUnit(s,wj);
+      flashScreen('rgba(180,230,255,.5)');break;
+    case 4:mine.forEach(function(j){var u=s.units[j],g=healU(u,pctOf(u,'h',10)),x=pctOf(u,'d',15);u.def+=x;pop(s,j,'+'+fmt(g)+' PV','heal');});sfxHeal();flashScreen('rgba(255,170,60,.45)');break;
+    case 5:theirs.forEach(function(j){hurtPct(o,j,10);});mine.forEach(function(j){hurtPct(s,j,5);});s.ki+=1;sfxKi();flashScreen('rgba(255,255,160,.6)');shake($('arena'),10);break;
+    case 6:mine.forEach(function(j){s.units[j].evB=(s.units[j].evB||0)+15;pop(s,j,'+15% ESQUIVE','buff');});flashScreen('rgba(120,200,255,.4)');break;
+    case 7:
+      var fj=-1;theirs.forEach(function(j){if(fj<0||o.units[j].hp>o.units[fj].hp)fj=j;});var hu=mostHurt(s);
+      if(fj>=0){var st=Math.min(o.units[fj].hp-1,pctOf(o.units[fj],'h',10));o.units[fj].hp-=st;pop(o,fj,'-'+fmt(st),'down');if(hu){var gg=healU(hu,st);pop(s,s.units.indexOf(hu),'+'+fmt(gg),'heal');}}
+      flashScreen('rgba(140,100,40,.45)');break;
+  }
+  renderBattle();await wait(450);checkEnd();
 }
 
 async function koFX(slot){
@@ -3425,11 +3702,11 @@ async function endTurn(){
   tip('b_enemy');
   await enemyTurn();
 }
-function aiPickEnemy(s,dmg,basic){
+function aiPickEnemy(s,dmg,basic,att){
   var o=opp(s),idx=basic?basicTargets(s):alive(o),best=-1,bs=-1e9;
   idx.forEach(function(j){
-    var u=o.units[j],eff=Math.max(1,dmg-(basic?u.def:0)-(u.race==='alien'?1:(u.race==='dieu'?2:0)));
-    var sc=(u.hp<=eff?1000+u.atk*10:0)-u.hp*1.5+u.atk*4+(u.gauge>=80?20:0)+(hasAb(u,'healer')?15:0)+(SP[u.id]&&SP[u.id][1]==='summon'?25:0);
+    var u=o.units[j],eff=basic&&att?basicDmg(att,u,1):dmg;eff=Math.max(1,Math.round(eff*(1-Math.min(80,abVal(u,'dr'))/100)));
+    var sc=(u.hp<=eff?1000+u.atk/40:0)-u.hp/K*1.5+u.atk/K*4+(u.gauge>=80?20:0)+(hasAb(u,'healer')?15:0)+(SP[u.id]&&SP[u.id][1]==='summon'?25:0);
     if(sc>bs){bs=sc;best=j;}
   });
   return best;
@@ -3463,13 +3740,13 @@ function aiCard(){
     else if(c.t==='t'){var cand=[];for(var j=0;j<TEAM_SIZE;j++)if(validCardTarget(E,c,'ally',j))cand.push(j);if(cand.length){cand.sort(function(a,b){return E.units[b].atk-E.units[a].atk;});t=cand[0];sc=88+c.lv*2;}}
     else c.fx.forEach(function(f){
       var k=f[0],v=f[1];
-      if(k==='dmg'){var j2=aiPickEnemy(E,v,false);if(j2>=0){var s2=o.units[j2].hp<=v?92:40+v;if(s2>sc){sc=s2;t=j2;}}}
+      if(k==='dmg'){var j2=aiPickEnemy(E,v,false);if(j2>=0){var s2=o.units[j2].hp<=v?92:40+v/K;if(s2>sc){sc=s2;t=j2;}}}
       else if(k==='kill'){alive(o).forEach(function(j){if(o.units[j].hp<=v&&95>sc){sc=95;t=j;}});}
       else if(k==='stun'){var b=-1;alive(o).forEach(function(j){if(!o.units[j].stun&&(b<0||o.units[j].atk>o.units[b].atk))b=j;});if(b>=0&&55>sc){sc=55;t=b;}}
       else if(k==='aoe')sc=Math.max(sc,25+alive(o).length*10);
       else if(k==='heal'||k==='full'){var m=mostHurt(E);if(m&&m.hp<m.maxHp*.5&&70>sc){sc=70;t=E.units.indexOf(m);}}
       else if(k==='atk'||k==='def'||k==='kaioken'){var bb=-1;alive(E).forEach(function(j){var u=E.units[j];if(!u.acted&&!(k==='kaioken'&&u.kaiokenPending)&&(bb<0||u.atk>E.units[bb].atk))bb=j;});if(bb>=0&&45>sc){sc=45;t=bb;}}
-      else if(k==='hurt'){if(t>=0&&E.units[t]&&E.units[t].hp<=v+4)sc=0;}
+      else if(k==='hurt'){if(t>=0&&E.units[t]&&E.units[t].hp<=v+4*K)sc=0;}
       else if(k==='boom'){var lo=mostHurt(E);if(lo&&lo.hp<lo.maxHp*.35&&alive(o).length>=2&&60>sc){sc=60;t=E.units.indexOf(lo);}}
       else if(k==='draw')sc=Math.max(sc,E.hand.length<4?40:15);
       else if(k==='ki')sc=Math.max(sc,E.ki<4?45:0);
@@ -3484,7 +3761,7 @@ function aiUnit(i){
   if(u.gauge>=100){var ul=ulOf(u),t0=aiSkillTarget(E,u,ul[1],ul[2]);if(t0!==-2&&skillPossible(E,u,ul[1],ul[2]))return {k:'ul',t:t0};}
   var sp=spOf(u),cost=spCost(u,sp);
   if(E.ki>=cost&&skillPossible(E,u,sp[1],sp[2])){var val=aiSkillValue(E,u,sp[1],sp[2]);if(val>=50||(val>0&&Math.random()<.5)){var t1=aiSkillTarget(E,u,sp[1],sp[2]);if(t1!==-2)return {k:'sp',t:t1};}}
-  var t2=aiPickEnemy(E,u.atk,true);
+  var t2=aiPickEnemy(E,u.atk,true,u);
   return t2>=0?{k:'atk',t:t2}:null;
 }
 async function enemyTurn(){
