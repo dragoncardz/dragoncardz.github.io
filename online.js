@@ -31,14 +31,21 @@ var Online=(function(){
     try{r=await fetch(SUPA_URL+path,{method:opt.method||'GET',headers:h,body:opt.body!=null?JSON.stringify(opt.body):undefined,keepalive:!!opt.keepalive});}
     catch(e){throw new Error(frErr(String(e&&e.message||e)));}
     var txt=await r.text(),data=null;try{data=txt?JSON.parse(txt):null;}catch(e){data=txt;}
-    if(!r.ok){var m=(data&&(data.msg||data.message||data.error_description||data.error))||('Erreur '+r.status);throw new Error(frErr(m));}
+    if(!r.ok){var m=(data&&(data.msg||data.message||data.error_description||data.error))||('Erreur '+r.status);throw new Error(frErr(m,data&&data.error_code));}
     return data;
   }
-  function frErr(m){
-    var T={'Invalid login credentials':'Email ou mot de passe incorrect.','User already registered':'Un compte existe déjà avec cet email.',
-      'Email not confirmed':'Confirme d’abord ton email (regarde ta boîte de réception).','Password should be at least 6 characters':'Le mot de passe doit faire au moins 6 caractères.',
-      'Unable to validate email address: invalid format':'Adresse email invalide.'};
+  function frErr(m,code){
+    var C={invalid_credentials:'Email ou mot de passe incorrect.',user_already_exists:'Un compte existe déjà avec cet email.',email_exists:'Un compte existe déjà avec cet email.',
+      email_not_confirmed:'Confirme d’abord ton email (regarde ta boîte de réception et les spams).',weak_password:'Mot de passe trop faible : 8 caractères minimum.',
+      email_address_invalid:'Adresse email invalide.',validation_failed:'Écris ton email et ton mot de passe.',over_email_send_rate_limit:'Trop d’emails envoyés pour le moment : réessaie dans une heure.',
+      over_request_rate_limit:'Trop de tentatives : patiente quelques minutes.',signup_disabled:'Les inscriptions sont fermées pour le moment.'};
+    m=String(m||'').replace(/\.$/,'');
+    if(/invalid format|validate email/i.test(m))return C.email_address_invalid;
+    if(code&&C[code])return C[code];
+    var T={'Invalid login credentials':C.invalid_credentials,'User already registered':C.user_already_exists,'Email not confirmed':C.email_not_confirmed,
+      'missing email or phone':'Écris ton adresse email.','Unable to validate email address: invalid format':C.email_address_invalid,'email rate limit exceeded':C.over_email_send_rate_limit};
     if(T[m])return T[m];
+    if(/Password should be/i.test(m))return C.weak_password;
     if(/duplicate key.*pseudo/i.test(m)||/profiles_pseudo_unique/.test(m))return 'Ce pseudo est déjà pris.';
     if(/Failed to fetch|NetworkError/i.test(m))return 'Impossible de joindre le serveur. Vérifie ta connexion.';
     return m;
@@ -259,9 +266,12 @@ var Online=(function(){
   }
 
   /* ---------- Interface ---------- */
+  /* Lance une action réseau. L'écran n'est redessiné qu'après : le redessiner avant effacerait les champs du formulaire. */
   function act(fn){
     return async function(){
-      if(busyNet)return;busyNet=true;msg='';refreshUI();
+      if(busyNet)return;busyNet=true;msg='';
+      var st=$('o_status');if(st)st.textContent='Connexion au serveur…';
+      document.querySelectorAll('#online_box button').forEach(function(b){b.disabled=true;});
       try{await fn.apply(null,arguments);}catch(e){msg=e.message||String(e);}
       busyNet=false;refreshUI();
     };
@@ -277,7 +287,7 @@ var Online=(function(){
   function render(){
     var box=$('online_box');if(!box)return;
     if(!configured()){box.innerHTML='<div class="panel"><p style="font-weight:800">Le mode Online n’est pas encore configuré.</p><p class="hint">Il faut renseigner l’adresse et la clé publique du projet Supabase dans online.js (voir supabase/LISEZMOI.txt).</p></div>';return;}
-    var h=tabsHTML()+(msg?'<div class="panel" style="border-color:#f87171;color:#fecaca;font-weight:800">'+esc(msg)+'</div>':'')+(busyNet?'<p class="hint">Connexion au serveur…</p>':'');
+    var h=tabsHTML()+(msg?'<div class="panel" style="border-color:#f87171;color:#fecaca;font-weight:800">'+esc(msg)+'</div>':'')+'<p class="hint" id="o_status">'+(busyNet?'Connexion au serveur…':'')+'</p>';
     if(tab==='account')h+=accountHTML();
     else if(!me)h+=needLogin();
     else if(tab==='arena')h+=arenaHTML();
