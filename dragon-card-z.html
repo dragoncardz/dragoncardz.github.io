@@ -3155,7 +3155,8 @@ function renderInv(){
   $('inv_box').innerHTML=res+h;
 }
 async function redeemCode(){
-  var inp=$('gift_code'),code=(inp&&inp.value||'').toUpperCase().replace(/\s+/g,'');
+  // Garde seulement lettres, chiffres et tirets (un copier-coller peut ajouter des caractères invisibles ou des tirets longs)
+  var inp=$('gift_code'),code=(inp&&inp.value||'').toUpperCase().replace(/[‐-―−]/g,'-').replace(/[^A-Z0-9-]/g,'');
   if(code.length<4){sfxError();$('gift_msg').textContent='Écris ton code.';return;}
   $('gift_btn').disabled=true;$('gift_msg').textContent='Vérification…';
   try{var R=await Online.redeem(code);inp.value='';await grantGift(R,code);}
