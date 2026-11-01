@@ -9,7 +9,7 @@
 var SUPA_URL='https://tugraajxznhtyqwzkosb.supabase.co';
 var SUPA_KEY='sb_publishable_iEhjmAoVo3xE-qJUM81mKw_4EANtdiE';
 
-var ONLINE_V=5;
+var ONLINE_V=6;
 var Online=(function(){
   var SESS_KEY='dczo_session',SYNC_KEY='dczo_sync',OWNER_KEY='dczo_owner';
   var sess=null,me=null,rank=null,tab='account',lbTab='all',pushTimer=null,dirty=false,lastSync=null,busyNet=false,opps=null,friendsData=null,friendsLoading=false,searchRes=null,msg='';
@@ -101,7 +101,10 @@ var Online=(function(){
   /* Retour depuis un lien reçu par email (confirmation de compte ou mot de passe oublié) */
   function readHash(){
     if(/error_description=/.test(location.hash)){
-      var m=decodeURIComponent((location.hash.match(/error_description=([^&]*)/)||[])[1]||'').replace(/\+/g,' ');
+      var m=(location.hash.match(/error_description=([^&]*)/)||[])[1]||'';
+      for(var k=0;k<2;k++){try{m=decodeURIComponent(m.replace(/\+/g,' '));}catch(e){}}
+      if(/exchange external code/i.test(m))m='Le fournisseur a refusé la connexion (réglage Client ID / Client Secret à vérifier dans Supabase).';
+      else m=m.replace(/code:.*$/i,'').trim();
       history.replaceState(null,'',location.pathname+location.search);toast('Connexion impossible',m);return null;
     }
     if(!location.hash||location.hash.indexOf('access_token=')<0)return null;
