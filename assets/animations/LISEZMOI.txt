@@ -1,9 +1,32 @@
-ANIMATIONS D'INVOCATION (ouverture des boosters)
+OUVERTURE DES BOOSTERS : TRANSFORMATIONS DE GOKU
 ================================================
 
-Quand un booster est ouvert, le jeu regarde la meilleure carte obtenue
-et joue la vidéo de cette rareté, avant de révéler les 5 cartes.
-S'il n'y a pas de vidéo pour cette rareté, l'animation d'origine du jeu est jouée.
+Goku apparaît sous sa forme de base, puis se transforme selon les cartes du booster.
+Les effets (aura, éclairs, rochers, ondes de choc, flash, nom de la forme) et le son
+d'explosion de ki sont faits par le jeu : il suffit de fournir les images.
+
+  Meilleure carte du booster     Forme finale (Goku passe par toutes les formes d'avant)
+  Commune / Peu commune          Forme de base
+  Rare                           Super Saiyan
+  Épique                         Super Saiyan 2
+  Légendaire                     Super Saiyan 3
+  2 Légendaires (sans Mythique)  Fusion Super Saiyan
+  Mythique                       Super Saiyan 4
+  2 Mythiques                    Fusion Super Saiyan 4
+
+Noms des images (.webp, .png ou .jpg, idéalement 16/9, personnage au centre) :
+  Animation_de_base       Animation_ssj1        Animation_ssj2       Animation_ssj3
+  Animation_ssj4          Animation_fusion_ssj1 Animation_fusion_ssj4
+Une image manquante : l'image de la forme précédente est gardée (seuls l'aura et les effets changent).
+Sans Animation_de_base, le jeu joue les vidéos ci-dessous, ou son animation d'origine.
+
+Sons facultatifs (.mp3, .ogg ou .wav) pour remplacer ceux générés par le jeu :
+  sfx_charge     → pendant que Goku charge son ki (avant chaque transformation)
+  sfx_explosion  → au moment de la transformation
+
+ANCIENNES VIDÉOS D'INVOCATION (utilisées seulement sans Animation_de_base)
+=========================================================================
+Le jeu joue la vidéo de la rareté de la meilleure carte, avant de révéler les 5 cartes.
 Le joueur peut cliquer sur la vidéo pour la passer.
 
 Noms des fichiers (en .webm ou .mp4) :
