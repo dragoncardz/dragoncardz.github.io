@@ -832,6 +832,7 @@ body.calm .sk-flash.on{animation:none}
 .synmini{display:inline-flex;gap:3px;margin-left:6px;vertical-align:middle}
 .synmini span{font-size:12px;background:rgba(255,255,255,.12);border-radius:8px;padding:0 5px;cursor:help}
 .actbar{display:flex;flex-wrap:wrap;gap:8px;align-items:stretch;justify-content:center;min-height:62px;margin:4px 0 8px}
+.ab-tap{flex:0 0 100%;text-align:center;font-weight:800;font-size:.82em;color:#ffe9a8}
 .ab-hint,.ab-prompt{align-self:center;font-weight:800;color:var(--muted);text-align:center;padding:0 8px}
 .ab-prompt{color:#ffd23f;font-size:15px}
 .ltimer{align-self:center;font-family:var(--font-ui);font-size:15px;color:#7cc7ff;min-width:44px;text-align:center}
@@ -914,6 +915,7 @@ body.calm .sk-flash.on{animation:none}
 @media (max-width:560px){
   .abtn{min-width:120px;padding:6px 9px;flex:none}
   .actbar{flex-wrap:nowrap;overflow-x:auto;justify-content:flex-start;min-height:54px;padding-bottom:2px}
+  .ab-tap{display:none}
   .actbar>.ab-hint,.actbar>.ab-prompt{flex:1;font-size:12.5px}
   .teamrow .card{--w:92px}.tslot{width:92px;height:129px}
   .tbtns{gap:5px}
@@ -2666,7 +2668,7 @@ var TIPS={
  intro:{t:'Avant chaque combat, regarde l’équipe adverse : chaque boss a ses catégories, ses renforts et ses pièges. Lance le combat !',f:'btn_fight',go:1},
  b_start:{t:'Combat en équipe ! Tu gagnes quand toute l’équipe adverse est K.O. Ton Ki ⚡ (ici) paie les Spéciaux, les attaques d’équipe et les cartes de soutien.',f:'hud_me'},
  b_select:{t:'À toi ! Clique sur un de tes combattants pour choisir son action. Chacun agit une fois par tour.',f:'row_me',go:1},
- b_actions:{t:'Attaque : gratuite, charge la jauge jaune. Spécial : coûte du Ki. Ultime : quand la jauge est pleine. Choisis une action !',f:'actbar',go:1},
+ b_actions:{t:'Attaque : gratuite, charge la jauge jaune. Spécial : coûte du Ki. Ultime : quand la jauge est pleine. Astuce : touche directement un ennemi pour l’attaquer !',f:'actbar',go:1},
  b_combo:{t:'COMBO ! Plusieurs attaques de base sur la même cible dans le même tour font +400 dégâts par coup supplémentaire.',c:1},
  b_hand:{t:'Ici, tes cartes de soutien : objets, transformations, boules. Clique pour jouer, « i » ou clic droit pour les détails. 📜 à gauche du terrain = historique du combat.',f:'p_hand'},
  b_gauge:{t:'Une jauge d’Ultime est pleine ! Sélectionne ce combattant pour déclencher son attaque ultime.'},
@@ -4101,7 +4103,7 @@ function renderActbar(){
   if(TGT){bar.innerHTML='<div class="ab-prompt">🎯 '+TGT.prompt+'</div><button class="abtn cl" onclick="clearSel()"><b>Annuler</b></button>';return;}
   if(SEL&&P.units[SEL.i]&&!busy){
     var u=P.units[SEL.i];
-    bar.innerHTML=unitActions(SEL.i).map(function(a){
+    bar.innerHTML=(!u.acted?'<div class="ab-tap">👆 Touche un ennemi pour l’attaquer</div>':'')+unitActions(SEL.i).map(function(a){
       return '<button class="abtn '+a.cls+'" '+(a.ok?'':'disabled ')+'onclick="doAction(\''+a.key+'\')" title="'+(a.why||'')+'"><b>'+a.lbl+'</b><span>'+a.sub+'</span>'+(a.cost?'<em>'+a.cost+'</em>':'')+'</button>';
     }).join('')+'<button class="abtn cl" onclick="clearSel()"><b>Fermer</b><span>'+nm(u)+'</span></button>';
     return;
@@ -4120,7 +4122,16 @@ function clickSlot(side,i){
     return;
   }
   if(busy)return;
-  if(side==='foe'){if(u)showDetails(u.id);return;}
+  if(side==='foe'){
+    if(!u)return;
+    // Combattant sélectionné et prêt : toucher un ennemi lance l'attaque de base
+    var atk=SEL&&P.units[SEL.i]&&unitActions(SEL.i)[0];
+    if(atk&&atk.ok){
+      if(basicTargets(P).indexOf(i)<0){sfxError();nope(slotEl(E,i).firstElementChild);logMsg('Provocation : tu dois d’abord viser le combattant qui provoque.');tip('b_taunt');return;}
+      var ai=SEL.i;SEL=null;pMove({k:'atk',i:ai,t:i});return;
+    }
+    showDetails(u.id);return;
+  }
   if(!u)return;
   if(SEL&&SEL.i===i)SEL=null;else{SEL={i:i};sfxClick();tip('b_actions');}
   renderBattle();
