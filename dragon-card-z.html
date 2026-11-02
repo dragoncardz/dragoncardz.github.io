@@ -2826,6 +2826,8 @@ function playVideo(ov,name){
     function next(){if(started)return end(true);if(!exts.length){ANIM_KO[name]=1;return end(false);}v.src=ANIM_DIR+name+'.'+exts.shift();}
     v.className='po-video';v.playsInline=true;v.preload='auto';
     v.onerror=next;
+    // Sécurité : si la vidéo ne démarre pas, on n'attend pas indéfiniment
+    setTimeout(function(){if(!started){ANIM_KO[name]=1;end(false);}},4000);
     v.oncanplay=function(){if(started)return;started=true;var p=v.play();if(p&&p.catch)p.catch(function(){v.muted=true;v.play().catch(function(){end(true);});});};
     v.onended=function(){end(true);};
     v.onclick=function(){end(true);};
@@ -3159,23 +3161,32 @@ async function redeemCode(){
   var inp=$('gift_code'),code=(inp&&inp.value||'').toUpperCase().replace(/[‐-―−]/g,'-').replace(/[^A-Z0-9-]/g,'');
   if(code.length<4){sfxError();$('gift_msg').textContent='Écris ton code.';return;}
   $('gift_btn').disabled=true;$('gift_msg').textContent='Vérification…';
-  try{var R=await Online.redeem(code);inp.value='';await grantGift(R,await sha256hex(code));}
-  catch(e){sfxError();if($('gift_msg'))$('gift_msg').textContent=e.message;}
+  var h=await sha256hex(code);
+  try{var R=await Online.redeem(code);inp.value='';$('gift_msg').textContent='Code accepté !';await grantGift(R,h);}
+  catch(e){
+    // Code déjà utilisé : si la récompense manque dans la sauvegarde, on la redonne
+    if(e.code==='already_used'){
+      if(meta.codes[h]){sfxError();$('gift_msg').textContent='Tu as déjà reçu ce cadeau le '+new Date(meta.codes[h]).toLocaleDateString('fr-FR')+'.';}
+      else if(await syncGifts()){inp.value='';$('gift_msg').textContent='Récompense récupérée !';}
+      else {sfxError();$('gift_msg').textContent=e.message;}
+    }
+    else {sfxError();if($('gift_msg'))$('gift_msg').textContent=e.message||'Erreur inconnue';console.warn(e);}
+  }
   if($('gift_btn'))$('gift_btn').disabled=false;
 }
 async function sha256hex(s){var b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(s));return Array.from(new Uint8Array(b)).map(function(x){return x.toString(16).padStart(2,'0');}).join('');}
 /* Redonne les récompenses des codes utilisés par ce compte qui manquent dans la sauvegarde */
 var giftSyncing=false;
 async function syncGifts(){
-  if(giftSyncing||!window.Online||!Online.who())return;giftSyncing=true;
+  if(giftSyncing||!window.Online||!Online.who())return 0;giftSyncing=true;var n=0;
   try{
     // Anciennes entrées enregistrées avec le code en clair : converties en empreinte
     for(var k in meta.codes){if(/^DCZ/i.test(k)){var h=await sha256hex(k.toUpperCase());meta.codes[h]=meta.codes[k];delete meta.codes[k];}}
     saveMeta();
     var rows=await Online.myGifts();
-    for(var i=0;i<rows.length;i++){if(!meta.codes[rows[i].code_hash])await grantGift(rows[i].reward,rows[i].code_hash,true);}
+    for(var i=0;i<rows.length;i++){if(!meta.codes[rows[i].code_hash]){await grantGift(rows[i].reward,rows[i].code_hash,true);n++;}}
   }catch(e){console.warn(e);}
-  giftSyncing=false;
+  giftSyncing=false;return n;
 }
 /* Récompense d'un code : {z, tk, orbe, parch, cards:[ids], pack:'db'|'z'|'gt'|'s', msg} */
 async function grantGift(R,code,recovered){
@@ -4287,7 +4298,7 @@ function init(){
 init();
 </script>
 <!-- Augmenter le numéro à chaque modification de online.js, pour que les navigateurs ne gardent pas l'ancienne version en cache -->
-<script src="online.js?v=10"></script>
+<script src="online.js?v=11"></script>
 <script src="live.js?v=2"></script>
 </body>
 </html>

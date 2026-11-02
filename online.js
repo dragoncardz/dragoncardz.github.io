@@ -9,7 +9,7 @@
 var SUPA_URL='https://tugraajxznhtyqwzkosb.supabase.co';
 var SUPA_KEY='sb_publishable_iEhjmAoVo3xE-qJUM81mKw_4EANtdiE';
 
-var ONLINE_V=10;
+var ONLINE_V=11;
 var Online=(function(){
   var SESS_KEY='dczo_session',SYNC_KEY='dczo_sync',OWNER_KEY='dczo_owner';
   var sess=null,me=null,rank=null,tab='account',lbTab='all',pushTimer=null,dirty=false,lastSync=null,busyNet=false,opps=null,friendsData=null,friendsLoading=false,searchRes=null,msg='';
@@ -423,12 +423,12 @@ var Online=(function(){
       try{R=await req('/rest/v1/rpc/redeem_code',{method:'POST',body:{p_code:code}});}
       catch(e){
         m=e.message||'';
-        for(var k in C)if(m.indexOf(k)>=0)throw new Error(C[k]);
+        for(var k in C)if(m.indexOf(k)>=0){var er=new Error(C[k]);er.code=k;throw er;}
         if(/redeem_code|PGRST202|404/.test(m))throw new Error('Les codes cadeaux ne sont pas encore activés sur le serveur.');
         throw e;
       }
       // Refus renvoyé par le serveur : {error:'...'}
-      if(R&&R.error)throw new Error(C[R.error]||R.error);
+      if(R&&R.error){var err=new Error(C[R.error]||R.error);err.code=R.error;throw err;}
       return R;
     },
     myGifts:async function(){if(!me)return [];try{return await req('/rest/v1/rpc/my_gifts',{method:'POST',body:{}})||[];}catch(e){return [];}},
