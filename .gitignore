@@ -1,2 +1,8 @@
 # Codes cadeaux en clair : ne jamais publier
 codes-cadeaux-PRIVE/
+
+# Images d'origine (lourdes, droits a verifier) : ne pas publier
+images-originales/
+
+# Outils de test locaux : ne pas publier
+test-local/

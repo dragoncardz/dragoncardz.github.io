@@ -1,41 +1,8 @@
-OUVERTURE DES BOOSTERS : TRANSFORMATIONS DE GOKU
-================================================
-
-Goku apparaît sous sa forme de base, puis se transforme selon les cartes du booster.
-Les effets (aura, éclairs, rochers, ondes de choc, flash, nom de la forme) et le son
-d'explosion de ki sont faits par le jeu : il suffit de fournir les images.
-
-  Meilleure carte du booster     Forme finale (Goku passe par toutes les formes d'avant)
-  Commune / Peu commune          Forme de base
-  Rare                           Super Saiyan
-  Épique                         Super Saiyan 2
-  Légendaire                     Super Saiyan 3
-  2 Légendaires (sans Mythique)  Fusion Super Saiyan
-  Mythique                       Super Saiyan 4
-  2 Mythiques                    Fusion Super Saiyan 4
-
-Noms des images (.webp, .png ou .jpg, idéalement 16/9, personnage au centre) :
-  Animation_de_base       Animation_ssj1        Animation_ssj2       Animation_ssj3
-  Animation_ssj4          Animation_fusion_ssj1 Animation_fusion_ssj4
-Une image manquante : l'image de la forme précédente est gardée (seuls l'aura et les effets changent).
-Sans Animation_de_base, le jeu joue les vidéos ci-dessous, ou son animation d'origine.
-
-Sons facultatifs (.mp3, .ogg ou .wav) pour remplacer ceux générés par le jeu :
-  sfx_charge     → pendant que Goku charge son ki (avant chaque transformation)
-  sfx_explosion  → au moment de la transformation
-
-ANCIENNES VIDÉOS D'INVOCATION (utilisées seulement sans Animation_de_base)
-=========================================================================
-Le jeu joue la vidéo de la rareté de la meilleure carte, avant de révéler les 5 cartes.
-Le joueur peut cliquer sur la vidéo pour la passer.
-
-Noms des fichiers (en .webm ou .mp4) :
-  invocation_commun.webm
-  invocation_peu-commun.webm
-  invocation_rare.webm
-  invocation_epique.webm
-  invocation_legendaire.webm
-  invocation_mythique.webm
+OUVERTURE DES BOOSTERS
+======================
+Ciel étoilé en 3D, généré par le jeu : aucun fichier à fournir.
+En plein écran, Légendaire et Mythique affichent l'illustration de la carte (assets/cartes/) :
+prévoir pour ces cartes une image d'au moins 1500 px de large.
 
 AUTRES ANIMATIONS (même principe : jouées si le fichier existe, sinon rien)
   cadeau.webm         → quand un joueur valide un code cadeau, avant d'afficher ses récompenses
@@ -48,3 +15,18 @@ Conseils pour les animateurs :
   - Le son est permis (il est coupé automatiquement si le navigateur le refuse).
   - Une vidéo légère (moins de 5 Mo) se charge plus vite, surtout sur GitHub Pages.
   - Si l'animation est un GIF ou une suite d'images, il faut d'abord l'exporter en vidéo.
+
+ANIMATIONS DES SPÉCIAUX ET ULTIMES
+  Le jeu dessine un effet pour chaque famille de technique. Si tu ajoutes une image, elle s'affiche
+  environ une seconde par-dessus le combat au moment de l'attaque :
+    fx_beam.webp    rayons (Kaméhaméha, Final Flash, Garlic Ho...)
+    fx_ball.webp    boules d'énergie (Genkidama, Death Ball, Big Bang...)
+    fx_disc.webp    disques (Kienzan)
+    fx_spiral.webp  spirales (Makankosappo)
+    fx_rain.webp    pluies de projectiles (Hellzone Grenade, Rafale...)
+    fx_slash.webp   lames (épée, griffes...)
+    fx_punch.webp   coups au corps à corps (Poing du Dragon, Janken...)
+    fx_time.webp    temps (Saut temporel)
+    fx_blast.webp   explosions (Final Explosion, Bomber DX...)
+    fx_hakai.webp   destruction (Hakai)
+    fx_flash.webp   flashs et étourdissements (Taiyoken...)

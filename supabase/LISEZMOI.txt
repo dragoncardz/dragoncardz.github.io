@@ -45,7 +45,16 @@ INSTALLER LE MODE ONLINE (Supabase) — environ 10 minutes
    - Les deux joueurs calculent le même combat chacun de leur côté : un tricheur pourrait modifier le sien.
      Les combats en direct sont donc amicaux (pas de points de rang).
 
+7. Cartes certifiées et échanges (Inventaire > « 🤝 Échanges »)
+   - Exécute supabase/echanges.sql dans le SQL Editor (coller tout le fichier, puis Run). Il peut être relancé.
+   - Si tu ajoutes des cartes jusqu'à Épique au jeu, il faut mettre à jour la liste en bas de ce fichier.
+   - Les cartes certifiées sont créées et déplacées uniquement par le serveur : 1 booster de 3 cartes par jour,
+     échanges de même rareté, 3 échanges par 24 h, compte d'au moins 3 jours, 48 h pour répondre.
+   - Réglages modifiables dans echanges.sql : « 3 days » (âge du compte), « >= 3 » (échanges par 24 h),
+     « 1..3 » (cartes par booster) et les pourcentages du tirage.
+
 Ce qui est protégé
+   - Les cartes certifiées et les échanges : le jeu ne peut ni les créer, ni les modifier lui-même.
    - Chaque joueur ne peut lire et modifier que SA sauvegarde.
    - Les profils (pseudo, équipe, collection) sont publics, mais seul leur propriétaire peut les modifier.
    - Les points de classement ne peuvent pas être modifiés directement : seul le serveur les calcule

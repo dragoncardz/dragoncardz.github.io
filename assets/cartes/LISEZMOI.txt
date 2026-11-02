@@ -9,10 +9,13 @@ Nom du fichier : l'ID de la carte + .webp, .png ou .jpg
   La liste des ID est dans la colonne « ID » du fichier cartes-dragon-card-z.xlsx
   (et la colonne « Fichier image » donne le chemin complet).
 
+Dos des cartes : dos_cartes.webp (480 px de large, rapport 5:7 environ).
+
 Conseils pour les dessinateurs :
   - Format conseillé : 1000 x 900 px (rapport 10:9), en .webp (plus léger) ou .png.
   - Le personnage centré, avec le visage dans le tiers haut de l'image :
     les avatars ronds (combats, boss) recadrent sur le haut du dessin.
   - Une image plus haute (portrait) fonctionne aussi : elle est recadrée automatiquement.
-  - Les techniques, les objets et les boules de cristal peuvent aussi avoir leur image.
+  - Les objets, les Terrains et les boules de cristal peuvent aussi avoir leur image.
+  - Le fond de combat des Terrains va dans assets/terrains/ (voir son LISEZMOI).
   - Le nom du fichier doit être EXACTEMENT l'ID : en minuscules, sans espace ni accent.

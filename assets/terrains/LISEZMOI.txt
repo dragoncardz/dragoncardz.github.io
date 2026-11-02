@@ -1,0 +1,19 @@
+IMAGES DES TERRAINS
+===================
+
+Dépose ici une image par Terrain : elle s'affiche en grand derrière le combat.
+Sans image, le jeu utilise un dégradé de couleurs.
+
+Nom du fichier : l'ID du Terrain + .webp
+  pl_froid.webp          Planète du froid
+  pleine_lune.webp       Pleine lune
+  arene.webp             Arène Tenkaichi
+  pl_namek.webp          Planète Namek
+  labo.webp              Labo du Dr Gero
+  vaisseau_babidi.webp   Vaisseau Babidi
+  kaios.webp             Monde des Kaïos
+  neant.webp             Monde du Néant
+
+Format conseillé : 1600 x 900 px (paysage), sans personnage au centre.
+
+L'illustration de la carte elle-même va dans assets/cartes/ (même ID), comme pour les autres cartes.

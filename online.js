@@ -9,7 +9,7 @@
 var SUPA_URL='https://tugraajxznhtyqwzkosb.supabase.co';
 var SUPA_KEY='sb_publishable_iEhjmAoVo3xE-qJUM81mKw_4EANtdiE';
 
-var ONLINE_V=11;
+var ONLINE_V=13;
 var Online=(function(){
   var SESS_KEY='dczo_session',SYNC_KEY='dczo_sync',OWNER_KEY='dczo_owner';
   var sess=null,me=null,rank=null,tab='account',lbTab='all',pushTimer=null,dirty=false,lastSync=null,busyNet=false,opps=null,friendsData=null,friendsLoading=false,searchRes=null,msg='';
@@ -196,6 +196,7 @@ var Online=(function(){
     if(me)await syncOnLogin(interactive);
     refreshUI();
     if(me&&window.syncGifts)syncGifts();
+    if(me&&window.syncCert)syncCert();
   }
 
   /* ---------- Arène (PvP asynchrone) ---------- */
@@ -215,7 +216,7 @@ var Online=(function(){
   }
   function validDeck(def){
     var out=((def&&def.deck)||[]).filter(function(id){return typeof id==='string'&&CARDS[id]&&CARDS[id].t!=='p';}).slice(0,DECK_MAX);
-    if(out.length<10){var pool=Object.keys(CARDS).filter(function(id){var c=CARDS[id];return (c.t==='q'||c.t==='o')&&!c.en&&RIDX[c.rar]<=3;});while(out.length<16)out.push(pool[Math.floor(Math.random()*pool.length)]);}
+    if(out.length<10){var pool=Object.keys(CARDS).filter(function(id){var c=CARDS[id];return c.t==='o'&&!c.en&&RIDX[c.rar]<=3;});while(out.length<16)out.push(pool[Math.floor(Math.random()*pool.length)]);}
     return out;
   }
   function validAw(def){var aw={};var src=(def&&def.aw)||{};Object.keys(src).forEach(function(id){var n=parseInt(src[id],10);if(CARDS[id]&&n>=0)aw[id]=Math.min(5,n);});return aw;}
@@ -430,6 +431,23 @@ var Online=(function(){
       // Refus renvoyé par le serveur : {error:'...'}
       if(R&&R.error){var err=new Error(C[R.error]||R.error);err.code=R.error;throw err;}
       return R;
+    },
+    /* Cartes certifiées et échanges : le serveur décide de tout (voir supabase/echanges.sql) */
+    cert:{
+      call:async function(fn,body){
+        var C={not_logged_in:'Connecte-toi d’abord.',no_profile:'Crée d’abord ton profil Online.',already_claimed:'Tu as déjà ouvert ton booster certifié aujourd’hui. Reviens demain !',
+            account_too_new:'Ton compte doit avoir au moins 3 jours pour échanger.',partner_too_new:'Le compte de ce joueur doit avoir au moins 3 jours pour échanger.',not_your_card:'Cette carte ne t’appartient plus.',
+            same_owner:'Cette carte est déjà à toi.',rarity_mismatch:'Les deux cartes doivent avoir la même rareté.',card_locked:'Cette carte est déjà proposée dans un autre échange.',
+            too_many_pending:'Tu as déjà 5 propositions en attente.',daily_limit:'Tu as atteint la limite de 3 échanges par 24 h.',partner_limit:'Ce joueur a atteint sa limite de 3 échanges par 24 h.',
+            card_gone:'Une des deux cartes n’est plus disponible.',expired:'Cette proposition a expiré.',not_found:'Proposition introuvable.',not_pending:'Cette proposition a déjà reçu une réponse.'};
+        var R=await req('/rest/v1/rpc/'+fn,{method:'POST',body:body||{}});
+        if(R&&R.error){var e=new Error(C[R.error]||R.error);e.code=R.error;throw e;}
+        return R;
+      },
+      cards:function(user){return req('/rest/v1/certified_cards?select=id,card_id,rarity&owner=eq.'+user+'&order=rarity,card_id&limit=500');},
+      trades:function(){return req('/rest/v1/trades?select=*&order=created_at.desc&limit=30');},
+      names:async function(ids){var o={};if(ids.length){(await req('/rest/v1/profiles?select=id,pseudo&id=in.('+ids.join(',')+')')||[]).forEach(function(p){o[p.id]=p.pseudo;});}return o;},
+      find:async function(term){term=(term||'').replace(/[^A-Za-z0-9_-]/g,'').slice(0,16);if(term.length<2)return [];var r=await req('/rest/v1/profiles?select=id,pseudo&pseudo=ilike.*'+term+'*&limit=10');return (r||[]).filter(function(p){return p.id!==uid();});}
     },
     myGifts:async function(){if(!me)return [];try{return await req('/rest/v1/rpc/my_gifts',{method:'POST',body:{}})||[];}catch(e){return [];}},
     who:function(){return me&&uid()?{uid:uid(),pseudo:me.pseudo,lvl:meta.lvl||1}:null;},

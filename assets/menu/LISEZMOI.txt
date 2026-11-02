@@ -1,0 +1,15 @@
+IMAGES DU MENU TOURNANT
+=======================
+
+Dépose ici une image par mode (.webp, .png ou .jpg). Elle remplace automatiquement
+le fond coloré et l'icône provisoires. Sans image, le mode garde son fond coloré.
+
+Noms des fichiers :
+  menu_histoire   menu_online     menu_boutique   menu_deck
+  menu_tour       menu_missions   menu_inventaire
+
+Conseils :
+  - Portrait, 900 x 1200 px (rapport 3:4), la même taille pour toutes.
+  - Sujet bien au centre, avec de la marge sur les bords.
+  - Bas de l'image plutôt sombre ou simple : le jeu y écrit le nom du mode et ses infos.
+  - Pas de texte dans l'image si possible.
