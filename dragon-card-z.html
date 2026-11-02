@@ -652,8 +652,10 @@ body.inbattle{overflow:hidden}
 .pack{--pw:150px;width:var(--pw);height:calc(var(--pw)*1.45);position:relative;cursor:pointer;flex:none;perspective:800px;animation:packFloat 3.6s ease-in-out infinite}
 .packcol:nth-child(2) .pack{animation-delay:-1.2s}.packcol:nth-child(3) .pack{animation-delay:-2.4s}.packcol:nth-child(4) .pack{animation-delay:-.6s}
 .pack.poor{filter:grayscale(.6) brightness(.7)}
-.pack.locked{animation:none}.pack.locked .pack-inner{filter:grayscale(.45) brightness(.65)}
-.pk-lock{position:absolute;inset:0;display:grid;place-items:center;font-size:44px;text-shadow:0 3px 10px rgba(0,0,0,.8);pointer-events:none}
+.pack.tall{height:calc(var(--pw)*1.78)}
+.pk-full img{width:100%;height:100%;object-fit:cover;display:block}
+.pack.locked{animation:none}.pack.locked .pack-inner{filter:brightness(.72)}
+.pk-lock{position:absolute;top:8px;right:8px;display:grid;place-items:center;width:34px;height:34px;border-radius:50%;background:rgba(10,6,20,.8);font-size:18px;pointer-events:none;z-index:2}
 @keyframes packFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
 .pack-inner{position:absolute;inset:0;transform:rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg));transition:transform .35s ease}
 .pack-body{position:absolute;inset:0;border-radius:8px;overflow:hidden;display:flex;flex-direction:column;align-items:center;
@@ -2964,13 +2966,14 @@ function pullCard(era,minIdx){
 function pullPack(minIdx){var pool=POOLS.base[rollRarity(minIdx,PACK.max)];return pool[Math.floor(Math.random()*pool.length)];}
 function packInner(p){
   p=p||PACK;
+  if(p.img)return '<div class="pack-inner"><div class="pack-body pk-full"><img alt="'+p.n+'" draggable="false" src="'+p.img+'"><div class="pk-shine"></div><div class="glare"></div></div></div>';
   return '<div class="pack-inner"><div class="pack-body"><div class="pk-top"></div><div class="pk-brand">DRAGON CARD Z</div>'+
     '<div class="pk-art">'+artSVG(p.rep)+'</div><div class="pk-name">'+p.short+'</div>'+
     '<div class="pk-sub">'+(p.sub||'Booster')+' · 5 cartes</div><div class="pk-bot"></div><div class="pk-shine"></div><div class="glare"></div></div></div>';
 }
 function packStyle(p){p=p||PACK;return '--pa:'+p.a+';--pb:'+p.b+';--pc:'+p.c;}
 /* Booster d'évènement : arc Beerus uniquement. Il reste verrouillé tant que active vaut false. */
-var EVENT_PACK={short:'BEERUS',sub:'Évènement',n:'Booster Dieu de la Destruction',price:300,rep:'beerus',a:'#d8b4fe',b:'#7c3aed',c:'#2e1065',last:RIDX.e,active:false,
+var EVENT_PACK={short:'BEERUS',sub:'Évènement',n:'Booster Dieu de la Destruction',price:300,rep:'beerus',img:'assets/Booster/beerus.webp',a:'#d8b4fe',b:'#7c3aed',c:'#2e1065',last:RIDX.e,active:false,
   stars:['beerus','whis','goku_god','vegeta_rage'],
   guests:['goku_db','vegeta','gohan','goten','trunks_kid','videl','krillin','yamcha','tenshinhan','chaozu','tortue','piccolo','dende','c18','satan','pilaf','shu','mai','kaios']};
 function eventCards(){return EVENT_PACK.stars.concat(EVENT_PACK.guests);}
@@ -3015,7 +3018,7 @@ function renderShop(){
   var can=zeni>=PACK.price,on=EVENT_PACK.active,canE=zeni>=EVENT_PACK.price,h='<div class="packcol"><div class="pack tilt'+(can?'':' poor')+'" id="pack_base" style="'+packStyle()+'" onclick="openPack()">'+packInner()+'</div>'+
       '<button class="btn small'+(can?'':' ghost')+'" onclick="openPack()"><i class="coin"></i> '+PACK.price+'</button>'+
       (meta.tickets>0?'<button class="btn small green" onclick="openPack(true)">🎫 Ticket</button>':'')+'<button class="btn small ghost" onclick="baseInfo()">📊 Taux et cartes</button></div>'+
-      '<div class="packcol"><div class="pack'+(on?' tilt'+(canE?'':' poor'):' locked')+'" id="pack_event" style="'+packStyle(EVENT_PACK)+'" onclick="openEventPack()">'+packInner(EVENT_PACK)+(on?'':'<div class="pk-lock">🔒</div>')+'</div>'+
+      '<div class="packcol"><div class="pack tall'+(on?' tilt'+(canE?'':' poor'):' locked')+'" id="pack_event" style="'+packStyle(EVENT_PACK)+'" onclick="openEventPack()">'+packInner(EVENT_PACK)+(on?'':'<div class="pk-lock">🔒</div>')+'</div>'+
       (on?'<button class="btn small'+(canE?'':' ghost')+'" onclick="openEventPack()"><i class="coin"></i> '+EVENT_PACK.price+'</button>':'<button class="btn small ghost" onclick="eventInfo()">🔒 Bientôt disponible</button>')+
       '<button class="btn small ghost" onclick="eventInfo()">📊 Taux et cartes</button></div>';
   var free=Date.now()>=meta.freeAt;
