@@ -86,8 +86,8 @@ var Online=(function(){
   }
   async function resetPassword(email){await req('/auth/v1/recover?redirect_to='+encodeURIComponent(location.href.split('#')[0]),{method:'POST',auth:false,body:{email:email}});}
   async function setPassword(pass){await req('/auth/v1/user',{method:'PUT',body:{password:pass}});}
-  /* Connexion Google / Facebook / Discord : les boutons n'apparaissent que si le fournisseur est activé dans Supabase */
-  var PROV={google:['Google','#fff','#1f1f1f'],facebook:['Facebook','#1877f2','#fff'],discord:['Discord','#5865f2','#fff']},provOn=[];
+  /* Connexion Google / Discord : les boutons n'apparaissent que si le fournisseur est activé dans Supabase */
+  var PROV={google:['Google','#fff','#1f1f1f'],discord:['Discord','#5865f2','#fff']},provOn=[];
   async function loadProviders(){
     try{var s=await req('/auth/v1/settings',{auth:false});provOn=Object.keys(PROV).filter(function(k){return s&&s.external&&s.external[k];});}catch(e){provOn=[];}
   }

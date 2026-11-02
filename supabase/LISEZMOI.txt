@@ -33,7 +33,7 @@ INSTALLER LE MODE ONLINE (Supabase) — environ 10 minutes
    - Copie l'ID client et le Code secret client dans Supabase : « Authentication » > « Sign In / Providers » > Google,
      active-le et enregistre.
    - Le bouton « Continuer avec Google » apparaît alors tout seul dans le jeu (rien à modifier dans le code).
-   - Même principe pour Facebook (developers.facebook.com) ou Discord (discord.com/developers) : le bouton
+   - Même principe pour Discord (discord.com/developers) : le bouton
      apparaît dès que le fournisseur est activé dans Supabase.
    - Le code secret client reste dans Supabase : ne le mets jamais dans le jeu.
 
