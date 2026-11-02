@@ -625,19 +625,19 @@ body.inbattle{overflow:hidden}
 @keyframes packBurst{from{transform:scale(1.2);filter:brightness(2);opacity:1}to{transform:scale(2.3);filter:brightness(4);opacity:0}}
 .po-video{position:fixed;inset:0;width:100%;height:100%;object-fit:cover;z-index:5;background:#000;cursor:pointer}
 /* Animation d'ouverture : transformations */
-.tf{position:fixed;inset:0;z-index:5;background:#000;overflow:hidden;cursor:pointer;transition:opacity .35s}
-.tf.out{opacity:0}
-.tf-shake{position:absolute;inset:0;will-change:transform}
-.tf-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 38%;opacity:0;transition:opacity .5s}
-.tf-tint{position:absolute;inset:0;mix-blend-mode:screen;opacity:0;pointer-events:none}
-.tf-cv{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.tf{position:fixed;inset:0;z-index:5;background:#000;overflow:hidden;cursor:pointer;opacity:0;transition:opacity .45s}
+.tf.in{opacity:1}
+.tf.in.out{opacity:0;transition-duration:.35s}
+.tf-img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;opacity:0;transition:opacity .45s}
+.tf-img.on{opacity:1}
+.tf-img.charge{animation:tfCharge .09s linear infinite;filter:brightness(1.25) saturate(1.2);transition:opacity .45s,filter .6s}
+.tf-img.hit{animation:tfHit .5s ease-out}
+@keyframes tfCharge{0%{transform:translate(-2px,1px)}50%{transform:translate(2px,-1px)}100%{transform:translate(-1px,-2px)}}
+@keyframes tfHit{0%{transform:scale(1.08)}100%{transform:scale(1)}}
+body.calm .tf-img.charge{animation:none}
 .tf-flash{position:absolute;inset:0;background:#fff;opacity:0;pointer-events:none}
-.tf-flash.on{animation:tfFlash .55s ease-out}
+.tf-flash.on{animation:tfFlash .6s ease-out}
 @keyframes tfFlash{0%{opacity:1}100%{opacity:0}}
-.tf-name{position:absolute;left:8px;right:8px;bottom:10%;text-align:center;font-family:var(--font-title);font-size:clamp(30px,8.5vw,88px);line-height:1;letter-spacing:.04em;
-  -webkit-text-stroke:2px #1a0d06;paint-order:stroke fill;pointer-events:none;opacity:0}
-.tf-name.on{animation:tfName 1.6s cubic-bezier(.2,1.4,.4,1) forwards}
-@keyframes tfName{0%{opacity:0;transform:scale(2.2)}18%{opacity:1;transform:scale(1)}80%{opacity:1}100%{opacity:1;transform:scale(1.04)}}
 .tf-skip{position:absolute;right:12px;bottom:10px;font-family:var(--font-body);font-weight:800;font-size:12px;color:rgba(255,255,255,.55);pointer-events:none}
 .po-cards{position:relative;display:flex;flex-wrap:wrap;justify-content:center;gap:18px 14px;max-width:720px;padding-top:26px}
 .po-actions{position:relative;text-align:center;min-height:50px}
@@ -2878,116 +2878,33 @@ function tfSnd(name){
   return TF_SND[name];
 }
 function tfPlaySnd(a){if(!a)return false;var c=a.cloneNode();c.volume=Math.min(1,SET.sv/100);c.play().catch(function(){});return true;}
-function hexA(h,a){var n=parseInt(h.slice(1),16);return 'rgba('+(n>>16)+','+(n>>8&255)+','+(n&255)+','+a+')';}
-var TF_GLOW={};
-function tfGlow(col){
-  if(!TF_GLOW[col]){var c=document.createElement('canvas');c.width=c.height=64;var x=c.getContext('2d'),g=x.createRadialGradient(32,32,0,32,32,32);
-    g.addColorStop(0,'rgba(255,255,255,1)');g.addColorStop(.25,hexA(col,.9));g.addColorStop(1,hexA(col,0));x.fillStyle=g;x.fillRect(0,0,64,64);TF_GLOW[col]=c;}
-  return TF_GLOW[col];
-}
+/* Fondu au noir → image de base → (charge, flash blanc, nouvelle image) pour chaque forme → fondu au noir → cartes.
+   Une forme sans image est sautée. */
 async function playTransform(ov,path){
   var imgs=await Promise.all(path.map(function(k){return tfImg(TF_FORMS[k].img);}));
   if(!imgs[0])return false;
-  for(var q=1;q<imgs.length;q++)if(!imgs[q])imgs[q]=imgs[q-1];
-  var sCharge=await tfSnd('sfx_charge'),sBlast=await tfSnd('sfx_explosion');
-  var calm=document.body.classList.contains('calm'),skip=false,run=true;
+  var steps=[0];for(var q=1;q<imgs.length;q++)if(imgs[q])steps.push(q);
+  var sCharge=await tfSnd('sfx_charge'),sBlast=await tfSnd('sfx_explosion'),skip=false;
   var box=document.createElement('div');box.className='tf';
-  box.innerHTML='<div class="tf-shake"><img class="tf-img" alt=""><div class="tf-tint"></div></div><canvas class="tf-cv"></canvas><div class="tf-flash"></div><div class="tf-name"></div><div class="tf-skip">Touche pour passer</div>';
+  box.innerHTML='<img class="tf-img" alt=""><div class="tf-flash"></div><div class="tf-skip">Touche pour passer</div>';
   ov.appendChild(box);box.onclick=function(){skip=true;};
-  var sh=box.querySelector('.tf-shake'),im=box.querySelector('.tf-img'),tint=box.querySelector('.tf-tint'),cv=box.querySelector('.tf-cv'),
-      fl=box.querySelector('.tf-flash'),nm=box.querySelector('.tf-name'),cx=cv.getContext('2d'),W=0,H=0,dpr=Math.min(1.5,window.devicePixelRatio||1);
-  function size(){W=box.clientWidth;H=box.clientHeight;cv.width=W*dpr;cv.height=H*dpr;cx.setTransform(dpr,0,0,dpr,0,0);}
-  size();window.addEventListener('resize',size);
-  // S : état animé (aura, charge, tremblement, zoom) ; f = forme affichée, cf = forme en train de se charger
-  var S={aura:0,charge:0,shake:0,zoom:1,conv:0,lines:0,f:TF_FORMS.base,cf:TF_FORMS.base,acc:0,accIn:0,accR:0},TW={},P=[],B=[],RG=[],RK=[],last=performance.now();
-  function tw(k,to,ms){TW[k]={a:S[k],b:to,t0:performance.now(),d:ms};}
+  var im=box.querySelector('.tf-img'),fl=box.querySelector('.tf-flash');
   function w(ms){return new Promise(function(r){var e=Date.now()+ms;(function c(){if(skip||Date.now()>=e)r();else setTimeout(c,30);})();});}
-  function ctr(){return {x:W/2,y:H*.45};}
-  function flame(){
-    var c=S.charge>0&&Math.random()<S.charge?S.cf:S.f,side=Math.random()<.3,x=side?(Math.random()<.5?Math.random()*W*.15:W-Math.random()*W*.15):Math.random()*W;
-    return {x:x,y:H+20,vx:(Math.random()-.5)*40,vy:-(160+Math.random()*260)*(1+S.aura*.6+S.charge*.8),dr:.2,r:18+Math.random()*40*(1+S.charge*.5),l:.7+Math.random()*.6,L:1.3,o:.35+S.aura*.35,c:Math.random()<.25?c.c2:c.col,k:'fl'};
-  }
-  function inward(){
-    var o=ctr(),a=Math.random()*6.283,R=Math.max(W,H)*.65;
-    return {x:o.x+Math.cos(a)*R,y:o.y+Math.sin(a)*R,tx:o.x,ty:o.y,s:2.2+Math.random()*2,r:5+Math.random()*7,l:.6+Math.random()*.3,L:.9,o:.9,c:Math.random()<.5?S.cf.c2:S.cf.col,k:'in'};
-  }
-  function rock(){var n=5+(Math.random()*3|0),s=5+Math.random()*16,pts=[];for(var i=0;i<n;i++){var a=i/n*6.283,rr=s*(.6+Math.random()*.5);pts.push([Math.cos(a)*rr,Math.sin(a)*rr]);}
-    return {x:Math.random()*W,y:H+30,vy:-(50+Math.random()*120),rot:Math.random()*6,vr:(Math.random()-.5)*2,pts:pts,l:3.5};}
-  function bolt(col){var x=Math.random()*W,y=Math.random()*H*.85,p=[[x,y]],n=5+(Math.random()*7|0),an=Math.random()*6.283,len=(W+H)*.035;
-    for(var i=0;i<n;i++){an+=(Math.random()-.5)*1.8;x+=Math.cos(an)*len;y+=Math.sin(an)*len;p.push([x,y]);}return {p:p,l:.07+Math.random()*.09,c:col};}
-  function boom(f,big){
-    var o=ctr(),n=calm?40:(big?110:70);
-    for(var i=0;i<n;i++){var a=Math.random()*6.283,v=350+Math.random()*(big?1100:750);P.push({x:o.x,y:o.y,vx:Math.cos(a)*v,vy:Math.sin(a)*v,dr:2.6,r:6+Math.random()*14,l:.5+Math.random()*.8,L:1.3,o:1,c:i%3?f.col:f.c2,k:'ex'});}
-    RG.push({r:10,v:Math.max(W,H)*(big?2.2:1.6),w:big?26:16,l:.7,L:.7,c:f.c2});RG.push({r:0,v:Math.max(W,H)*1.1,w:10,l:.9,L:.9,c:f.col});
-    S.lines=big?.6:.35;
-  }
-  function frame(t){
-    if(!run)return;var dt=Math.min(.05,(t-last)/1000);last=t;
-    for(var k in TW){var T=TW[k],u=Math.min(1,(t-T.t0)/T.d);S[k]=T.a+(T.b-T.a)*(1-Math.pow(1-u,2));if(u>=1)delete TW[k];}
-    cx.clearRect(0,0,W,H);var f=S.f,o=ctr();
-    // Lueur de l'aura depuis le bas de l'écran
-    var ga=Math.min(1,S.aura+S.charge*.6);
-    if(ga>0){var gc=S.charge>.5?S.cf.col:f.col,g=cx.createLinearGradient(0,H,0,H*.25);g.addColorStop(0,hexA(gc,.55*ga));g.addColorStop(1,hexA(gc,0));cx.fillStyle=g;cx.fillRect(0,0,W,H);}
-    // Rochers qui s'élèvent
-    if((S.charge>0&&S.cf.rock)||(f.rock&&S.aura>.5)){S.accR+=dt*(calm?3:8);while(S.accR>=1){S.accR--;RK.push(rock());}}
-    cx.globalCompositeOperation='source-over';
-    for(var i=RK.length-1;i>=0;i--){var r=RK[i];r.l-=dt;if(r.l<=0||r.y<-40){RK.splice(i,1);continue;}r.y+=r.vy*dt*(1+S.charge);r.rot+=r.vr*dt;
-      cx.save();cx.translate(r.x,r.y);cx.rotate(r.rot);cx.beginPath();r.pts.forEach(function(p,j){j?cx.lineTo(p[0],p[1]):cx.moveTo(p[0],p[1]);});cx.closePath();
-      cx.fillStyle='#3a2416';cx.fill();cx.strokeStyle='rgba(255,220,150,.35)';cx.lineWidth=1.5;cx.stroke();cx.restore();}
-    cx.globalCompositeOperation='lighter';
-    // Flammes d'aura et particules qui convergent
-    S.acc+=dt*(S.aura*70+S.charge*140)*(calm?.5:1);while(S.acc>=1){S.acc--;P.push(flame());}
-    if(S.conv){S.accIn+=dt*110*(calm?.5:1);while(S.accIn>=1){S.accIn--;P.push(inward());}}
-    if(P.length>420)P.splice(0,P.length-420);
-    for(i=P.length-1;i>=0;i--){var p=P[i];p.l-=dt;if(p.l<=0){P.splice(i,1);continue;}
-      if(p.k==='in'){var m=Math.min(1,dt*p.s);p.x+=(p.tx-p.x)*m;p.y+=(p.ty-p.y)*m;}
-      else{var d=Math.max(0,1-p.dr*dt);p.vx*=d;p.vy*=d;p.x+=p.vx*dt;p.y+=p.vy*dt;}
-      var kk=p.l/p.L,s=p.r*(p.k==='fl'?.5+kk*.8:1);cx.globalAlpha=Math.min(1,kk*1.6)*p.o;cx.drawImage(tfGlow(p.c),p.x-s,p.y-s,s*2,s*2);}
-    // Fusion : deux orbes d'énergie se rejoignent pendant la charge
-    if(S.cf.fus&&S.charge>0){var dx=(1-S.charge)*W*.38,rr=60+S.charge*90;cx.globalAlpha=.9;
-      cx.drawImage(tfGlow(S.cf.col),o.x-dx-rr,o.y-rr,rr*2,rr*2);cx.drawImage(tfGlow(S.cf.c2),o.x+dx-rr,o.y-rr,rr*2,rr*2);}
-    // Cœur lumineux pendant la charge
-    if(S.charge>0){var cr=30+S.charge*Math.min(W,H)*.35*(1+Math.sin(t/40)*.06);cx.globalAlpha=S.charge*.8;cx.drawImage(tfGlow(S.cf.c2),o.x-cr,o.y-cr,cr*2,cr*2);}
-    // Éclairs
-    var bz=S.charge>0?(S.cf.bolt||0)*S.charge:(f.bolt||0)*.35*S.aura;
-    if(bz&&Math.random()<dt*bz*(calm?4:10))B.push(bolt(S.charge>0?S.cf.c2:f.c2));
-    for(i=B.length-1;i>=0;i--){var b=B[i];b.l-=dt;if(b.l<=0){B.splice(i,1);continue;}cx.globalAlpha=1;
-      cx.beginPath();b.p.forEach(function(q,j){j?cx.lineTo(q[0],q[1]):cx.moveTo(q[0],q[1]);});
-      cx.strokeStyle=hexA(b.c,.45);cx.lineWidth=7;cx.stroke();cx.strokeStyle='#fff';cx.lineWidth=2;cx.stroke();}
-    // Ondes de choc
-    for(i=RG.length-1;i>=0;i--){var g2=RG[i];g2.l-=dt;if(g2.l<=0){RG.splice(i,1);continue;}g2.r+=g2.v*dt*(g2.l/g2.L);
-      cx.globalAlpha=g2.l/g2.L;cx.beginPath();cx.arc(o.x,o.y,g2.r,0,6.283);cx.strokeStyle=g2.c;cx.lineWidth=g2.w*(g2.l/g2.L)+1;cx.stroke();}
-    // Lignes de vitesse
-    if(S.lines>0){S.lines-=dt;cx.globalAlpha=Math.min(1,S.lines*2.5)*.7;cx.strokeStyle='#fff';cx.lineWidth=2;cx.beginPath();
-      for(i=0;i<46;i++){var a=Math.random()*6.283,r0=Math.min(W,H)*(.25+Math.random()*.2),r1=Math.max(W,H);cx.moveTo(o.x+Math.cos(a)*r0,o.y+Math.sin(a)*r0);cx.lineTo(o.x+Math.cos(a)*r1,o.y+Math.sin(a)*r1);}cx.stroke();}
-    cx.globalAlpha=1;cx.globalCompositeOperation='source-over';
-    // Image : tremblement, zoom, éclat pendant la charge
-    var amp=S.shake*(calm?.25:1);
-    sh.style.transform='translate('+((Math.random()-.5)*amp).toFixed(1)+'px,'+((Math.random()-.5)*amp).toFixed(1)+'px) scale('+S.zoom.toFixed(3)+')';
-    im.style.filter='brightness('+(1+S.charge*.55).toFixed(2)+') saturate('+(1+S.charge*.5).toFixed(2)+')';
-    tint.style.opacity=Math.min(.6,S.aura*.35+S.charge*.4).toFixed(2);
-    requestAnimationFrame(frame);
-  }
-  function setForm(k,i){S.f=TF_FORMS[k];im.src=imgs[i];tint.style.background='radial-gradient(ellipse at 50% 55%,transparent 30%,'+S.f.col+' 115%)';}
-  function flash(){fl.classList.remove('on');void fl.offsetWidth;fl.classList.add('on');}
-  function title(f){if(!f.n)return;nm.textContent=f.n;nm.style.color=f.c2;nm.style.textShadow='0 0 18px '+f.col+',0 0 42px '+f.col;nm.classList.remove('on');void nm.offsetWidth;nm.classList.add('on');}
-
-  setForm(path[0],0);requestAnimationFrame(frame);
-  await w(40);im.style.opacity=1;tw('aura',.3,700);tw('zoom',1.02,1800);sfxWhoosh();
-  await w(path.length>1?950:1500);
-  for(var i=1;i<path.length&&!skip;i++){
-    var k=path[i],f=TF_FORMS[k],end=i===path.length-1,lv=Math.min(5,i),cd=end?1400:(i===1?950:700);
-    // Charge
-    S.cf=f;S.conv=1;tw('charge',1,cd);tw('shake',end?12:7,cd);tw('zoom',S.zoom+.035,cd);
-    if(!tfPlaySnd(sCharge))sfxKiCharge(cd/1000,lv,!!f.fus);
+  void box.offsetWidth;box.classList.add('in');
+  await w(450);
+  im.src=imgs[0];void im.offsetWidth;im.classList.add('on');sfxWhoosh();
+  await w(steps.length>1?1400:1700);
+  for(var i=1;i<steps.length&&!skip;i++){
+    var n=steps[i],end=i===steps.length-1,lv=Math.min(5,n),cd=end?1100:800;
+    im.classList.add('charge');
+    if(!tfPlaySnd(sCharge))sfxKiCharge(cd/1000,lv,!!TF_FORMS[path[n]].fus);
     await w(cd);if(skip)break;
-    // Explosion de ki : nouvelle forme
-    S.conv=0;S.charge=0;delete TW.charge;flash();setForm(k,i);boom(f,end);title(f);
-    if(!tfPlaySnd(sBlast))sfxKiBlast(lv,k==='ssj4'||k==='fssj4');
-    S.aura=1;tw('aura',.7,900);S.shake=end?26:15;tw('shake',end?3:2,700);S.zoom=1;tw('zoom',1.035,2200);
-    await w(end?1700:520);
+    im.classList.remove('charge');fl.classList.remove('on');void fl.offsetWidth;fl.classList.add('on');
+    im.src=imgs[n];im.classList.remove('hit');void im.offsetWidth;im.classList.add('hit');
+    if(!tfPlaySnd(sBlast))sfxKiBlast(lv,path[n]==='ssj4'||path[n]==='fssj4');
+    await w(end?1700:1000);
   }
-  run=false;window.removeEventListener('resize',size);
+  im.classList.remove('on','charge');await wait(400);
   box.classList.add('out');await wait(350);box.remove();
   return true;
 }
@@ -3034,8 +2951,9 @@ async function openPack(era,useTk){
   var pk=ov.querySelector('.po-pack');
   var best=pulled.reduce(function(b,id){var r=CARDS[id].rar;return RIDX[r]>RIDX[b]?r:b;},'c'),path=tfPath(pulled);
   path.forEach(function(k){tfImg(TF_FORMS[k].img);});
-  await wait(450);
-  if(!(await playTransform(ov,path))&&!(await playSummonVideo(ov,best))){
+  var anim=await playTransform(ov,path);
+  if(!anim)await wait(450);
+  if(!anim&&!(await playSummonVideo(ov,best))){
     sfxRumble();pk.classList.add('charging');
     var r0=pk.getBoundingClientRect();converge(ov,r0.left+r0.width/2,r0.top+r0.height/2,'#ffd23f',26,220,1000);
     await wait(1100);
