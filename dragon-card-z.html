@@ -652,6 +652,8 @@ body.inbattle{overflow:hidden}
 .pack{--pw:150px;width:var(--pw);height:calc(var(--pw)*1.45);position:relative;cursor:pointer;flex:none;perspective:800px;animation:packFloat 3.6s ease-in-out infinite}
 .packcol:nth-child(2) .pack{animation-delay:-1.2s}.packcol:nth-child(3) .pack{animation-delay:-2.4s}.packcol:nth-child(4) .pack{animation-delay:-.6s}
 .pack.poor{filter:grayscale(.6) brightness(.7)}
+.pack.locked{animation:none}.pack.locked .pack-inner{filter:grayscale(.45) brightness(.65)}
+.pk-lock{position:absolute;inset:0;display:grid;place-items:center;font-size:44px;text-shadow:0 3px 10px rgba(0,0,0,.8);pointer-events:none}
 @keyframes packFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
 .pack-inner{position:absolute;inset:0;transform:rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg));transition:transform .35s ease}
 .pack-body{position:absolute;inset:0;border-radius:8px;overflow:hidden;display:flex;flex-direction:column;align-items:center;
@@ -1308,6 +1310,7 @@ T_('u_mui','Ultra Instinct Maîtrisé','sayen','g','goku',7,4000,3200,9,'x','s',
 T_('golden_oozaru','Oozaru doré','sayen','m',null,4,3200,1200,5,'e','gt',{rr:'sayen',art:'moon_gold'});
 T_('vegeta_ssj','Vegeta SSJ','sayen','m','vegeta',1,1200,800,2,'r','z');
 T_('vegeta_majin','Majin Vegeta','sayen','m','vegeta',2,2000,800,4,'e','z',{fl:'Il a laissé Babidi le contrôler pour retrouver sa fierté.'});
+T_('vegeta_rage','Vegeta Rage','sayen','m','vegeta',3,2400,1200,4,'l','s',{fl:'Comment oses-tu frapper ma Bulma !'});
 T_('vegeta_ssj4','Vegeta SSJ4','sayen','m','vegeta',5,2800,1600,6,'l','gt');
 T_('vegeta_blue','Vegeta SSJ Blue','sayen','m','vegeta',5,2400,2000,6,'e','s');
 T_('vegeta_ue','Vegeta Ultra Ego','sayen','m','vegeta',6,3200,1600,7,'l','s');
@@ -1463,6 +1466,7 @@ var PS={
  golden_oozaru:['Singe doré',['rage:12','hpp:40']],
  vegeta_ssj:['Fierté dorée',['atkp:15','zenkai:10']],
  vegeta_majin:['Marque de Babidi',['rage:10','fury:30']],
+ vegeta_rage:['Colère du Prince',['rage:10','fury:30']],
  vegeta_ssj4:['Prince primal',['crit:25','hpp:20']],
  vegeta_blue:['Ki divin du prince',['atkp:20','dr:15']],
  vegeta_ue:['Ultra Ego',['rage:12','zenkai:30']],
@@ -1547,6 +1551,7 @@ var VIS={
  vegeta:{skin:'#f3c08f',hair:'#15151c',hs:'vegeta',outfit:'#1f3fb8',armor:true,angry:true},
  vegeta_ssj:{skin:'#f3c08f',hair:'#ffe14d',hs:'vegeta',outfit:'#1f3fb8',armor:true,angry:true,eye:'#17a398',aura:'#ffd93b'},
  vegeta_majin:{skin:'#f3c08f',hair:'#ffe14d',hs:'vegeta',outfit:'#1f3fb8',armor:true,angry:true,eye:'#17a398',aura:'#ffd93b',spark:true,majinM:true},
+ vegeta_rage:{skin:'#f3c08f',hair:'#ffe14d',hs:'vegeta',outfit:'#1f3fb8',angry:true,eye:'#17a398',aura:'#ff5a1f'},
  vegeta_ssj4:{skin:'#f3c08f',hair:'#15151c',hs:'vegeta',outfit:'#b5303a',angry:true,eye:'#f5b301',aura:'#ff5a3c'},
  vegeta_blue:{skin:'#f3c08f',hair:'#34b6ff',hs:'vegeta',outfit:'#1f3fb8',armor:true,angry:true,eye:'#1f7ae0',aura:'#4fc3ff'},
  vegeta_ue:{skin:'#f3c08f',hair:'#6b2fa0',hs:'vegeta',outfit:'#1f3fb8',armor:true,angry:true,eye:'#c04ad9',aura:'#8b3fd9',spark:true},
@@ -1689,7 +1694,7 @@ var UL={
  gamma1:['Gamma Burst Flash','dmg',10400],cellmax:['Pied géant','aoe',11200],
  kaioken:['Kaméhaméha Kaïoken x20','dmg',10400],goku_ssj1:['Kaméhaméha Super Saiyan','dmg',10400],goku_ssj2:['Kaméhaméha','dmg',11200],goku_ssj3:['Poing du Dragon','dmg',13600],goku_god:['Kaméhaméha Divin','dmg',13600],goku_blue:['Kaméhaméha Blue','dmg',15200],
  goku_ssj4:['Kaméhaméha x10','dmg',15200],goku_mui:['Genkidama de l’Univers','dmg',16800],u_mui:['Kaméhaméha Ultra Instinct','aoe',12000],vegeta_ssj:['Final Flash','dmg',12000],vegeta_majin:['Final Explosion','aoe',7200],
- vegeta_ssj4:['Final Shine','dmg',15200],vegeta_blue:['Final Flash Blue','dmg',15200],vegeta_ue:['Hakai d’Ultra Ego','dmg',17600],gohan_ssj:['Masenko','dmg',10400],gohan_ssj2:['Kaméhaméha','dmg',13600],
+ vegeta_rage:['Colère du Prince','dmg',13600],vegeta_ssj4:['Final Shine','dmg',15200],vegeta_blue:['Final Flash Blue','dmg',15200],vegeta_ue:['Hakai d’Ultra Ego','dmg',17600],gohan_ssj:['Masenko','dmg',10400],gohan_ssj2:['Kaméhaméha','dmg',13600],
  gohan_ult:['Kaméhaméha ultime','dmg',15200],gohan_beast:['Makankosappo Beast','dmg',19200],trunks_ssj:['Shining Sword Attack','dmg',12800],piccolo_orange:['Hellzone Grenade','aoe',7200],
  freezer_final:['Death Ball','aoe',6400],freezer_100:['Death Ball','aoe',8000],freezer_gold:['Golden Death Ball','aoe',9600],freezer_black:['Supernova noire','aoe',12000],
  cell_semi:['Kaméhaméha','dmg',11200],cell_perfect:['Kaméhaméha solaire','aoe',8800],buu_super:['Absorption','dmg',12000],buu_kid:['Planet Burst','aoe',9600],black_rose:['Faux divine','aoe',8000],
@@ -2957,16 +2962,62 @@ function pullCard(era,minIdx){
   var pool=POOLS[era][RKEYS[i]];return pool[Math.floor(Math.random()*pool.length)];
 }
 function pullPack(minIdx){var pool=POOLS.base[rollRarity(minIdx,PACK.max)];return pool[Math.floor(Math.random()*pool.length)];}
-function packInner(){
+function packInner(p){
+  p=p||PACK;
   return '<div class="pack-inner"><div class="pack-body"><div class="pk-top"></div><div class="pk-brand">DRAGON CARD Z</div>'+
-    '<div class="pk-art">'+artSVG(PACK.rep)+'</div><div class="pk-name">'+PACK.short+'</div>'+
-    '<div class="pk-sub">Booster · 5 cartes</div><div class="pk-bot"></div><div class="pk-shine"></div><div class="glare"></div></div></div>';
+    '<div class="pk-art">'+artSVG(p.rep)+'</div><div class="pk-name">'+p.short+'</div>'+
+    '<div class="pk-sub">'+(p.sub||'Booster')+' · 5 cartes</div><div class="pk-bot"></div><div class="pk-shine"></div><div class="glare"></div></div></div>';
 }
-function packStyle(){return '--pa:'+PACK.a+';--pb:'+PACK.b+';--pc:'+PACK.c;}
+function packStyle(p){p=p||PACK;return '--pa:'+p.a+';--pb:'+p.b+';--pc:'+p.c;}
+/* Booster d'évènement : arc Beerus uniquement. Il reste verrouillé tant que active vaut false. */
+var EVENT_PACK={short:'BEERUS',sub:'Évènement',n:'Booster Dieu de la Destruction',price:300,rep:'beerus',a:'#d8b4fe',b:'#7c3aed',c:'#2e1065',last:RIDX.e,active:false,
+  stars:['beerus','whis','goku_god','vegeta_rage'],
+  guests:['goku_db','vegeta','gohan','goten','trunks_kid','videl','krillin','yamcha','tenshinhan','chaozu','tortue','piccolo','dende','c18','satan','pilaf','shu','mai','kaios']};
+function eventCards(){return EVENT_PACK.stars.concat(EVENT_PACK.guests);}
+function pullEvent(minIdx){var r=rollRarity(minIdx),pool=eventCards().filter(function(id){return CARDS[id].rar===r;});return pool[Math.floor(Math.random()*pool.length)];}
+function pctTxt(v){return (v>=10?v.toFixed(0):v.toFixed(1)).replace('.',',')+' %';}
+/* Taux et aperçu des cartes : ids = cartes du booster, last = rareté minimale de la 5e carte */
+function packOdds(ids,last){
+  var rs=RKEYS.filter(function(r){return RAR[r].w>0&&ids.some(function(id){return CARDS[id].rar===r;});}),tot=0,top=0,h='';
+  rs.forEach(function(r){tot+=RAR[r].w;if(RIDX[r]>=last)top+=RAR[r].w;});
+  rs.slice().reverse().forEach(function(r){
+    var g=ids.filter(function(id){return CARDS[id].rar===r;}),a=RAR[r].w/tot*100,b=RIDX[r]>=last?RAR[r].w/top*100:0;
+    h+='<div class="section-title"><span class="rgem" style="--rc:'+RAR[r].col+'"></span> '+RAR[r].n+' : '+pctTxt(a)+(g.length>1?' ('+pctTxt(a/g.length)+' par carte)':'')+(b?' · 5e carte : '+pctTxt(b):'')+'</div>'+
+      '<div class="minirow">'+g.map(function(id){return cardHTML(id,{noi:true,badge:col[id]?'×'+col[id]:''});}).join('')+'</div>';
+  });
+  return h;
+}
+function eventInfo(){
+  sfxClick();var P_=EVENT_PACK;
+  openModal('<h3 class="mtitle">'+P_.n+'</h3><p style="font-weight:800">'+(P_.active?'Disponible pendant l’évènement.':'🔒 Bientôt disponible : ce booster s’ouvrira pendant un prochain évènement.')+'</p>'+
+    '<div class="abl"><b>Taux et cartes</b><br>5 cartes par booster, parmi '+eventCards().length+' cartes de l’arc Beerus. Les 4 premières suivent les taux ci-dessous. La 5e carte est toujours Épique ou mieux.</div>'+packOdds(eventCards(),P_.last));
+}
+function baseInfo(){
+  sfxClick();var ids=[];RKEYS.forEach(function(r){if(RIDX[r]<=PACK.max)ids=ids.concat(POOLS.base[r]);});
+  openModal('<h3 class="mtitle">Booster '+PACK.short+'</h3>'+
+    '<div class="abl"><b>Taux et cartes</b><br>5 cartes par booster, parmi '+ids.length+' cartes de toutes les ères. Les 4 premières suivent les taux ci-dessous. La 5e carte est toujours Rare ou mieux.</div>'+packOdds(ids,RIDX.r));
+}
+async function openEventPack(){
+  var P_=EVENT_PACK;
+  if(!P_.active){sfxError();eventInfo();return;}
+  if(packBusy)return;
+  if(zeni<P_.price){sfxError();nope($('pack_event'));return;}
+  packBusy=true;setZeni(zeni-P_.price);sfxCoin();
+  var pulled=[],isNew={};
+  for(var i=0;i<5;i++)pulled.push(pullEvent(i===4?P_.last:0));
+  saveMeta();track('pack');
+  pulled.forEach(function(id,i){if(!col[id]&&!isNew[id])isNew[i]=true;addCard(id);});
+  var ov=$('pack_overlay');ov.classList.remove('hidden');
+  await skyReveal(ov,pulled,isNew);
+  packBusy=false;renderShop();
+}
 function renderShop(){
-  var can=zeni>=PACK.price,h='<div class="packcol"><div class="pack tilt'+(can?'':' poor')+'" id="pack_base" style="'+packStyle()+'" onclick="openPack()">'+packInner()+'</div>'+
+  var can=zeni>=PACK.price,on=EVENT_PACK.active,canE=zeni>=EVENT_PACK.price,h='<div class="packcol"><div class="pack tilt'+(can?'':' poor')+'" id="pack_base" style="'+packStyle()+'" onclick="openPack()">'+packInner()+'</div>'+
       '<button class="btn small'+(can?'':' ghost')+'" onclick="openPack()"><i class="coin"></i> '+PACK.price+'</button>'+
-      (meta.tickets>0?'<button class="btn small green" onclick="openPack(true)">🎫 Ticket</button>':'')+'</div>';
+      (meta.tickets>0?'<button class="btn small green" onclick="openPack(true)">🎫 Ticket</button>':'')+'<button class="btn small ghost" onclick="baseInfo()">📊 Taux et cartes</button></div>'+
+      '<div class="packcol"><div class="pack'+(on?' tilt'+(canE?'':' poor'):' locked')+'" id="pack_event" style="'+packStyle(EVENT_PACK)+'" onclick="openEventPack()">'+packInner(EVENT_PACK)+(on?'':'<div class="pk-lock">🔒</div>')+'</div>'+
+      (on?'<button class="btn small'+(canE?'':' ghost')+'" onclick="openEventPack()"><i class="coin"></i> '+EVENT_PACK.price+'</button>':'<button class="btn small ghost" onclick="eventInfo()">🔒 Bientôt disponible</button>')+
+      '<button class="btn small ghost" onclick="eventInfo()">📊 Taux et cartes</button></div>';
   var free=Date.now()>=meta.freeAt;
   h='<div class="panel center" style="width:100%"><b>🎫 Tickets : '+meta.tickets+'</b> · '+
     (free?'<button class="btn small" onclick="claimFree()">Récupérer le booster gratuit</button>':'Booster gratuit dans '+fmtLeft(meta.freeAt-Date.now()))+'</div>'+h;
