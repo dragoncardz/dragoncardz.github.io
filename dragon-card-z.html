@@ -712,7 +712,22 @@ body.inbattle{overflow:hidden}
 .r-r{--ab:22px;--as:4px;--ad:1.1s}
 .r-e{--ab:30px;--as:6px;--ad:.9s}
 .r-l{--ab:40px;--as:9px;--ad:.7s}
-.r-m,.r-x{--ab:52px;--as:13px;--ad:.55s}
+.r-m,.r-x,.r-s{--ab:52px;--as:13px;--ad:.55s}
+.sec-ov{position:fixed;inset:0;z-index:99995;background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:16px;box-sizing:border-box;overflow:hidden;font-family:Bangers,Impact,sans-serif;color:#fff;text-align:center}
+.sec-ov.noir{background:#000;transition:background 1.1s ease-in}
+.sec-ov.etoile{background:#04040f}
+.sec-et{position:absolute;left:50%;top:40%;width:60px;height:60px;margin:-30px 0 0 -30px;border-radius:50%;background:radial-gradient(circle,#fff 18%,transparent 62%),conic-gradient(#ff5f5f,#ffd23f,#4ade80,#38bdf8,#a78bfa,#f472b6,#ff5f5f);animation:secFonce 1.25s cubic-bezier(.75,0,1,.6) both}
+@keyframes secFonce{from{transform:scale(.08) rotate(0)}to{transform:scale(70) rotate(240deg)}}
+.sec-r,.sec-n,.sec-a,.sec-h{opacity:0;transition:opacity .7s,transform .7s}
+.sec-r.on,.sec-n.on,.sec-a.on,.sec-h.on{opacity:1;transform:none}
+.sec-r{font-size:clamp(18px,3.4vw,30px);letter-spacing:.3em;padding-left:.3em;background:linear-gradient(90deg,#ff5f5f,#ffd23f,#4ade80,#38bdf8,#a78bfa,#f472b6);-webkit-background-clip:text;background-clip:text;color:transparent}
+.sec-n{font-size:clamp(34px,7vw,68px);letter-spacing:.03em;line-height:1;transform:translateY(12px);text-shadow:0 0 26px rgba(240,171,252,.9)}
+.sec-a{position:relative;width:min(76vw,calc(62vh*.72));height:62vh;transform:scale(.92)}
+.sec-a::before{content:"";position:absolute;inset:6%;z-index:-1;border-radius:50%;background:conic-gradient(#ff5f5f,#ffd23f,#4ade80,#38bdf8,#a78bfa,#f472b6,#ff5f5f);filter:blur(34px);animation:secHalo 4s linear infinite}
+.sec-a .art-img{width:100%;height:100%;object-fit:contain;object-position:50% 50%;transform:none}
+.sec-a svg{width:100%;height:100%}
+@keyframes secHalo{to{transform:rotate(360deg)}}
+.sec-h{font:800 15px Nunito,Trebuchet MS,sans-serif;color:#eaf1ff}
 @keyframes auraDos{from{opacity:.7}to{opacity:1}}
 /* Épique : illustration complète sur la carte */
 .sk-full{position:absolute;inset:0;overflow:hidden;border-radius:15px;background:#000;box-shadow:0 0 0 3px var(--rc),0 0 34px 6px var(--rc)}
@@ -1161,10 +1176,11 @@ var RAR={
  e:{n:'Épique',col:'#c084fc',max:2,w:6.5},
  l:{n:'Légendaire',col:'#ffd23f',max:2,w:2.8},
  m:{n:'Mythique',col:'#ff4d6d',max:1,w:.7},
- x:{n:'Unique',col:'#ffffff',max:1,w:0}
+ x:{n:'Unique',col:'#ffffff',max:1,w:0},
+ s:{n:'Secrète',col:'#f0abfc',max:1,w:0}
 };
-var RKEYS=['c','u','r','e','l','m','x'];
-var RIDX={c:0,u:1,r:2,e:3,l:4,m:5,x:6};
+var RKEYS=['c','u','r','e','l','m','x','s'];
+var RIDX={c:0,u:1,r:2,e:3,l:4,m:5,x:6,s:7};
 var RACES={
  sayen:{n:'Saiyan',a:'#ffb347',b:'#d9420c',ch:'S',i:'🔄'},
  terrien:{n:'Terrien',a:'#8fd0ff',b:'#2459d1',ch:'T',i:'💰'},
@@ -1190,6 +1206,7 @@ var ABS={
  evade:{n:'Esquive',i:'💨',d:function(v){return v+'% de chances d’esquiver une attaque de base.';}},
  revive:{n:'Immortel',i:'♾',d:function(){return 'La première fois qu’il tombe K.O., il revient avec 50% de ses PV.';}},
  survive:{n:'Volonté de fer',i:'🔥',d:function(){return 'Une fois par combat, survit à un coup fatal avec 1 PV.';}},
+ kakumei:{n:'Réveil divin',i:'🌈',d:function(){return 'Une fois par combat, survit à un K.O. avec 1 PV, contre-attaque tous les ennemis et gagne 70% de chances d’esquiver les attaques de base.';}},
  double:{n:'Frappe double',i:'⚡',d:function(){return 'Attaque deux fois par tour.';}},
  scout:{n:'Éclaireur',i:'📡',d:function(){return 'À son arrivée : pioche 1 carte.';}},
  freeze:{n:'Paralysie',i:'🧊',d:function(){return 'À son arrivée : un ennemi au hasard est étourdi.';}},
@@ -1296,6 +1313,7 @@ P_('nuova','Nuova Shenron','dragon','g',3900,3450,16200,4,'e','gt',{fl:'Le seul 
 P_('omega','Omega Shenron','dragon','m',5250,4750,25000,8,'m','gt',{fl:'Le dragon ultime, né des sept boules.'});
 /* --- Personnages : Super --- */
 P_('beerus','Beerus','dieu','m',5250,4750,24800,8,'m','s',{fl:'Le Dieu de la Destruction. Ne réveillez pas le chat.'});
+P_('beerus_kakumei','Beerus Kakumei','dieu','m',6000,5400,28000,9,'s','s',{sec:true,fl:'Certains dieux ne s’éveillent qu’une fois. Personne n’en est revenu pour le raconter.'});
 P_('whis','Whis','dieu','g',3600,5500,22600,7,'l','s',{fl:'L’ange accompagnateur de Beerus.'});
 P_('hit','Hit','alien','m',3900,3000,16200,4,'e','s',{fl:'L’assassin légendaire de l’Univers 6.'});
 P_('cabba','Cabba','sayen','g',2750,2300,11700,2,'u','s');
@@ -1455,6 +1473,7 @@ var PS={
  nuova:['Honneur du dragon',['regen:6','counter:30','atkp:10']],
  omega:['Énergie négative',['drain','regen:5','dr:25']],
  beerus:['Dieu de la Destruction',['pierce','crit:25','dr:20']],
+ beerus_kakumei:['Dieu de la Destruction éveillé',['pierce','crit:30','dr:25','kakumei']],
  whis:['Ange accompagnateur',['evade:40','healer:10']],
  hit:['Saut temporel',['evade:30','counter:40']],
  cabba:['Fierté de l’Univers 6',['zenkai:20','defp:10']],
@@ -1511,7 +1530,7 @@ Object.keys(PS).forEach(function(id){if(CARDS[id]){CARDS[id].pn=PS[id][0];CARDS[
 
 /* --- Compétences de leader (1er emplacement de l'équipe) [nom, condition] : ATK, DEF et PV +X% selon la rareté.
    Conditions : 'r:race', 'f:g|m' (faction), 'e:ère', 's:synergie'. Une transformation garde la condition et prend son % si meilleur. --- */
-var LDPCT={c:20,u:30,r:50,e:70,l:100,m:150,x:200};
+var LDPCT={c:20,u:30,r:50,e:70,l:100,m:150,x:200,s:200};
 var LD={
  goku_kid:['Petit aventurier','s:ecoles'],krillin:['Courage de l’École','s:ecoles'],yamcha:['Guerrier Z','s:z'],tenshinhan:['École de la Grue','s:ecoles'],chaozu:['École de la Grue','s:ecoles'],
  tortue:['Grand Maître','s:ecoles'],pilaf:['Bande à Pilaf','s:pilaf'],shu:['Bande à Pilaf','s:pilaf'],mai:['Bande à Pilaf','s:pilaf'],soldat:['Ruban Rouge','s:ruban'],
@@ -1526,13 +1545,13 @@ var LD={
  buu:['Clan Majin','s:majin'],goten:['Famille Son','s:son'],trunks_kid:['Fierté Saiyan','s:saiyan'],videl:['Famille Son','s:son'],satan:['Champion du monde','s:budokai'],shin:['Divinités','s:dieux'],
  goku_gt:['Famille Son','s:son'],pan:['Famille Son','s:son'],giru:['Androïdes','s:android'],uub:['Clan Majin','s:majin'],baby:['Menaces universelles','s:menaces'],s17:['Androïdes','s:android'],
  haze:['Dragons maléfiques','s:dragons'],rage_s:['Dragons maléfiques','s:dragons'],eis:['Dragons maléfiques','s:dragons'],nuova:['Dragons maléfiques','s:dragons'],omega:['Dragons maléfiques','s:dragons'],
- beerus:['Divinités','s:dieux'],whis:['Divinités','s:dieux'],hit:['Tournoi des Univers','s:tournoi'],cabba:['Tournoi des Univers','s:tournoi'],caulifla:['Tournoi des Univers','s:tournoi'],kale:['Tournoi des Univers','s:tournoi'],
+ beerus:['Divinités','s:dieux'],beerus_kakumei:['Divinités','s:dieux'],whis:['Divinités','s:dieux'],hit:['Tournoi des Univers','s:tournoi'],cabba:['Tournoi des Univers','s:tournoi'],caulifla:['Tournoi des Univers','s:tournoi'],kale:['Tournoi des Univers','s:tournoi'],
  goku_black:['Divinités','s:dieux'],zamasu:['Divinités','s:dieux'],jiren:['Tournoi des Univers','s:tournoi'],toppo:['Tournoi des Univers','s:tournoi'],broly:['Sang saiyan','s:saiyan'],gamma1:['Ruban Rouge','s:ruban'],cellmax:['Ruban Rouge','s:ruban']
 };
 function ldCondTxt(cd){var p=cd.split(':'),k=p[0],v=p[1];
   if(k==='r')return 'les '+(RACES[v]?RACES[v].n:v)+'s';
   if(k==='e')return 'les personnages de la saga '+(ERAS[v]?ERAS[v].n:v);if(k==='s'){var S=SYN.filter(function(x){return x.id===v;})[0];return 'les membres « '+(S?S.n:v)+' »';}return 'toute l’équipe';}
-/* Une forme ne dépasse pas le bonus d'un Mythique : le +200 % reste réservé aux fusions */
+/* Une forme ne dépasse pas le bonus d'un Mythique : le +200 % reste réservé aux fusions et aux cartes Secrètes */
 function ldPct(id){var c=CARDS[id],p=LDPCT[c.rar]||0;return c.flv?Math.min(p,LDPCT.m):p;}
 function ldText(id){var d=LD[id];if(!d)return '';return 'ATK, DEF et PV +'+ldPct(id)+'% pour '+ldCondTxt(d[1])+'.';}
 
@@ -1651,6 +1670,7 @@ var VIS={
  nuova:{skin:'#ff7a3c',hs:'horns',horn:'#c0392b',outfit:'#c0392b',ears:'pointy'},
  omega:{skin:'#f4f4f4',hs:'horns',horn:'#c0392b',outfit:'#f4f4f4',gem:'#c0392b',ears:'pointy',angry:true,eye:'#c01c28',aura:'#ff4d4d'},
  beerus:{skin:'#8b5fbf',hs:'none',ears:'cat',outfit:'#111827',under:'#ffd23f',eye:'#ffd23f',angry:true},
+ beerus_kakumei:{skin:'#8b5fbf',hs:'none',ears:'cat',outfit:'#111827',under:'#f0abfc',eye:'#f0abfc',angry:true},
  whis:{skin:'#9cc3e8',hair:'#f4f4f4',hs:'whis',outfit:'#5b2b86',under:'#111111',smile:true},
  hit:{skin:'#8b5fbf',hs:'horns',horn:'#5b2b86',outfit:'#3a2a1a',ears:'none',angry:true,eye:'#ffd23f'},
  cabba:{skin:SK,hair:HB,hs:'vegeta',outfit:'#1f3fb8'},
@@ -1685,7 +1705,7 @@ var SP={
  yamu:['Aspirateur d’énergie','drain',2400,1],buu:['Rayon chocolat','stun',1200,3],goten:['Kaméhaméha','dmg',3200,2],trunks_kid:['Buster Cannon','dmg',3200,2],videl:['Coup de pied sauté','dmg',2400,1],
  satan:['Provocation','guard',1200,1],shin:['Paralysie divine','stun',800,2],pan:['Maiden Blast','dmg',2800,2],giru:['Radar','draw',1,1],uub:['Rafale de Ki','dmg',4000,2],
  baby:['Infection','drain',3600,2],s17:['Absorption','drain',4800,3],haze:['Brume toxique','aoe',1600,3],rage_s:['Choc électrique','stun',1200,2],eis:['Blizzard','stun',1600,2],
- nuova:['Nova Strike','dmg',4800,3],omega:['Minus Energy','aoe',3200,4],beerus:['Hakai','kill',8000,5],whis:['Retour temporel','healall',4800,4],hit:['Saut temporel','stun',2400,3],
+ nuova:['Nova Strike','dmg',4800,3],omega:['Minus Energy','aoe',3200,4],beerus:['Hakai','kill',8000,5],beerus_kakumei:['Hakai absolu','kill',9600,5],whis:['Retour temporel','healall',4800,4],hit:['Saut temporel','stun',2400,3],
  cabba:['Galick Gun','dmg',3600,2],caulifla:['Crush Cannon','dmg',4000,2],kale:['Berserk','buffself',1200,2],goku_black:['Lame de Ki','dmg',5200,3],zamasu:['Lumière divine','dmg',4000,3],
  kaioken:['Kaméhaméha','dmg',4400,2],vegeta_ssj:['Big Bang Attack','dmg',5600,3],
  jiren:['Coup de poing','dmg',6400,3],toppo:['Hakai','kill',6400,4],broly:['Eraser Cannon','dmg',5600,3],gamma1:['Gamma Blaster','dmg',4400,2],cellmax:['Rugissement','aoe',4000,4]
@@ -1703,7 +1723,7 @@ var UL={
  dabura:['Darkness Sword','dmg',9600],spopovitch:['Gonflement','kamikaze',5600],yamu:['Pillage d’énergie','drain',5600],buu:['Planet Burst','aoe',5600],goten:['Coup de pied volant','dmg',7200],
  trunks_kid:['Burning Attack','dmg',7200],videl:['Justice !','dmg',5600],satan:['Dynamite Kick','dmg',3200],shin:['Téléportation sacrée','healall',3200],pan:['Masenko','dmg',6400],
  giru:['Giru Beam','dmg',4800],uub:['Kaméhaméha','dmg',9600],baby:['Revenge Death Ball','aoe',5600],s17:['Flash Bomber','aoe',6400],haze:['Poison mortel','multi',8400],
- rage_s:['Tempête','aoe',4000],eis:['Gel absolu','stunall',1600],nuova:['Soleil de Nuova','aoe',5600],omega:['Minus Energy Power Ball','aoe',9600],beerus:['Sphère de destruction','aoe',10400],
+ rage_s:['Tempête','aoe',4000],eis:['Gel absolu','stunall',1600],nuova:['Soleil de Nuova','aoe',5600],omega:['Minus Energy Power Ball','aoe',9600],beerus:['Sphère de destruction','aoe',10400],beerus_kakumei:['Destruction éveillée','aoe',12400],
  whis:['Coup de bâton','dmg',12000],hit:['Coup mortel','dmg',12800],cabba:['Super Saiyan','buffself',2000],caulifla:['Rafale de Ki','multi',7200],kale:['Gigantic Meteor','aoe',5600],
  goku_black:['Kaméhaméha noir','dmg',11200],zamasu:['Jugement divin','aoe',5600],jiren:['Power Impact','aoe',9600],toppo:['Énergie de destruction','aoe',7200],broly:['Gigantic Roar','aoe',8000],
  gamma1:['Gamma Burst Flash','dmg',10400],cellmax:['Pied géant','aoe',11200],
@@ -1753,7 +1773,7 @@ var SYN=[
  {id:'ruban',n:'Ruban Rouge',i:'🎗',m:['soldat','blue','tao','c8','c16','c17','c18','c19','c20','cell','celljr','gamma1','cellmax'],t:[[3,'draw',1,'+1 carte piochée par tour']]},
  {id:'android',n:'Androïdes',i:'🤖',m:['c8','c16','c17','c18','c19','c20','cell','celljr','s17','gamma1','giru','cellmax'],t:[[3,'ki',1,'+1 Ki par tour'],[5,'defall',800,'+800 DEF à toute l’équipe']]},
  {id:'majin',n:'Clan Majin',i:'Ⓜ',m:['babidi','dabura','spopovitch','yamu','buu','uub'],t:[[3,'atk',1200,'+1 200 ATK aux membres']]},
- {id:'dieux',n:'Divinités',i:'✨',m:['shin','kami','beerus','whis','goku_black','zamasu','toppo'],t:[[2,'defall',400,'+400 DEF à toute l’équipe'],[3,'spcostall',1,'Tous les Spéciaux : -1 Ki']]},
+ {id:'dieux',n:'Divinités',i:'✨',m:['shin','kami','beerus','beerus_kakumei','whis','goku_black','zamasu','toppo'],t:[[2,'defall',400,'+400 DEF à toute l’équipe'],[3,'spcostall',1,'Tous les Spéciaux : -1 Ki']]},
  {id:'tournoi',n:'Tournoi des Univers',i:'🏆',m:['hit','cabba','caulifla','kale','jiren','toppo','goku_db','vegeta','c17','c18'],t:[[2,'def',800,'+800 DEF aux membres'],[3,'atk',800,'+800 ATK aux membres']]},
  {id:'dragons',n:'Dragons maléfiques',i:'🐉',m:['haze','rage_s','eis','nuova','omega'],t:[[3,'stunimm',1,'Immunisés contre l’étourdissement']]},
  {id:'pilaf',n:'Bande à Pilaf',i:'🐷',m:['pilaf','shu','mai'],t:[[3,'draw',1,'+1 carte piochée par tour']]},
@@ -1884,7 +1904,7 @@ var TUTO_TEAM=['goku_db','krillin','yamcha','tenshinhan','chaozu'];
 var TUTO_DECK=['db1','bazooka','nuage','capsule','senzu','dogi','db2','canon','capsule','dogi','db3','nyoibo','bazooka','radar','bazooka','db4','telecommande','nuage','capsule','canon'];
 var STARTER_COL={goku_db:1,goku_kid:1,krillin:1,yamcha:1,tenshinhan:1,chaozu:1,goku_ssj1:1,kaioken:1,bazooka:3,canon:3,dogi:2,senzu:1,nuage:2,capsule:2,nyoibo:2,telecommande:1,db1:1,db2:1,db3:1,radar:1};
 var STARTER_TEAM=['goku_db','krillin','yamcha','tenshinhan','chaozu'];
-var DECK_MIN=20,DECK_MAX=20,TEAM_SIZE=5,TEAM_MAX=22,HPX=1,TENSION_T=12;
+var DECK_MIN=20,DECK_MAX=20,TEAM_SIZE=5,HPX=1,TENSION_T=12;
 
 /* =====================================================================
    SAUVEGARDE
@@ -2274,7 +2294,7 @@ function cardHTML(id,o){
   else if(c.t==='t') stats='<span class="st atk">'+IC.atk+'+'+fmt(c.a)+'</span><span class="st def">'+IC.def+'+'+fmt(c.d)+'</span>';
   else stats=fxShort(c);
   var tl=TYPES[c.t]+(c.t==='p'&&synOfCard(id).length?' · '+synOfCard(id).map(function(S){return S.i;}).join(''):'')+(c.t==='t'&&!c.fus?' · Nv '+c.lv:'')+(c.fus?' · Fusion':'');
-  var cls='card tilt rar-'+c.rar+(o.dim?' dim':'')+(o.cls?' '+o.cls:'');
+  var cls='card tilt rar-'+c.rar+(c.rar==='s'?' rar-x':'')+(o.dim?' dim':'')+(o.cls?' '+o.cls:'');
   var style='--ra:'+R.a+';--rb:'+R.b+';--rc:'+rr.col+(o.i!=null?';--i:'+o.i:'');
   return '<div class="'+cls+'" data-id="'+id+'" style="'+style+'"'+(o.onclick?' onclick="'+o.onclick+'"':'')+'>'+
     '<div class="card-inner"><div class="card-face">'+
@@ -2346,7 +2366,7 @@ function openArtView(id){
 function showDetails(id){
   var c=CARDS[id];if(!c)return;sfxClick();
   var rr=RAR[c.rar], R=RACES[cardRace(c)]||RACES.autre, h='';
-  var chips='<div class="kv"><span class="chip" style="color:'+(c.rar==='x'?'#fff':rr.col)+'"><span class="rgem" style="--rc:'+rr.col+';font-size:11px"></span>'+rr.n+'</span>'+
+  var chips='<div class="kv"><span class="chip" style="color:'+(c.rar==='x'||c.rar==='s'?'#fff':rr.col)+'"><span class="rgem" style="--rc:'+rr.col+';font-size:11px"></span>'+rr.n+'</span>'+
     '<span class="chip">'+TYPEN[c.t]+'</span>'+(c.era?'<span class="chip">'+ERAS[c.era].n+'</span>':'')+
     (c.t==='p'?'<span class="chip">🔶 Puissance : '+c.c+'</span>':(c.c!==undefined?'<span class="chip">⚡ Coût : '+c.c+' Ki</span>':''))+'</div>';
   if(c.t==='p'||c.t==='t'){
@@ -2600,8 +2620,12 @@ function setVol(k,v){
 function setCalm(v){SET.calm=!!v;saveLS('dcz_settings',SET);document.body.classList.toggle('calm',SET.calm);openSettings();}
 function setFx3d(v){fx3dPref=!!v;saveLS('dcz_3d',fx3dPref);if(fx3dPref)fx3dCharge();openSettings();}
 /* --- Infos : ajouter ici chaque mise à jour et chaque évènement, le plus récent en premier. Changer INFOS_VERSION allume le point rouge --- */
-var INFOS_VERSION='2026-11-03b';
+var INFOS_VERSION='2026-11-03c';
 var INFOS_MAJ=[
+ {d:'3 novembre 2026',t:'Le Booster Dieu de la Destruction est ouvert !',l:[
+  'Beerus, Whis, Goku SSJ Divin et Vegeta Rage t’attendent dans la Boutique.',
+  'Plus de limite de Puissance : compose ton équipe de 5 comme tu veux.',
+  'Nouvelle intro au premier lancement du jeu.']},
  {d:'3 novembre 2026',t:'68 nouvelles illustrations',l:[
   '68 cartes reçoivent leur illustration : Cell, Raditz, le commando Ginyu, Trunks du futur, Caulifla et bien d’autres.',
   'Les images des cartes sont mieux cadrées.',
@@ -2617,7 +2641,7 @@ var INFOS_MAJ=[
   'Nouvelles catégories : Super Saiyan, Puissance de gorille et Formes ultimes. Seules les fusions restent dans le deck.']}
 ];
 var INFOS_EVENTS=[
- {d:'Bientôt',t:'Booster Dieu de la Destruction',l:['Beerus, Whis, Goku SSJ Divin et Vegeta Rage arrivent dans un booster spécial, limité à l’arc Beerus. La date sera annoncée ici.']}
+ {d:'En ce moment',t:'Booster Dieu de la Destruction',l:['Beerus, Whis, Goku SSJ Divin et Vegeta Rage sont disponibles dans ce booster spécial, limité à l’arc Beerus. Rendez-vous dans la Boutique.']}
 ];
 function infosHTML(L){return L.map(function(i){return '<div class="info-it"><div class="info-d">'+i.d+'</div><h4>'+i.t+'</h4><ul>'+i.l.map(function(x){return '<li>'+x+'</li>';}).join('')+'</ul></div>';}).join('');}
 function openInfos(onglet){
@@ -2641,7 +2665,7 @@ function openSettings(){
 }
 document.addEventListener('pointerdown',function first(e){
   document.removeEventListener('pointerdown',first,true);
-  if(musicPref&&!Music.on&&!(e.target.closest&&e.target.closest('#musicBtn'))){Music.start();updateMusicBtn();}
+  if(musicPref&&!Music.on&&!$('intro_ov')&&!(e.target.closest&&e.target.closest('#musicBtn'))){Music.start();updateMusicBtn();}
 },true);
 document.addEventListener('click',function(e){if(e.target.closest&&e.target.closest('.btn,.mc.cur,.mgift,.mnav,.iconbtn,.brand,.fchip'))sfxClick();});
 function sfxClick(){var t=now();if(t==null)return;tone(sfxBus,{type:'triangle',f:1100,t:t,d:.015,r:.04,v:.07});}
@@ -2802,7 +2826,7 @@ var TIPS={
  tower:{t:'Ici, ton équipe et ton deck habituels affrontent des adversaires générés étage par étage. Tu peux voir à l’avance l’équipe de l’étage suivant pour t’y préparer.'},
  quests:{t:'Récupère tes récompenses ici. Termine les 3 missions du jour pour le bonus : un ticket booster ! Les tickets ouvrent gratuitement un booster dans la Boutique.'},
  pack:{t:'À chaque booster, regarde le ciel : la couleur des étoiles annonce la rareté des cartes. Touche ensuite chaque carte pour la retourner !'},
- deck:{t:'Ici tu prépares ton Équipe de 5 personnages (un seul exemplaire de chaque, Puissance totale max '+TEAM_MAX+') et ton Deck de soutien ('+DECK_MIN+' cartes).',f:'team_panel'},
+ deck:{t:'Ici tu prépares ton Équipe de 5 personnages (un seul exemplaire de chaque) et ton Deck de soutien ('+DECK_MIN+' cartes).',f:'team_panel'},
  deck2:{t:'Astuce : vise une catégorie, un leader et un Terrain qui vont ensemble, et des attaques d’équipe, puis ajoute tes objets et tes fusions dans le deck. Les boutons « auto » peuvent t’aider !',f:'btn_autoteam'}
 };
 // Astuces de situation : petite bulle en bas, sans bloquer le jeu
@@ -3008,7 +3032,6 @@ function ownedChars(){return Object.keys(col).filter(function(id){return CARDS[i
 function validTeam(){
   var ownF={};ownedChars().forEach(function(id){ownF[famOf(id)]=1;});var need=Math.min(TEAM_SIZE,Object.keys(ownF).length),fams={};
   if(myTeam.length<need)return 'Ton équipe doit contenir '+need+' personnages ('+myTeam.length+' actuellement).';
-  if(teamCost(myTeam)>TEAM_MAX)return 'La Puissance de ton équipe dépasse '+TEAM_MAX+'.';
   for(var i=0;i<myTeam.length;i++){var f=famOf(myTeam[i]);if(fams[f])return 'Un même personnage ne peut pas être deux fois dans l’équipe.';fams[f]=1;if(!col[myTeam[i]])return 'Tu ne possèdes plus « '+CARDS[myTeam[i]].n+' ».';}
   return null;
 }
@@ -3044,7 +3067,7 @@ function openLevel(i){
 var POOLS={};
 Object.keys(ERAS).forEach(function(e){POOLS[e]={};RKEYS.forEach(function(r){POOLS[e][r]=[];});});
 POOLS.base={};RKEYS.forEach(function(r){POOLS.base[r]=[];});
-Object.keys(CARDS).forEach(function(id){var c=CARDS[id];if(c.en||c.rar==='x'||!c.era)return;POOLS[c.era][c.rar].push(id);POOLS.base[c.rar].push(id);});
+Object.keys(CARDS).forEach(function(id){var c=CARDS[id];if(c.en||c.sec||c.rar==='x'||!c.era)return;POOLS[c.era][c.rar].push(id);POOLS.base[c.rar].push(id);});
 /* Booster unique : toutes les ères, Épique au maximum. Légendaires et Mythiques : Histoire, Tour, codes et évènements. */
 var PACK={short:'DCZ',price:150,rep:'goku_ssj1',a:'#fff08a',b:'#f59e0b',c:'#7c2d12',max:RIDX.e};
 function rollRarity(minIdx,maxIdx){
@@ -3069,7 +3092,7 @@ function packInner(p){
 }
 function packStyle(p){p=p||PACK;return '--pa:'+p.a+';--pb:'+p.b+';--pc:'+p.c;}
 /* Booster d'évènement : arc Beerus uniquement. Il reste verrouillé tant que active vaut false. */
-var EVENT_PACK={short:'BEERUS',sub:'Évènement',n:'Booster Dieu de la Destruction',price:300,rep:'beerus',img:'assets/Booster/beerus.webp',a:'#d8b4fe',b:'#7c3aed',c:'#2e1065',last:RIDX.e,active:false,
+var EVENT_PACK={short:'BEERUS',sub:'Évènement',n:'Booster Dieu de la Destruction',price:300,rep:'beerus',img:'assets/Booster/beerus.webp',a:'#d8b4fe',b:'#7c3aed',c:'#2e1065',last:RIDX.e,active:true,
   stars:['beerus','whis','goku_god','vegeta_rage'],
   guests:['goku_db','vegeta','gohan','goten','trunks_kid','videl','krillin','yamcha','tenshinhan','chaozu','tortue','piccolo','dende','c18','satan','pilaf','shu','mai','kaios']};
 function eventCards(){return EVENT_PACK.stars.concat(EVENT_PACK.guests);}
@@ -3106,9 +3129,55 @@ async function openEventPack(){
   for(var i=0;i<5;i++)pulled.push(pullEvent(i===4?P_.last:0));
   saveMeta();track('pack');
   pulled.forEach(function(id,i){if(!col[id]&&!isNew[id])isNew[i]=true;addCard(id);});
+  var secret=Math.random()<SECRET_TAUX,secretNeuf=!col[SECRET_CARTE];
+  if(secret)addCard(SECRET_CARTE);
   var ov=$('pack_overlay');ov.classList.remove('hidden');
   await skyReveal(ov,pulled,isNew);
+  if(secret)await secretSuite(ov,pulled,isNew,secretNeuf);
   packBusy=false;renderShop();
+}
+/* Invocation secrète : hors des taux affichés. Elle interrompt le récapitulatif du booster Beerus. */
+var SECRET_CARTE='beerus_kakumei',SECRET_TAUX=.01,secret3dPromesse=null;
+function secret3dCharge(){
+  if(secret3dPromesse)return secret3dPromesse;
+  fontes();
+  secret3dPromesse=chargeSuite(FX3D_BASE.concat(['fx3d/secrete.js?v=2'])).then(function(ok){return ok&&!!window.SECRET3D;});
+  return secret3dPromesse;
+}
+function secretAttend(ms){return new Promise(function(r){setTimeout(r,ms);});}
+async function secretSuite(ov,pulled,isNew,neuf){
+  await secretAttend(1400);
+  await secretReveal(SECRET_CARTE);
+  var tous=pulled.concat(SECRET_CARTE),nv=Object.assign({},isNew);if(neuf)nv[pulled.length]=true;
+  ov.classList.remove('hidden');skyRecap(ov,tous,nv);
+}
+async function secretReveal(id){
+  var c=CARDS[id],calm=document.body.classList.contains('calm')||(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches),en3d=false;
+  var o=document.createElement('div');o.className='sec-ov';
+  o.innerHTML='<div class="sec-r">'+RAR[c.rar].n.toUpperCase()+'</div><div class="sec-n">'+c.n+'</div><div class="sec-a">'+artSVG(id)+'</div><div class="sec-h">Touche pour continuer</div>';
+  if(fx3dPref&&!calm&&!window.SIM){
+    try{
+      var pret=await Promise.race([secret3dCharge(),secretAttend(3500).then(function(){return false;})]);
+      if(pret&&window.SECRET3D)en3d=await SECRET3D.play({sons:{alerte:function(){sfxGlint(6);},tourne:function(){sfxWhoosh();},charge:function(){sfxCharge(1);},fonce:function(){sfxBeam();},flash:function(){sfxBoom();}}});
+    }catch(e){en3d=false;}
+  }
+  if(!en3d){
+    /* Sans 3D : l'étoile seule, en plein écran. Avec les animations réduites, un simple fondu. */
+    if(calm)o.classList.add('noir');
+    else{
+      o.classList.add('etoile');var et=document.createElement('div');et.className='sec-et';o.appendChild(et);document.body.appendChild(o);
+      sfxCharge(1);await secretAttend(1250);sfxBoom();et.remove();o.classList.remove('etoile');
+    }
+  }
+  document.body.appendChild(o);
+  if(window.SECRET3D)SECRET3D.ferme();
+  void o.offsetWidth;o.classList.add('noir');
+  await secretAttend(1250);o.querySelector('.sec-r').classList.add('on');
+  await secretAttend(450);o.querySelector('.sec-n').classList.add('on');sfxKi();
+  await secretAttend(900);o.querySelector('.sec-a').classList.add('on');sfxKiBlast(5,true);
+  await secretAttend(1000);o.querySelector('.sec-h').classList.add('on');
+  await new Promise(function(r){o.addEventListener('click',r,{once:true});});
+  o.remove();
 }
 function renderShop(){
   var can=zeni>=PACK.price,on=EVENT_PACK.active,canE=zeni>=EVENT_PACK.price,h='<div class="packcol"><div class="pack tilt'+(can?'':' poor')+'" id="pack_base" style="'+packStyle()+'" onclick="openPack()">'+packInner()+'</div>'+
@@ -3123,7 +3192,7 @@ function renderShop(){
   $('packs').innerHTML=h;
   var rs=RKEYS.filter(function(r){return RIDX[r]<=PACK.max;}),tot=0;rs.forEach(function(r){tot+=RAR[r].w;});
   $('odds').innerHTML=rs.map(function(r){return '<span class="chip"><span class="rgem" style="--rc:'+RAR[r].col+'"></span>'+RAR[r].n+' '+(RAR[r].w/tot*100).toFixed(0)+'%</span>';}).join('');
-  var all=Object.keys(CARDS).filter(function(k){return !CARDS[k].en;}).length,own=Object.keys(col).filter(function(k){return CARDS[k]&&!CARDS[k].en;}).length;
+  var all=Object.keys(CARDS).filter(function(k){return !CARDS[k].en&&!CARDS[k].sec;}).length,own=Object.keys(col).filter(function(k){return CARDS[k]&&!CARDS[k].en&&!CARDS[k].sec;}).length;
   $('shop_stats').textContent='Ta collection : '+totalCards()+' cartes · '+own+' / '+all+' cartes différentes découvertes';
 }
 var ANIM_DIR='assets/animations/',ANIM_EXT=['webm','mp4'],ANIM_KO={};
@@ -3401,10 +3470,10 @@ function claimLogin(){
 /* --- Succès --- */
 var ACH=[];
 function achTier(g,i,t,f,steps){var prev=0;steps.forEach(function(s,k){if(s[0]<=prev)return;prev=s[0];ACH.push({id:g+k,g:g,i:i,t:t.replace('#',s[0]),f:f,n:s[0],z:s[1],tk:s[2]||0});});}
-function distinctOwned(){return Object.keys(col).filter(function(k){return CARDS[k]&&!CARDS[k].en&&col[k]>0;}).length;}
+function distinctOwned(){return Object.keys(col).filter(function(k){return CARDS[k]&&!CARDS[k].en&&!CARDS[k].sec&&col[k]>0;}).length;}
 function totalStars(){var t=0;Object.keys(meta.stars).forEach(function(k){t+=meta.stars[k];});return t;}
 function maxAwaken(){var m=0;Object.keys(col).forEach(function(id){m=Math.max(m,awakeOf(id));});return m;}
-var ALLN=Object.keys(CARDS).filter(function(k){return !CARDS[k].en;}).length;
+var ALLN=Object.keys(CARDS).filter(function(k){return !CARDS[k].en&&!CARDS[k].sec;}).length;
 achTier('win','🏆','Gagne # combats',function(){return mstat('win');},[[1,50],[10,150],[50,400,1],[150,800,2],[400,1500,3]]);
 achTier('ko','💥','Mets # ennemis K.O.',function(){return mstat('ko');},[[25,80],[200,250],[1000,600,1],[3000,1200,2]]);
 achTier('dmg','⚔','Inflige # dégâts',function(){return mstat('dmg');},[[1000,100],[10000,400,1],[50000,1000,2]]);
@@ -3747,7 +3816,7 @@ async function exCancel(id){try{await Online.cert.call('cancel_trade',{p_id:id})
 function claimFree(){if(Date.now()<meta.freeAt)return;meta.freeAt=Date.now()+4*36e5;meta.tickets++;saveMeta();sfxCoin();toast('🎫 Booster gratuit !','Utilise ton ticket dans la Boutique');renderShop();renderTop();}
 
 /* --- Tour de Karin --- */
-var TOWER_POOL=Object.keys(CARDS).filter(function(id){return CARDS[id].t==='p'&&id!=='daimao';});
+var TOWER_POOL=Object.keys(CARDS).filter(function(id){return CARDS[id].t==='p'&&id!=='daimao'&&!CARDS[id].sec;});
 var TF_LIST=Object.keys(CARDS).filter(function(id){var c=CARDS[id];return c.t==='t'&&!c.fus;});
 function towerRew(n){return {z:Math.min(400,40+n*8),xp:Math.min(120,25+n*2),card:n%25===0?5:(n%5===0?(n>=40?4:(n>=20?3:2)):null)};}
 function towerLevel(n){
@@ -3851,9 +3920,7 @@ function setFilter(f){deckFilter=f;deckFirst=true;renderDeck();}
 function teamSwap(id){for(var i=0;i<myTeam.length;i++){if(famOf(myTeam[i])===famOf(id))return i;}return -1;}
 function canAddTeam(id){
   if(myTeam.indexOf(id)>=0)return 'Déjà dans l’équipe.';
-  var sw=teamSwap(id),tc=teamCost(myTeam)+CARDS[id].c-(sw>=0?CARDS[myTeam[sw]].c:0);
-  if(sw<0&&myTeam.length>=TEAM_SIZE)return 'Ton équipe est complète (5). Retire quelqu’un d’abord.';
-    if(tc>TEAM_MAX)return 'Puissance trop élevée ('+tc+' / '+TEAM_MAX+').';
+  if(teamSwap(id)<0&&myTeam.length>=TEAM_SIZE)return 'Ton équipe est complète (5). Retire quelqu’un d’abord.';
   return null;
 }
 var deckCat='all';
@@ -3869,8 +3936,8 @@ function renderDeck(hl){
   $('syn_list').innerHTML=(syn.length||ta.length)?syn.map(function(a){return '<span class="chip" title="'+a.tiers.map(function(t){return t[3];}).join(' · ')+'">'+a.S.i+' '+a.S.n+' ('+a.n+') : '+a.tiers.map(function(t){return t[3];}).join(' · ')+'</span>';}).join('')+
     ta.map(function(T){return '<span class="chip" style="color:#d8b4fe">🟣 '+T.n+'</span>';}).join(''):'<span class="hint">Aucune catégorie active. Réunis des personnages liés (Sang Saiyan, Commando Ginyu…).</span>';
   var tc=teamCost(myTeam),te=validTeam();
-  $('team_meter').style.width=Math.min(100,tc/TEAM_MAX*100)+'%';$('team_meter').classList.toggle('ok',!te);
-  $('team_status').innerHTML=myTeam.length+'/5 · 🔶 '+tc+' / '+TEAM_MAX+' '+(te?'<span class="status-bad">(incomplète)</span>':'<span class="status-ok">✓</span>');
+  $('team_meter').style.width=myTeam.length/TEAM_SIZE*100+'%';$('team_meter').classList.toggle('ok',!te);
+  $('team_status').innerHTML=myTeam.length+'/5 · 🔶 '+tc+' '+(te?'<span class="status-bad">(incomplète)</span>':'<span class="status-ok">✓</span>');
   sortIds(Object.keys(col).filter(function(id){return CARDS[id]&&col[id]>0&&!CARDS[id].en&&(deckFilter==='all'||CARDS[id].t===deckFilter)&&(deckFilter!=='p'||deckCat==='all'||synById(deckCat).m.indexOf(id)>=0);})).forEach(function(id){
     var c=CARDS[id],dim=c.t==='p'?!!canAddTeam(id):(counts[id]||0)>=maxCopies(id);
     ch+=cardHTML(id,{onclick:(c.t==='p'?"addToTeam('":"addToDeck('")+id+"',this)",badge:'×'+col[id]+(awakeOf(id)?' ★'+awakeOf(id):''),dim:dim,cls:deckFirst?'deal':'',i:Math.min(idx++,20)});
@@ -3924,7 +3991,7 @@ function autoTeam(silent){
   if(!pool.length)return;
   for(var k=0;k<700;k++){
     var cand=shuffle(pool.slice()),t=[],fams={};
-    for(var i=0;i<cand.length&&t.length<TEAM_SIZE;i++){var id=cand[i],f=famOf(id);if(fams[f]||teamCost(t)+CARDS[id].c>TEAM_MAX)continue;t.push(id);fams[f]=1;}
+    for(var i=0;i<cand.length&&t.length<TEAM_SIZE;i++){var id=cand[i],f=famOf(id);if(fams[f])continue;t.push(id);fams[f]=1;}
     var sc=teamScore(t)+t.length*100;if(sc>bs){bs=sc;best=t;}
   }
   myTeam=best||[];saveTeam();
@@ -4237,7 +4304,7 @@ function tokenHTML(u,s){
   if(isTaunt(u))bd+='<span title="Provocation">🛡</span>';
   if(u.token)bd+='<span title="Invocation">✦</span>';
   if(s&&s.ld&&s.ldUid===u.uid)bd+='<span title="Leader">👑</span>';
-  return '<div class="ftk rar-'+c.rar+(u.acted&&s===P?' acted':'')+(u.gauge>=100?' ultready':'')+(u._new?' summon':'')+(u._tf?' tfin':'')+'" style="--ra:'+R.a+';--rb:'+R.b+'">'+
+  return '<div class="ftk rar-'+c.rar+(c.rar==='s'?' rar-x':'')+(u.acted&&s===P?' acted':'')+(u.gauge>=100?' ultready':'')+(u._new?' summon':'')+(u._tf?' tfin':'')+'" style="--ra:'+R.a+';--rb:'+R.b+'">'+
     (bd?'<div class="ftk-bd">'+bd+'</div>':'')+
     '<div class="ftk-in"><div class="ftk-art">'+artSVG(u.id)+'</div><div class="ftk-name">'+(u._moon?CARDS[u.baseId].n:c.n)+'</div>'+
     '<div class="ftk-hp"><i style="width:'+pct(u.hp,u.maxHp)+'"></i><span>'+fmt(Math.max(0,u.hp))+'</span></div>'+
@@ -4623,6 +4690,19 @@ function stunUnit(o,t){
 }
 async function koUnit(s,t,k,ki){
   var u=s.units[t];if(!u)return;var el=slotEl(s,t);
+  if(hasAb(u,'kakumei')&&!u.kakumeiOn){
+    u.kakumeiOn=true;u.hp=1;u.evB=(u.evB||0)+70;
+    var pk=posOf(s,t);floatText(pk.x,pk.y-30,'RÉVEIL DIVIN !','buff small');floatText(pk.x,pk.y-52,'+70% ESQUIVE','buff small');
+    logMsg(nm(u)+' s’éveille : il survit, contre-attaque tous les ennemis et gagne 70% d’esquive !');
+    ringAt(s,t,'#f0abfc');flashScreen('rgba(240,171,252,.5)');sfxKiBlast(5,true);renderBattle();tip('b_ability');await wait(450);
+    var en=opp(s),ck=alive(en);
+    for(var ik=0;ik<ck.length&&!gameOver&&s.units[t]===u;ik++){
+      var vk=en.units[ck[ik]];if(!vk)continue;
+      var qk=posOf(en,ck[ik]);impact($('fx'),qk.x,qk.y,'#d8b4fe');sfxBoom();floatText(qk.x,qk.y-44,'CONTRE !','buff small');
+      await dealDmg(en,ck[ik],basicDmg(u,vk,1),s,t);await wait(160);
+    }
+    renderBattle();checkEnd();return;
+  }
   if(hasAb(u,'revive')&&!u.revived){
     u.revived=true;u.hp=Math.ceil(u.maxHp/2);logMsg(nm(u)+' est Immortel : il revient à la vie !');
     ringAt(s,t,'#ffffff');sfxHeal();var p=posOf(s,t);floatText(p.x,p.y-30,'RÉSURRECTION','heal small');renderBattle();tip('b_ability');await wait(500);return;
@@ -5049,6 +5129,29 @@ function init(){
   rollDaily();renderTop();
   setInterval(updateDots,60000);
   show('screen-menu');
+  introLance();
+}
+/* Intro : une seule fois par appareil. Il faut un geste du joueur pour que la vidéo ait le son. */
+function introLance(){
+  if(loadLS('dcz_intro_vue',false)||window.SIM)return;
+  var o=document.createElement('div');o.id='intro_ov';
+  o.style.cssText='position:fixed;inset:0;z-index:99998;background:#000;display:flex;align-items:center;justify-content:center';
+  o.innerHTML='<video playsinline preload="metadata" src="'+ANIM_DIR+'intro.mp4" style="position:absolute;inset:0;width:100%;height:100%;object-fit:contain"></video>'+
+    '<button class="btn big" id="intro_go" style="position:relative">▶ Lancer l’intro</button>'+
+    '<button class="btn ghost small" id="intro_passe" style="position:absolute;top:calc(12px + env(safe-area-inset-top,0px));right:12px">Passer</button>';
+  var v=o.querySelector('video'),go=o.querySelector('#intro_go');
+  function fin(vue){
+    if(!o.parentNode)return;
+    if(vue)saveLS('dcz_intro_vue',true);
+    v.pause();v.removeAttribute('src');v.load();o.remove();
+    if(musicPref&&!Music.on){Music.start();updateMusicBtn();}
+  }
+  v.onended=function(){fin(true);};
+  /* Vidéo indisponible : le joueur arrive au menu et la reverra au prochain lancement */
+  v.onerror=function(){fin(false);};
+  go.onclick=function(){go.remove();var p=v.play();if(p&&p.catch)p.catch(function(){fin(false);});};
+  o.querySelector('#intro_passe').onclick=function(){fin(true);};
+  document.body.appendChild(o);
 }
 /* --- Les techniques ne sont plus des cartes : chaque exemplaire devient un objet de même rareté, ou des Fragments --- */
 var TECH_SWAP={kamehameha:'bazooka',janken:'bazooka',dodonpa:'dogi',masenko:'dogi',kikoho:'bombe',taiyoken:'telecommande',galickgun:'bombe',burning:'vaisseau',heal_dende:'cuve',explosive_wave:'bombe',death_beam:'cape',makankosappo:'canon',kienzan:'canon',bigbang:'canon',time_skip:'machine',eraser:'epee_z',mafuba:'jarre',finalflash:'jarre',finalexplosion:'fruit',hellzone:'fruit',fist_dragon:'jarre',kame_divin:'fruit'};
