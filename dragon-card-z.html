@@ -1366,7 +1366,7 @@ O_('eau_divine','Eau ultra-divine',3,'e','z',[['atk',2000],['hurt',2000]],{art:'
 O_('bazooka','Bazooka',1,'c','db',[['dmg',1400]],{art:'beam',c1:'#fde68a',c2:'#b45309'});
 O_('dogi','Kimono Tortue',1,'c','db',[['atk',400],['def',400]],{art:'armor',fl:'Le symbole de la Tortue, cousu sur le cœur.'});
 O_('bombe','Bombe Capsule',3,'u','db',[['aoe',1200]],{art:'bomb',c1:'#fdba74',c2:'#b91c1c'});
-O_('cape','Cape lestée',2,'u','db',[['def',1400]],{art:'weight',fl:'Piccolo l’enlève rarement. Quand il le fait, ça tremble.'});
+O_('cape','Poids de 10 Tonne',2,'u','db',[['def',1400]],{art:'weight',fl:'Piccolo l’enlève rarement. Quand il le fait, ça tremble.'});
 O_('telecommande','Télécommande',2,'u','z',[['stun',1]],{art:'flash',c1:'#fecaca'});
 O_('cuve','Cuve de soin',2,'u','z',[['heal',4000]],{art:'heal'});
 O_('vaisseau','Vaisseau spatial',2,'u','z',[['draw',1],['ki',3]],{art:'capsule'});
@@ -2228,7 +2228,7 @@ function techSVG(id,c){
 function svgArt(id){var c=CARDS[id];if(!c)return '';if(c.art||c.t==='o'||c.t==='z'||c.t==='b')return techSVG(id,c);return portraitSVG(VIS[id]||DEFAULT_VIS,c.r);}
 /* Illustrations : une image assets/cartes/<id>.webp|png|jpg remplace le dessin SVG de la carte (sinon on garde le SVG) */
 var ART_DIR='assets/cartes/',ART_EXT=['webp','png','jpg'],ART_OK={},ART_KO={};
-var ART_POS={dabura:'50% 0',hit:'50% 0',krillin:'50% 21.2%',yamcha:'50% 58.7%',chaozu:'50% 39.6%',tortue:'50% 27%',pilaf:'50% 31.3%',daimao_p:'50% 87.2%',dende:'50% 29%',nappa:'50% 20.3%',freezer:'50% 12.2%',c18:'50% 13.1%',c16:'50% 42.7%',buu:'50% 24.9%',goten:'50% 25.1%',videl:'50% 1.2%',satan:'50% 17.3%',baby:'50% 0%',nuova:'50% 2.5%',beerus:'50% 17.8%',whis:'50% 0%',goku_black:'50% 8.3%',zamasu:'50% 7.8%',toppo:'50% 51.3%',goku_ssj1:'50% 41%',goku_ssj2:'50% 7.2%',goku_ssj3:'50% 23.8%',goku_god:'50% 44.8%',golden_oozaru:'50% 37.7%',vegeta_majin:'50% 57.6%',vegeta_rage:'50% 58.4%',vegeta_blue:'50% 14.5%',gohan_ssj2:'55.9% 22%',piccolo_orange:'50% 6.6%',freezer_100:'50% 49.2%',black_rose:'50% 9.4%',baby_vegeta:'50% 28.2%',gotenks:'50% 24%',pleine_lune:'50% 0%',kaios:'37.3% 22%'},ART_ZOOM={};
+var ART_POS={dabura:'50% 0',hit:'50% 0',krillin:'50% 21.2%',yamcha:'50% 58.7%',chaozu:'50% 39.6%',tortue:'50% 27%',pilaf:'50% 31.3%',daimao_p:'50% 87.2%',dende:'50% 29%',nappa:'50% 20.3%',freezer:'50% 12.2%',c18:'50% 13.1%',c16:'50% 42.7%',buu:'50% 24.9%',goten:'50% 25.1%',videl:'50% 1.2%',satan:'50% 17.3%',baby:'50% 0%',nuova:'50% 2.5%',beerus:'50% 17.8%',whis:'50% 0%',goku_black:'50% 8.3%',zamasu:'50% 12.4%',toppo:'50% 51.3%',goku_ssj1:'50% 41%',goku_ssj2:'50% 7.2%',goku_ssj3:'50% 23.8%',goku_god:'50% 44.8%',golden_oozaru:'50% 37.7%',vegeta_majin:'50% 57.6%',vegeta_rage:'50% 58.4%',vegeta_blue:'50% 14.5%',gohan_ssj2:'55.9% 22%',piccolo_orange:'50% 6.6%',freezer_100:'50% 49.2%',black_rose:'50% 9.4%',baby_vegeta:'50% 28.2%',gotenks:'50% 24%',kaios:'37.3% 22%',cape:'50% 13.6%',vaisseau:'70.8% 22%',epee_z:'50% 91.7%',fruit:'35.8% 22%',pl_froid:'33.3% 22%',pleine_lune:'50% 8.5%',tao:'50% 28.5%',c8:'78.9% 22%',kami:'50% 1.4%',nail:'50% 56.4%',raditz:'50% 5%',saibaman:'50% 0%',guldo:'50% 69.7%',jeice:'50% 27.9%',ginyu:'50% 30.8%',dodoria:'50% 87.7%',zarbon:'50% 6.6%',soldat_f:'50% 1.5%',trunks:'79.1% 22%',c19:'50% 23.1%',c17:'50% 9.1%',celljr:'50% 5.4%',babidi:'50% 28.7%',spopovitch:'50% 35.2%',yamu:'50% 54.7%',uub:'50% 38.9%',eis:'50% 0%',cabba:'50% 52.7%',caulifla:'50% 16.3%',gamma1:'50% 0%',vegeta_ssj:'50% 35.2%',gohan_ssj:'50% 20%',trunks_ssj:'50% 20.9%',cell_semi:'50% 12.7%',nuage:'99% 100%',armure:'50% 60.3%',gravite:'50% 58.6%',salle:'23.8% 22%',bazooka:'0% 0%'},ART_ZOOM={nuage:1.66,bazooka:1.33};
 function artCadre(id){var p=ART_POS[id],z=ART_ZOOM[id];return p||z?' style="'+(p?'--ap:'+p+';':'')+(z?'--az:'+z:'')+'"':'';}
 function artSVG(id){
   if(!CARDS[id])return '';
@@ -2600,8 +2600,12 @@ function setVol(k,v){
 function setCalm(v){SET.calm=!!v;saveLS('dcz_settings',SET);document.body.classList.toggle('calm',SET.calm);openSettings();}
 function setFx3d(v){fx3dPref=!!v;saveLS('dcz_3d',fx3dPref);if(fx3dPref)fx3dCharge();openSettings();}
 /* --- Infos : ajouter ici chaque mise à jour et chaque évènement, le plus récent en premier. Changer INFOS_VERSION allume le point rouge --- */
-var INFOS_VERSION='2026-11-03';
+var INFOS_VERSION='2026-11-03b';
 var INFOS_MAJ=[
+ {d:'3 novembre 2026',t:'68 nouvelles illustrations',l:[
+  '68 cartes reçoivent leur illustration : Cell, Raditz, le commando Ginyu, Trunks du futur, Caulifla et bien d’autres.',
+  'Les images des cartes sont mieux cadrées.',
+  'La Cape lestée devient « Poids de 10 Tonne ».']},
  {d:'3 novembre 2026',t:'Animations 3D et nouvelles illustrations',l:[
   'Invocation en 3D : les étoiles, la chute des cartes et les révélations sont entièrement refaites.',
   'L’Ultime de Son Goku devient le Super Kaméhaméha, avec une animation 3D. Le décor change selon le Terrain et la saga.',
