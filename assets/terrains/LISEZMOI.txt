@@ -17,3 +17,6 @@ Nom du fichier : l'ID du Terrain + .webp
 Format conseillé : 1600 x 900 px (paysage), sans personnage au centre.
 
 L'illustration de la carte elle-même va dans assets/cartes/ (même ID), comme pour les autres cartes.
+
+Décor de l'animation 3D par saga de l'Histoire, utilisé quand aucun Terrain n'est actif (facultatif) :
+  saga_db.webp   saga_z.webp   saga_gt.webp   saga_s.webp

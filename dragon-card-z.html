@@ -1680,7 +1680,7 @@ var SP={
  jiren:['Coup de poing','dmg',6400,3],toppo:['Hakai','kill',6400,4],broly:['Eraser Cannon','dmg',5600,3],gamma1:['Gamma Blaster','dmg',4400,2],cellmax:['Rugissement','aoe',4000,4]
 };
 var UL={
- goku_kid:['Kaméhaméha','dmg',5600],goku_db:['Genkidama','dmg',8800],goku_gt:['Kaméhaméha x10','dmg',9600],krillin:['Kienzan multiple','multi',7200],yamcha:['Soukidan','dmg',6400],
+ goku_kid:['Kaméhaméha','dmg',5600],goku_db:['Super Kaméhaméha','dmg',8800],goku_gt:['Kaméhaméha x10','dmg',9600],krillin:['Kienzan multiple','multi',7200],yamcha:['Soukidan','dmg',6400],
  tenshinhan:['Kikoho','dmg',8000],chaozu:['Auto-destruction','kamikaze',6400],tortue:['Kaméhaméha MAX','aoe',4000],pilaf:['Pilaf Machine','aoe',2400],shu:['Pluie de kunaïs','multi',3600],
  mai:['Bazooka','dmg',4800],soldat:['Grenade','aoe',1600],blue:['Lame cachée','dmg',5600],tao:['Super Dodonpa','dmg',8000],c8:['Colère de C-8','dmg',5600],tambourine:['Vol en piqué','dmg',5600],
  daimao_p:['Explosion démoniaque','aoe',4800],kami:['Mafuba','stunall',1600],daimao:['Gros câlin','dmg',4000],gohan_kid:['Colère de Gohan','dmg',8800],gohan:['Kaméhaméha','dmg',10400],
@@ -2586,6 +2586,7 @@ function setVol(k,v){
   if(k==='sv'&&sfxBus)sfxBus.gain.value=sfxVol();
 }
 function setCalm(v){SET.calm=!!v;saveLS('dcz_settings',SET);document.body.classList.toggle('calm',SET.calm);openSettings();}
+function setFx3d(v){fx3dPref=!!v;saveLS('dcz_3d',fx3dPref);if(fx3dPref)fx3dCharge();openSettings();}
 function setCine(m){cineMode=m;saveLS('dcz4_cine',cineMode);openSettings();if(P&&!gameOver)renderBattle();}
 function openSettings(){
   var cin=[['all','Toutes'],['ult','Ultimes seulement'],['off','Aucune']];
@@ -2593,6 +2594,7 @@ function openSettings(){
   openModal('<h3 class="mtitle">Paramètres</h3>'+
     '<div class="setrow" id="set_music"><span class="setlbl">🎵 Musique</span><button class="btn small'+(Music.on?'':' ghost')+'" onclick="toggleMusic()">'+(Music.on?'Activée':'Coupée')+'</button></div>'+
     slider('mv','Volume de la musique')+slider('sv','🔊 Volume des effets sonores')+
+    '<div class="setrow"><span class="setlbl">✨ Animations 3D</span><button class="btn small'+(fx3dPref?'':' ghost')+'" onclick="setFx3d('+(fx3dPref?'false':'true')+')">'+(fx3dPref?'Activées':'Coupées')+'</button></div>'+
     '<div class="setrow"><span class="setlbl">🎬 Cinématiques en combat</span><div class="segs">'+cin.map(function(c){return '<button class="btn small'+(cineMode===c[0]?' on':' ghost')+'" onclick="setCine(\''+c[0]+'\')">'+c[1]+'</button>';}).join('')+'</div></div>'+
     '<div class="setrow"><span class="setlbl">🌊 Mouvements réduits<br><span class="hint">Cartes et décors immobiles</span></span><button class="btn small'+(SET.calm?'':' ghost')+'" onclick="setCalm(!SET.calm)">'+(SET.calm?'Activés':'Désactivés')+'</button></div>'+
     '<div class="setrow"><span class="setlbl">💬 Tutoriels de Kaïo</span><button class="btn small ghost" onclick="closeModal();resetTips()">Les revoir</button></div>'+
@@ -3154,6 +3156,8 @@ function skyField(cv){
 /* Booster : 5 étoiles de la couleur des raretés, les cartes tombent (la moins rare devant), le joueur les retourne une à une, puis récap */
 function skyReveal(ov,pulled,isNew){
   return new Promise(async function(done){
+    ov.innerHTML='<div class="sk"></div>';
+    if(await invoc3dJoue(pulled,isNew)){skyRecap(ov,pulled,isNew);done();return;}
     var order=pulled.map(function(id,i){return i;}).sort(function(a,b){return RIDX[CARDS[pulled[a]].rar]-RIDX[CARDS[pulled[b]].rar]||a-b;});
     ov.innerHTML='<div class="sk"><canvas class="sk-cv"></canvas><div class="sk-stage"></div><div class="sk-hint"></div><div class="sk-flash"></div><button class="btn ghost small sk-skip">Tout passer</button></div>';
     var sk=ov.querySelector('.sk'),stage=sk.querySelector('.sk-stage'),hint=sk.querySelector('.sk-hint'),fl=sk.querySelector('.sk-flash'),sky=skyField(sk.querySelector('.sk-cv'));
@@ -3239,6 +3243,16 @@ function skyReveal(ov,pulled,isNew){
     cards.forEach(function(d,k){d.el.style.transform='translate3d(0,'+(-k*6)+'px,'+(-k*30)+'px)';d.el.classList.remove('fall');d.el.classList.add('still');});
     mode='front';hint.textContent='Touche la carte pour la retourner';
   });
+}
+/* Récapitulatif après l'invocation 3D : le même que l'animation classique */
+function skyRecap(ov,pulled,isNew){
+  var order=pulled.map(function(id,i){return i;}).sort(function(a,b){return RIDX[CARDS[pulled[a]].rar]-RIDX[CARDS[pulled[b]].rar]||a-b;});
+  ov.innerHTML='<div class="sk"><canvas class="sk-cv"></canvas></div>';
+  var sk=ov.querySelector('.sk');skyField(sk.querySelector('.sk-cv'));
+  var r=document.createElement('div');r.className='sk-recap';
+  r.innerHTML='<div class="sk-row">'+order.map(function(i,k){var c=CARDS[pulled[i]];return '<div class="sk-rc r-'+c.rar+'" style="--rc:'+RAR[c.rar].col+';--i:'+k+'">'+cardHTML(pulled[i],{isNew:isNew[i]})+'</div>';}).join('')+'</div>'+
+    '<div class="po-actions"><button class="btn big" onclick="closePackResult()">Super !</button> <button class="btn blue big" onclick="closePackResult();openDeckScreen()">Voir mon deck</button></div>';
+  sk.appendChild(r);
 }
 function closePackResult(){var ov=$('pack_overlay');ov.classList.add('hidden');ov.innerHTML='';renderShop();checkAchToasts();}
 
@@ -3905,6 +3919,54 @@ function autoDeck(silent){
    MOTEUR DE COMBAT EN ÉQUIPE (5 contre 5)
    ===================================================================== */
 var P,E,FIRST=null,gameOver,busy=false,curLevel=0,curL=null,SEL=null,TGT=null,slotCache={},UID=0,LOG=[];
+/* Animations 3D : chargées à la demande. Coupées par défaut sur téléphone, et le jeu retombe sur l'animation normale en cas de souci */
+var fx3dPref=loadLS('dcz_3d',!/Mobi|Android|iPhone/i.test(navigator.userAgent)),fx3dPromesse=null;
+var FX3D_BASE=['https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js'].concat(['shaders/CopyShader','shaders/LuminosityHighPassShader','postprocessing/EffectComposer','postprocessing/ShaderPass','postprocessing/RenderPass','postprocessing/UnrealBloomPass'].map(function(n){return 'https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/'+n+'.js';}));
+var FX3D_MODELE=['loaders/GLTFLoader','utils/SkeletonUtils'].map(function(n){return 'https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/'+n+'.js';});
+var scriptsCharges={};
+function chargeScript(src){
+  if(scriptsCharges[src])return scriptsCharges[src];
+  scriptsCharges[src]=new Promise(function(ok){var s=document.createElement('script');s.src=src;s.onload=function(){ok(true);};s.onerror=function(){ok(false);};document.body.appendChild(s);});
+  return scriptsCharges[src];
+}
+function chargeSuite(l){return l.reduce(function(p,src){return p.then(function(ok){return ok&&chargeScript(src);});},Promise.resolve(true));}
+var fontes3d=false;
+function fontes(){if(fontes3d)return;fontes3d=true;var f=document.createElement('link');f.rel='stylesheet';f.href='https://fonts.googleapis.com/css2?family=Bangers&display=swap';document.head.appendChild(f);}
+function fx3dCharge(){
+  if(fx3dPromesse)return fx3dPromesse;
+  fontes();
+  fx3dPromesse=chargeSuite(FX3D_BASE.concat(FX3D_MODELE,['fx3d/kamehameha.js?v=5'])).then(function(ok){if(ok&&window.FX3D){FX3D.chargeModele();return true;}return false;});
+  return fx3dPromesse;
+}
+/* Invocation : pas de modèle à charger, seulement la scène */
+var invoc3dPromesse=null;
+function invoc3dCharge(){
+  if(invoc3dPromesse)return invoc3dPromesse;
+  fontes();
+  invoc3dPromesse=chargeSuite(FX3D_BASE.concat(['fx3d/invocation.js?v=3'])).then(function(ok){return ok&&!!window.INVOC3D;});
+  return invoc3dPromesse;
+}
+async function invoc3dJoue(pulled,isNew){
+  if(!fx3dPref||window.SIM)return false;
+  try{
+    var pret=await Promise.race([invoc3dCharge(),new Promise(function(r){setTimeout(function(){r(false);},3500);})]);
+    if(!pret||!window.INVOC3D)return false;
+    await INVOC3D.play({ids:pulled,isNew:isNew,sons:{
+      etoile:function(ri){sfxGlint(ri);},chute:function(){sfxWhoosh();},sortie:function(){sfxWhoosh();},
+      flip:function(k){if(k.ri>=4)sfxKiBlast(Math.min(5,k.ri),k.ri>=5);else sfxFlip(k.c.rar);}
+    }});
+    return true;
+  }catch(e){if(window.INVOC3D)INVOC3D.ferme();return false;}
+}
+function fx3dPour(u){return fx3dPref&&cineMode!=='off'&&u.id==='goku_db'&&!window.SIM;}
+async function fx3dJoue(u,tg,d,deLEnnemi){
+  try{
+    var pret=await Promise.race([fx3dCharge(),new Promise(function(r){setTimeout(function(){r(false);},4000);})]);
+    if(!pret||!window.FX3D)return false;
+    await FX3D.play({hero:'assets/cartes/'+u.id+'.webp',foe:'assets/cartes/'+tg.id+'.webp',nomHero:CARDS[u.id].n,nomFoe:CARDS[tg.id].n,degats:'-'+fmt(skillVal(u,d[1],d[2])),modele:true,miroir:deLEnnemi,terrain:TERRAIN||(curL&&curL.saga?'saga_'+curL.saga:null)});
+    return true;
+  }catch(e){return false;}
+}
 var cineMode=loadLS('dcz4_cine','all');
 function opp(s){return s===P?E:P;}
 function sk(s){return s===P?'me':'foe';}
@@ -4068,6 +4130,7 @@ function startBattle(li,Lobj){
       if(hasAb(u,'freeze')){var o=opp(s),j=randAlive(o);if(j>=0&&!o.units[j].stunImm){o.units[j].stun=true;logMsg(nm(u)+' paralyse '+nm(o.units[j])+' !');}}
     });
   });
+  if(fx3dPref&&!window.SIM&&[P,E].some(function(s){return s.units.some(function(u){return u&&u.id==='goku_db';});}))fx3dCharge();
   if(L.live)Live.begin();else beginPlayerTurn(true);
 }
 async function beginPlayerTurn(first){
@@ -4579,10 +4642,15 @@ async function actSkill(s,i,lvl,t){
   if(lvl==='sp'){s.ki-=spCost(u,d);gainG(u,15);}else{u.gauge=0;if(s===P)track('ult');}
   u.acted=true;renderBattle();
   logMsg(nm(u)+(lvl==='ul'?' déchaîne son ULTIME : ':' utilise ')+d[0]+' !');
-  await unitCut(s,u,lvl==='ul'?'ult':'special',d[0],lvl==='ul'?'ULTIME':'SPÉCIAL');
+  var en3d=lvl==='ul'&&fx3dPour(u)&&!!opp(s).units[t]&&await fx3dJoue(u,opp(s).units[t],d,s===E);
+  if(!en3d)await unitCut(s,u,lvl==='ul'?'ult':'special',d[0],lvl==='ul'?'ULTIME':'SPÉCIAL');
   CUR_SK=d[0];
   if(s===P&&lvl==='sp')tip('b_cine');
-  await runEffect(s,i,d[1],d[2],t,lvl);
+  if(en3d){
+    /* L'animation 3D a déjà tout montré : les dégâts passent par le jeu, sans l'ancienne animation */
+    var f0=window.famFX,s0=window.shotFX;window.famFX=window.shotFX=async function(){};
+    try{await runEffect(s,i,d[1],d[2],t,lvl);}finally{window.famFX=f0;window.shotFX=s0;}
+  } else await runEffect(s,i,d[1],d[2],t,lvl);
   renderBattle();
 }
 async function actTeam(s,T,t){
