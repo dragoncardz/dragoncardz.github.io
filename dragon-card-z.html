@@ -915,6 +915,14 @@ body.calm .sk-flash.on{animation:none}
 .synrow{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px}
 .synrow .chip{font-size:12px}
 .synrow .chip.off{opacity:.45}
+.iconbtn{position:relative}
+.infos-pt{position:absolute;top:2px;right:2px;width:11px;height:11px;border-radius:50%;background:#ff3b5c;box-shadow:0 0 0 2px #1a1030,0 0 8px #ff3b5c}
+.info-tabs{display:flex;gap:6px;margin:6px 0 12px}
+.info-it{padding:12px 14px;border:1px solid var(--line);border-radius:12px;background:rgba(0,0,0,.25);margin-bottom:10px}
+.info-it h4{margin:0 0 4px;font-size:16px}
+.info-it .info-d{font-size:12px;font-weight:800;color:var(--gold);letter-spacing:.03em}
+.info-it ul{margin:6px 0 0;padding-left:18px}
+.info-it li{margin:3px 0}
 .costgem.pw{background:radial-gradient(circle at 35% 30%,#fff3c4 0,#ffb000 30%,#c2410c 75%,#7c2d12 100%);box-shadow:0 0 .7em rgba(255,170,0,.8);text-shadow:0 .1em 0 #5a1a00}
 @media (max-width:560px){
   .abtn{min-width:120px;padding:6px 9px;flex:none}
@@ -973,6 +981,9 @@ body.calm .arena .sun,body.calm .grid,body.calm .emptyslot,body.calm .stunb,body
       <button class="iconbtn off" id="musicBtn" onclick="toggleMusic()">
         <svg viewBox="0 0 24 24"><path d="M9 18V5l11-2v13" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="6.5" cy="18" r="2.8" fill="currentColor"/><circle cx="17.5" cy="16" r="2.8" fill="currentColor"/><path class="slash" d="M3 3l18 18" stroke="currentColor" stroke-width="2.4"/></svg>
         <span class="lbl" id="musicLbl">Musique</span>
+      </button>
+      <button class="iconbtn" id="infosBtn" onclick="openInfos()" title="Mises à jour et évènements">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 100 20 10 10 0 000-20zm1 15h-2v-6h2zm0-8h-2V7h2z"/></svg><span class="lbl">Infos</span><i class="infos-pt hidden" id="infosPt"></i>
       </button>
       <button class="iconbtn" onclick="openSettings()" title="Paramètres">
         <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19.4 13a7.6 7.6 0 000-2l2.1-1.6-2-3.5-2.5 1a7.4 7.4 0 00-1.7-1L15 3.3h-4l-.4 2.6a7.4 7.4 0 00-1.7 1l-2.5-1-2 3.5L6.5 11a7.6 7.6 0 000 2l-2.1 1.6 2 3.5 2.5-1a7.4 7.4 0 001.7 1l.4 2.6h4l.4-2.6a7.4 7.4 0 001.7-1l2.5 1 2-3.5zM13 15.5a3.5 3.5 0 110-7 3.5 3.5 0 010 7z" transform="translate(-1 0)"/></svg><span class="lbl">Réglages</span>
@@ -2587,6 +2598,29 @@ function setVol(k,v){
 }
 function setCalm(v){SET.calm=!!v;saveLS('dcz_settings',SET);document.body.classList.toggle('calm',SET.calm);openSettings();}
 function setFx3d(v){fx3dPref=!!v;saveLS('dcz_3d',fx3dPref);if(fx3dPref)fx3dCharge();openSettings();}
+/* --- Infos : ajouter ici chaque mise à jour et chaque évènement, le plus récent en premier. Changer INFOS_VERSION allume le point rouge --- */
+var INFOS_VERSION='2026-11-03';
+var INFOS_MAJ=[
+ {d:'3 novembre 2026',t:'Animations 3D et nouvelles illustrations',l:[
+  'Invocation en 3D : les étoiles, la chute des cartes et les révélations sont entièrement refaites.',
+  'L’Ultime de Son Goku devient le Super Kaméhaméha, avec une animation 3D. Le décor change selon le Terrain et la saga.',
+  'Une option « Animations 3D » permet de les couper dans les Paramètres. Elles sont coupées par défaut sur téléphone.',
+  '27 nouvelles illustrations de cartes : Vegeta, Piccolo, Krillin, Beerus, Whis et bien d’autres.',
+  'Nouvelle partie Infos, pour suivre les mises à jour et les évènements.']},
+ {d:'Novembre 2026',t:'Cartes uniques',l:[
+  'Chaque forme (Goku SSJ, Vegeta Blue…) est un personnage à part entière, avec son leader et ses catégories.',
+  'Nouvelles catégories : Super Saiyan, Puissance de gorille et Formes ultimes. Seules les fusions restent dans le deck.']}
+];
+var INFOS_EVENTS=[
+ {d:'Bientôt',t:'Booster Dieu de la Destruction',l:['Beerus, Whis, Goku SSJ Divin et Vegeta Rage arrivent dans un booster spécial, limité à l’arc Beerus. La date sera annoncée ici.']}
+];
+function infosHTML(L){return L.map(function(i){return '<div class="info-it"><div class="info-d">'+i.d+'</div><h4>'+i.t+'</h4><ul>'+i.l.map(function(x){return '<li>'+x+'</li>';}).join('')+'</ul></div>';}).join('');}
+function openInfos(onglet){
+  onglet=onglet==='event'?'event':'maj';sfxClick();
+  saveLS('dcz_infos_vu',INFOS_VERSION);majInfosPt();
+  openModal('<h3 class="mtitle">Infos</h3><div class="info-tabs"><button class="btn small'+(onglet==='maj'?' on':' ghost')+'" onclick="openInfos(\'maj\')">Mises à jour</button><button class="btn small'+(onglet==='event'?' on':' ghost')+'" onclick="openInfos(\'event\')">Évènements à venir</button></div>'+infosHTML(onglet==='maj'?INFOS_MAJ:INFOS_EVENTS));
+}
+function majInfosPt(){var p=$('infosPt');if(p)p.classList.toggle('hidden',loadLS('dcz_infos_vu','')===INFOS_VERSION);}
 function setCine(m){cineMode=m;saveLS('dcz4_cine',cineMode);openSettings();if(P&&!gameOver)renderBattle();}
 function openSettings(){
   var cin=[['all','Toutes'],['ult','Ultimes seulement'],['off','Aucune']];
@@ -3285,6 +3319,7 @@ function addXP(n){
   return ups;
 }
 function renderTop(){
+  majInfosPt();
   var c=$('lvlchip');if(!c)return;
   c.innerHTML='<b>'+meta.lvl+'</b><span class="xpb"><i style="width:'+pct(meta.xp,xpNeed(meta.lvl))+'"></i></span>';
   c.title='Niveau '+meta.lvl+' · '+meta.xp+' / '+xpNeed(meta.lvl)+' XP';
@@ -3935,7 +3970,7 @@ function fontes(){if(fontes3d)return;fontes3d=true;var f=document.createElement(
 function fx3dCharge(){
   if(fx3dPromesse)return fx3dPromesse;
   fontes();
-  fx3dPromesse=chargeSuite(FX3D_BASE.concat(FX3D_MODELE,['fx3d/kamehameha.js?v=5'])).then(function(ok){if(ok&&window.FX3D){FX3D.chargeModele();return true;}return false;});
+  fx3dPromesse=chargeSuite(FX3D_BASE.concat(FX3D_MODELE,['fx3d/kamehameha.js?v=6'])).then(function(ok){if(ok&&window.FX3D){FX3D.chargeModele();return true;}return false;});
   return fx3dPromesse;
 }
 /* Invocation : pas de modèle à charger, seulement la scène */

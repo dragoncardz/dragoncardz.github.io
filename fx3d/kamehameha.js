@@ -265,6 +265,12 @@ function joue(buf,quand,decal,vol,fin,fondu){
   s.connect(g);g.connect(maitre);s.start(quand,decal);s.stop(fin);actifs.push(s);
 }
 function sons(){
+  if(!bufK||!bufE){
+    if(window.sfxCharge)sfxCharge(1);
+    setTimeout(function(){if(window.sfxBeam)sfxBeam();},T.tir*1000);
+    setTimeout(function(){if(window.sfxBoom)sfxBoom();},T.impact*1000);
+    return;
+  }
   if(!ctx)return;var n=ctx.currentTime+.03;
   joue(bufK,n,6.4-T.tir,1.7,n+T.rayonFin,.3);
   joue(bufE,n+T.impact,.45,.9,n+T.fin+.5,1.4);
